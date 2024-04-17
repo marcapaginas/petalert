@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pet_clean/services/geolocator.dart';
+import 'package:pet_clean/services/geolocator_service.dart';
 
 class CustomSwitch extends StatefulWidget {
   const CustomSwitch({super.key});

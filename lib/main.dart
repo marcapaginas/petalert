@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pet_clean/pages/home.dart';
+import 'package:pet_clean/services/notification_service.dart';
 
 void main() {
+  NotificationService.initialize();
   runApp(const MyApp());
 }
 
