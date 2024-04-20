@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pet_clean/services/notification_service.dart';
 import 'package:pet_clean/widgets/custom_switch.dart';
 
-class Home extends StatelessWidget {
-  const Home({super.key});
+class Settings extends StatelessWidget {
+  const Settings({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,15 +18,6 @@ class Home extends StatelessWidget {
                 NotificationService.show(title: 'Notificacion', body: 'Hola');
               },
               child: const Text('Notificacion')),
-          const Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Text('Geolocalización:'),
-                const CustomSwitch()
-              ],
-            ),
-          ),
           Center(
               child: Row(
             mainAxisAlignment: MainAxisAlignment.center,

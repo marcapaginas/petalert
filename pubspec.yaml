@@ -16,6 +16,13 @@ dependencies:
   geolocator: ^11.0.0
   awesome_notifications_core: ^0.9.3
   awesome_notifications: ^0.9.3+1
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.1
+  flutter_map_animations: ^0.6.0
+  lottie: ^3.1.0
+  supabase_flutter: ^2.5.1
+  bloc: ^8.1.4
+  flutter_bloc: ^8.1.5
 
 dev_dependencies:
   flutter_test:
