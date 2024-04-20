@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pet_clean/blocs/alerts_cubit.dart';
 import 'package:pet_clean/models/alert_model.dart';
-import 'package:pet_clean/sample_data.dart';
 
 class Alerts extends StatefulWidget {
   const Alerts({super.key});

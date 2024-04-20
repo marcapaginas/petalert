@@ -31,7 +31,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final usernameCubit = context.watch<UsernameCubit>();
-    final alertsCubit = context.watch<AlertsCubit>();
 
     return Scaffold(
       appBar: AppBar(

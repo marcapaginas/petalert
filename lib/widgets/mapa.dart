@@ -1,10 +1,10 @@
-import 'dart:async';
+//import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
-import 'package:geolocator/geolocator.dart';
+//import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:pet_clean/blocs/location_cubit.dart';
 import 'package:pet_clean/blocs/markers_cubit.dart';
@@ -25,7 +25,7 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
   late final _animatedMapController = AnimatedMapController(vsync: this);
 
   LatLng _currentPosition = const LatLng(0, 0);
-  double _zoom = 19;
+  final double _zoom = 19;
 
   @override
   void initState() {
@@ -41,7 +41,7 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final locationCubit = context.watch<LocationCubit>();
+    //final locationCubit = context.watch<LocationCubit>();
     final markersCubit = context.watch<MarkersCubit>();
 
     return Scaffold(
@@ -103,12 +103,12 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
     );
   }
 
-  Future<void> _getCurrentPosition() async {
-    final position = await Geolocator.getCurrentPosition();
-    setState(() {
-      _currentPosition = LatLng(position.latitude, position.longitude);
-    });
-  }
+  // Future<void> _getCurrentPosition() async {
+  //   final position = await Geolocator.getCurrentPosition();
+  //   setState(() {
+  //     _currentPosition = LatLng(position.latitude, position.longitude);
+  //   });
+  // }
 
   //listen to cubit changes
   void _listenToLocationCubit() {

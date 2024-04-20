@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pet_clean/services/notification_service.dart';
-import 'package:pet_clean/widgets/custom_switch.dart';
 
 class Settings extends StatelessWidget {
   const Settings({super.key});
