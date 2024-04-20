@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:pet_clean/models/alert_model.dart';
 
-class AlertDetail extends StatelessWidget {
-  const AlertDetail({super.key});
+class AlertDetailPage extends StatelessWidget {
+  final AlertModel alert;
+
+  const AlertDetailPage({super.key, required this.alert});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Alerta 1'),
+        title: Text(alert.title),
       ),
       body: Column(
         children: [
-          const Text('Descripcion de la alerta 1'),
+          Text(alert.description),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);

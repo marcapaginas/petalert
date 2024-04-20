@@ -4,6 +4,8 @@ import 'package:pet_clean/blocs/alerts_cubit.dart';
 import 'package:pet_clean/blocs/location_cubit.dart';
 import 'package:pet_clean/blocs/markers_cubit.dart';
 import 'package:pet_clean/blocs/username_cubit.dart';
+import 'package:pet_clean/models/alert_model.dart';
+import 'package:pet_clean/pages/alert_detail_page.dart';
 import 'package:pet_clean/pages/home_page.dart';
 import 'package:pet_clean/services/geolocator_service.dart';
 import 'package:pet_clean/services/notification_service.dart';
@@ -45,6 +47,20 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const HomePage(),
+      initialRoute: '/', // La ruta que se carga inicialmente
+      onGenerateRoute: (settings) {
+        if (settings.name == '/alert_detail') {
+          // Verificar si la ruta es '/alertDetail'
+          // Obtener el objeto AlertModel de los argumentos pasados
+          final args = settings.arguments as AlertModel;
+          return MaterialPageRoute(
+            builder: (context) {
+              return AlertDetailPage(alert: args); // Pasar el objeto AlertModel
+            },
+          );
+        }
+        return null;
+      },
     );
   }
 }
