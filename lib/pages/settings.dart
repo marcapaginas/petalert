@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pet_clean/services/notification_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+final supabase = Supabase.instance.client;
 
 class Settings extends StatelessWidget {
   const Settings({super.key});
@@ -31,9 +34,32 @@ class Settings extends StatelessWidget {
                       NotificationService.cancelPeriodicNotifications(),
                   child: const Text('desactivar notis')),
             ],
-          ))
+          )),
+          ElevatedButton.icon(
+            onPressed: () => _signOut(),
+            icon: const Icon(Icons.logout),
+            label: const Text('Logout'),
+          )
         ],
       ),
     );
+  }
+
+  Future<void> _signOut() async {
+    try {
+      await supabase.auth.signOut();
+    } on AuthException catch (error) {
+      SnackBar(
+        content: Text(error.message),
+        backgroundColor: Colors.amber,
+      );
+    } catch (error) {
+      const SnackBar(
+        content: Text('Unexpected error occurred'),
+        backgroundColor: Colors.amber,
+      );
+    } finally {
+      const SnackBar(content: Text("HAS CERRADO SESION"));
+    }
   }
 }
