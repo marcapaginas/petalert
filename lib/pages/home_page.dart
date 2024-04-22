@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pet_clean/blocs/alerts_cubit.dart';
-import 'package:pet_clean/blocs/username_cubit.dart';
 import 'package:pet_clean/models/alert_model.dart';
 import 'package:pet_clean/pages/alerts.dart';
 import 'package:pet_clean/pages/first_page.dart';
@@ -31,8 +30,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final usernameCubit = context.watch<UsernameCubit>();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('PetAlert'),

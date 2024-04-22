@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:pet_clean/database/mongo_database.dart';
 
 class FirstPage extends StatefulWidget {
   const FirstPage({super.key});
@@ -33,19 +34,28 @@ class _FirstPageState extends State<FirstPage> {
   }
 
   void _addMarker() async {
-    await supabase.from('restaurants').insert([
-      {
-        'name': 'Supa Burger',
-        'location': 'POINT(-73.946823 40.807416)',
-      },
-      {
-        'name': 'Supa Pizza',
-        'location': 'POINT(-73.94581 40.807475)',
-      },
-      {
-        'name': 'Supa Taco',
-        'location': 'POINT(-73.945826 40.80629)',
-      },
-    ]);
+    MongoDatabase.connect();
+    //insert marker data
+    await MongoDatabase.insert({
+      'userId': _userId,
+      'location': 'POINT(0, 0)',
+    });
+
+    // set collection
+
+    // await supabase.from('restaurants').insert([
+    //   {
+    //     'name': 'Supa Burger',
+    //     'location': 'POINT(-73.946823 40.807416)',
+    //   },
+    //   {
+    //     'name': 'Supa Pizza',
+    //     'location': 'POINT(-73.94581 40.807475)',
+    //   },
+    //   {
+    //     'name': 'Supa Taco',
+    //     'location': 'POINT(-73.945826 40.80629)',
+    //   },
+    // ]);
   }
 }
