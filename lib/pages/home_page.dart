@@ -4,6 +4,7 @@ import 'package:pet_clean/blocs/alerts_cubit.dart';
 import 'package:pet_clean/blocs/username_cubit.dart';
 import 'package:pet_clean/models/alert_model.dart';
 import 'package:pet_clean/pages/alerts.dart';
+import 'package:pet_clean/pages/first_page.dart';
 import 'package:pet_clean/pages/settings.dart';
 import 'package:pet_clean/widgets/custom_switch.dart';
 import 'package:pet_clean/widgets/mapa.dart';
@@ -48,9 +49,7 @@ class _HomePageState extends State<HomePage> {
         children: <Widget>[
           Container(
             color: Colors.blue,
-            child: Center(
-              child: Text(usernameCubit.state),
-            ),
+            child: const FirstPage(),
           ),
           Container(
             color: Colors.green,

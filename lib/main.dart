@@ -56,9 +56,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       showPerformanceOverlay: false,
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'PetAlert',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
       initialRoute: '/',
@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/alert_detail') {
-          // Verificar si la ruta es '/alertDetail'
+          // Verificar si la ruta es '/alert_detail'
           // Obtener el objeto AlertModel de los argumentos pasados
           final args = settings.arguments as AlertModel;
           return MaterialPageRoute(

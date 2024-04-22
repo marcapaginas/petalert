@@ -6,7 +6,7 @@ class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
 
   @override
-  _AccountPageState createState() => _AccountPageState();
+  State<AccountPage> createState() => _AccountPageState();
 }
 
 class _AccountPageState extends State<AccountPage> {
@@ -30,12 +30,10 @@ class _AccountPageState extends State<AccountPage> {
     } on PostgrestException catch (error) {
       SnackBar(
         content: Text(error.message),
-        backgroundColor: Theme.of(context).colorScheme.error,
       );
     } catch (error) {
-      SnackBar(
-        content: const Text('Unexpected error occurred'),
-        backgroundColor: Theme.of(context).colorScheme.error,
+      const SnackBar(
+        content: Text('Unexpected error occurred'),
       );
     } finally {
       if (mounted) {
@@ -70,12 +68,10 @@ class _AccountPageState extends State<AccountPage> {
     } on PostgrestException catch (error) {
       SnackBar(
         content: Text(error.message),
-        backgroundColor: Theme.of(context).colorScheme.error,
       );
     } catch (error) {
-      SnackBar(
-        content: const Text('Unexpected error occurred'),
-        backgroundColor: Theme.of(context).colorScheme.error,
+      const SnackBar(
+        content: Text('Unexpected error occurred'),
       );
     } finally {
       if (mounted) {
@@ -92,12 +88,10 @@ class _AccountPageState extends State<AccountPage> {
     } on AuthException catch (error) {
       SnackBar(
         content: Text(error.message),
-        backgroundColor: Theme.of(context).colorScheme.error,
       );
     } catch (error) {
-      SnackBar(
-        content: const Text('Unexpected error occurred'),
-        backgroundColor: Theme.of(context).colorScheme.error,
+      const SnackBar(
+        content: Text('Unexpected error occurred'),
       );
     } finally {
       if (mounted) {

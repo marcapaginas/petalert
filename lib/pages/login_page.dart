@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:pet_clean/main.dart';
@@ -9,7 +8,7 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -38,12 +37,10 @@ class _LoginPageState extends State<LoginPage> {
     } on AuthException catch (error) {
       SnackBar(
         content: Text(error.message),
-        backgroundColor: Theme.of(context).colorScheme.error,
       );
     } catch (error) {
-      SnackBar(
-        content: const Text('Unexpected error occurred'),
-        backgroundColor: Theme.of(context).colorScheme.error,
+      const SnackBar(
+        content: Text('Unexpected error occurred'),
       );
     } finally {
       if (mounted) {
@@ -60,6 +57,8 @@ class _LoginPageState extends State<LoginPage> {
       if (_redirecting) return;
       final session = data.session;
       if (session != null) {
+        //print(session);
+
         _redirecting = true;
         Navigator.of(context).pushReplacementNamed('/homepage');
       }

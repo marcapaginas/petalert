@@ -55,11 +55,9 @@ class Settings extends StatelessWidget {
       );
     } catch (error) {
       const SnackBar(
-        content: Text('Unexpected error occurred'),
+        content: Text('Error inesperado al salir.'),
         backgroundColor: Colors.amber,
       );
-    } finally {
-      const SnackBar(content: Text("HAS CERRADO SESION"));
     }
   }
 }

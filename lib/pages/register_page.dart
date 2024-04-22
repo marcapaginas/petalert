@@ -11,7 +11,7 @@ class RegisterPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Register'),
+        title: const Text('Register'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -19,14 +19,14 @@ class RegisterPage extends StatelessWidget {
           children: [
             TextField(
               controller: emailController,
-              decoration: InputDecoration(labelText: 'Email'),
+              decoration: const InputDecoration(labelText: 'Email'),
             ),
             TextField(
               controller: passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
+              decoration: const InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () async {
                 // final response = await Supabase.auth.signUp(
@@ -37,6 +37,8 @@ class RegisterPage extends StatelessWidget {
                     password: passwordController.text,
                     email: emailController.text);
 
+                print(response);
+
                 // if (response.error == null) {
                 //   // Registration successful
                 //   print('User registered successfully');
@@ -45,7 +47,7 @@ class RegisterPage extends StatelessWidget {
                 //   print('Registration error: ${response.error!.message}');
                 // }
               },
-              child: Text('Register'),
+              child: const Text('Register'),
             ),
           ],
         ),
