@@ -63,9 +63,22 @@ class _AlertsState extends State<Alerts> {
                 child: const Padding(
                   padding:
                       EdgeInsets.symmetric(vertical: 8.0, horizontal: 30.0),
-                  child: Icon(
-                    Icons.delete,
-                    color: Colors.white,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                      ),
+                      SizedBox(width: 8.0),
+                      Text(
+                        'Borrar',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
