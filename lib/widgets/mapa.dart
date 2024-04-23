@@ -24,7 +24,8 @@ class Mapa extends StatefulWidget {
 class _MapaState extends State<Mapa> with TickerProviderStateMixin {
   final _mapboxAccessToken = dotenv.env['MAPBOX_ACCESS_TOKEN'];
   final _mapboxStyle_satellite = 'mapbox/satellite-streets-v12';
-  final _mapboxStyle = 'josemiguel/cluz800ct005g01qvc40k523n';
+  final _mapboxStyle_petalert = 'josemiguel/cluz800ct005g01qvc40k523n';
+  var _mapboxStyle = 'josemiguel/cluz800ct005g01qvc40k523n';
 
   late final _animatedMapController = AnimatedMapController(vsync: this);
 
@@ -49,62 +50,71 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
     final markersCubit = context.watch<MarkersCubit>();
 
     return Scaffold(
-      body: _currentPosition == const LatLng(0, 0)
-          ? const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+        body: _currentPosition == const LatLng(0, 0)
+            ? const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 10),
+                    Text('Obteniendo posición...'),
+                  ],
+                ),
+              )
+            : FlutterMap(
+                mapController: _animatedMapController.mapController,
+                options: MapOptions(
+                  initialCenter: _currentPosition,
+                  initialZoom: _zoom,
+                  onMapReady: () {
+                    _listenToLocationCubit();
+                  },
+                ),
                 children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 10),
-                  Text('Obteniendo posición...'),
+                  TileLayer(
+                    urlTemplate:
+                        'https://api.mapbox.com/styles/v1/$_mapboxStyle/tiles/{z}/{x}/{y}@2x?access_token=$_mapboxAccessToken',
+                  ),
+                  CircleLayer(
+                    circles: [
+                      CircleMarker(
+                        point: _currentPosition,
+                        radius: 30,
+                        borderColor: Colors.green,
+                        borderStrokeWidth: 1,
+                        useRadiusInMeter: true,
+                        color: const Color.fromRGBO(217, 255, 0, 0.268),
+                      ),
+                    ],
+                  ),
+                  MarkerLayer(
+                    markers: [
+                      Marker(
+                        point: _currentPosition,
+                        width: 80,
+                        height: 80,
+                        alignment: const Alignment(0, -0.65),
+                        child: const Icon(
+                          Icons.location_on,
+                          color: Colors.red,
+                          size: 60,
+                        ),
+                      ),
+                      ...markersCubit.state,
+                    ],
+                  ),
                 ],
               ),
-            )
-          : FlutterMap(
-              mapController: _animatedMapController.mapController,
-              options: MapOptions(
-                initialCenter: _currentPosition,
-                initialZoom: _zoom,
-                onMapReady: () {
-                  _listenToLocationCubit();
-                },
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate:
-                      'https://api.mapbox.com/styles/v1/$_mapboxStyle/tiles/{z}/{x}/{y}@2x?access_token=$_mapboxAccessToken',
-                ),
-                CircleLayer(
-                  circles: [
-                    CircleMarker(
-                      point: _currentPosition,
-                      radius: 30,
-                      borderColor: Colors.green,
-                      borderStrokeWidth: 1,
-                      useRadiusInMeter: true,
-                      color: const Color.fromRGBO(217, 255, 0, 0.268),
-                    ),
-                  ],
-                ),
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: _currentPosition,
-                      width: 80,
-                      height: 80,
-                      alignment: const Alignment(0, -0.65),
-                      child: const Icon(
-                        Icons.location_on,
-                        color: Colors.red,
-                        size: 60,
-                      ),
-                    ),
-                    ...markersCubit.state,
-                  ],
-                ),
-              ],
-            ),
-    );
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            setState(() {
+              _mapboxStyle == _mapboxStyle_satellite
+                  ? _mapboxStyle = _mapboxStyle_petalert
+                  : _mapboxStyle = _mapboxStyle_satellite;
+            });
+          },
+          child: const Icon(Icons.layers_outlined),
+        ));
   }
 
   Future<void> _getCurrentPosition() async {

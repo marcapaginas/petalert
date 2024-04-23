@@ -1,11 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:pet_clean/blocs/alerts_cubit.dart';
+import 'package:pet_clean/blocs/location_cubit.dart';
 import 'package:pet_clean/models/alert_model.dart';
 import 'package:pet_clean/pages/alerts.dart';
 import 'package:pet_clean/pages/first_page.dart';
 import 'package:pet_clean/pages/settings.dart';
-import 'package:pet_clean/widgets/custom_switch.dart';
+import 'package:pet_clean/services/geolocator_service.dart';
 import 'package:pet_clean/widgets/mapa.dart';
 
 class HomePage extends StatefulWidget {
@@ -18,6 +23,40 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController(initialPage: 0);
+
+  late LocationSettings locationSettings = AndroidSettings(
+    accuracy: LocationAccuracy.high,
+    distanceFilter: 5,
+    intervalDuration: const Duration(seconds: 2),
+    foregroundNotificationConfig: const ForegroundNotificationConfig(
+      notificationText: "La aplicación está ejecutándose en segundo plano.",
+      notificationTitle: "Corriendo en segundo plano",
+      enableWakeLock: true,
+      color: Colors.green,
+    ),
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    GeolocatorService.startBackgroundLocationService();
+    _listenToPositionStream();
+  }
+
+  void _listenToPositionStream() {
+    Geolocator.getPositionStream(locationSettings: locationSettings)
+        .listen((Position position) {
+      _actionsWithPosition(position);
+    });
+  }
+
+  void _actionsWithPosition(Position position) async {
+    setState(() {
+      context
+          .read<LocationCubit>()
+          .setLocation(LatLng(position.latitude, position.longitude));
+    });
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -33,7 +72,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('PetAlert'),
-        actions: const [CustomSwitch()],
+        //actions: const [CustomSwitch()],
         backgroundColor: Colors.green,
       ),
       body: PageView(

@@ -10,20 +10,28 @@ class MongoDatabase {
   MongoDatabase._privateConstructor();
   static final MongoDatabase instance = MongoDatabase._privateConstructor();
 
-  static connect() async {
-    await dotenv.load();
+  /// Connects to the MongoDB database.
+  static Future<void> connect() async {
+    try {
+      await dotenv.load();
 
-    db = await Db.create(dotenv.env['MONGO_CONNECTION_STRING']!);
-    await db!.open();
+      db = await Db.create(dotenv.env['MONGO_CONNECTION_STRING']!);
+      await db!.open();
 
-    await db!.createCollection('markers');
+      log('Connected to MongoDB');
+    } catch (e) {
+      log('Error connecting to MongoDB: $e');
+    }
   }
 
-  static close() {
-    db!.close();
+  /// Closes the connection to the MongoDB database.
+  static void close() {
+    db?.close();
+    log('Connection to MongoDB closed');
   }
 
-  static insert(Map<String, dynamic> data) async {
+  /// Inserts or updates data into the 'markers' collection.
+  static Future<void> insert(Map<String, dynamic> data) async {
     try {
       if (db == null) {
         await connect();
@@ -36,6 +44,35 @@ class MongoDatabase {
       log('Data inserted: $data');
     } catch (e) {
       log('Error inserting data: $e');
+    }
+  }
+
+  /// Retrieves all markers with a date within the last 5 seconds.
+  static Future<List<Map<String, dynamic>>> getRecentMarkers() async {
+    try {
+      if (db == null) {
+        await connect();
+      }
+
+      // Calculate the date 5 seconds ago
+      var now = DateTime.now();
+      var fiveSecondsAgo = now.subtract(const Duration(seconds: 5));
+
+      // Format the date to match MongoDB's format
+      var formattedDate = fiveSecondsAgo.toIso8601String();
+
+      // Construct the query
+      var query = {
+        'date': {'\$lte': formattedDate}
+      };
+
+      // Perform the query and return the results
+      var cursor = db!.collection('markers').find(query);
+      var markers = await cursor.toList();
+      return markers.map((marker) => marker).toList();
+    } catch (e) {
+      log('Error retrieving recent markers: $e');
+      return [];
     }
   }
 }
