@@ -34,7 +34,6 @@ class _FirstPageState extends State<FirstPage> {
   }
 
   void _addMarker() async {
-    MongoDatabase.connect();
     //insert marker data
     await MongoDatabase.insert({
       'userId': _userId,

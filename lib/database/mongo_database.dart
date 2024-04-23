@@ -28,7 +28,12 @@ class MongoDatabase {
       if (db == null) {
         await connect();
       }
-      await db!.collection('markers').insert(data);
+      await db!.collection('markers').update(
+        {'userId': data['userId']}, // Filtro de consulta
+        data, // Datos a insertar o actualizar
+        upsert: true, // Crea un nuevo documento si no se encuentra ninguno
+      );
+      log('Data inserted: $data');
     } catch (e) {
       log('Error inserting data: $e');
     }
