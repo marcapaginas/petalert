@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
@@ -28,12 +30,12 @@ class _HomePageState extends State<HomePage> {
     accuracy: LocationAccuracy.high,
     distanceFilter: 5,
     intervalDuration: const Duration(seconds: 2),
-    foregroundNotificationConfig: const ForegroundNotificationConfig(
-      notificationText: "La aplicación está ejecutándose en segundo plano.",
-      notificationTitle: "Corriendo en segundo plano",
-      enableWakeLock: true,
-      color: Colors.green,
-    ),
+    // foregroundNotificationConfig: const ForegroundNotificationConfig(
+    //   notificationText: "La aplicación está ejecutándose en segundo plano.",
+    //   notificationTitle: "Corriendo en segundo plano",
+    //   enableWakeLock: true,
+    //   color: Colors.green,
+    // ),
   );
 
   @override
@@ -51,6 +53,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _actionsWithPosition(Position position) async {
+    log(position.toString());
     setState(() {
       context
           .read<LocationCubit>()
@@ -62,7 +65,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _selectedIndex = index;
       // _pageController.animateToPage(index,
-      //     duration: Duration(milliseconds: 300), curve: Curves.ease);
+      //     duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
       _pageController.jumpToPage(index);
     });
   }
@@ -89,7 +92,6 @@ class _HomePageState extends State<HomePage> {
           ),
           Container(
             color: Colors.green,
-            padding: const EdgeInsets.all(20),
             child: const Mapa(),
           ),
           Container(
@@ -106,34 +108,46 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: BlocBuilder<AlertsCubit, List<AlertModel>>(
         builder: (context, state) {
-          return NavigationBar(
-            backgroundColor: Colors.white24,
-            onDestinationSelected: _onItemTapped,
-            indicatorColor: Colors.greenAccent,
-            selectedIndex: _selectedIndex,
-            destinations: <NavigationDestination>[
-              const NavigationDestination(
-                selectedIcon: Icon(Icons.home),
-                icon: Icon(Icons.home_outlined),
-                label: 'Inicio',
+          return Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.black54, Colors.black12],
+                begin: Alignment.topCenter,
+                end: Alignment(0, -0.8),
               ),
-              const NavigationDestination(
-                icon: Icon(Icons.map),
-                label: 'Mapa',
-              ),
-              NavigationDestination(
-                icon: state.isNotEmpty
-                    ? Badge(
-                        label: Text(state.length.toString()),
-                        child: const Icon(Icons.notifications_sharp))
-                    : const Icon(Icons.notifications_none),
-                label: 'Alertas',
-              ),
-              const NavigationDestination(
-                icon: Icon(Icons.settings),
-                label: 'Opciones',
-              ),
-            ],
+            ),
+            child: NavigationBar(
+              backgroundColor: Colors.transparent,
+              onDestinationSelected: _onItemTapped,
+              indicatorColor: Colors.greenAccent,
+              labelBehavior:
+                  NavigationDestinationLabelBehavior.onlyShowSelected,
+              selectedIndex: _selectedIndex,
+              destinations: <NavigationDestination>[
+                const NavigationDestination(
+                  selectedIcon: Icon(Icons.home),
+                  icon: Icon(Icons.home_outlined),
+                  label: 'Inicio',
+                ),
+                const NavigationDestination(
+                  icon: Icon(Icons.map_outlined),
+                  selectedIcon: Icon(Icons.map),
+                  label: 'Mapa',
+                ),
+                NavigationDestination(
+                  icon: state.isNotEmpty
+                      ? Badge(
+                          label: Text(state.length.toString()),
+                          child: const Icon(Icons.notifications_sharp))
+                      : const Icon(Icons.notifications_none),
+                  label: 'Alertas',
+                ),
+                const NavigationDestination(
+                  icon: Icon(Icons.settings),
+                  label: 'Opciones',
+                ),
+              ],
+            ),
           );
         },
       ),

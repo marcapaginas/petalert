@@ -48,63 +48,53 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final markersCubit = context.watch<MarkersCubit>();
+    final locationCubit = context.watch<LocationCubit>();
 
     return Scaffold(
-        body: _currentPosition == const LatLng(0, 0)
-            ? const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 10),
-                    Text('Obteniendo posición...'),
-                  ],
+        body: FlutterMap(
+          mapController: _animatedMapController.mapController,
+          options: MapOptions(
+            initialCenter: locationCubit.state,
+            initialZoom: _zoom,
+            onMapReady: () {
+              _listenToLocationCubit();
+            },
+          ),
+          children: [
+            TileLayer(
+              urlTemplate:
+                  'https://api.mapbox.com/styles/v1/$_mapboxStyle/tiles/{z}/{x}/{y}@2x?access_token=$_mapboxAccessToken',
+            ),
+            CircleLayer(
+              circles: [
+                CircleMarker(
+                  point: locationCubit.state,
+                  radius: 30,
+                  borderColor: Colors.green,
+                  borderStrokeWidth: 1,
+                  useRadiusInMeter: true,
+                  color: const Color.fromRGBO(217, 255, 0, 0.268),
                 ),
-              )
-            : FlutterMap(
-                mapController: _animatedMapController.mapController,
-                options: MapOptions(
-                  initialCenter: _currentPosition,
-                  initialZoom: _zoom,
-                  onMapReady: () {
-                    _listenToLocationCubit();
-                  },
+              ],
+            ),
+            MarkerLayer(
+              markers: [
+                Marker(
+                  point: locationCubit.state,
+                  width: 80,
+                  height: 80,
+                  alignment: const Alignment(0, -0.65),
+                  child: const Icon(
+                    Icons.location_on,
+                    color: Colors.red,
+                    size: 60,
+                  ),
                 ),
-                children: [
-                  TileLayer(
-                    urlTemplate:
-                        'https://api.mapbox.com/styles/v1/$_mapboxStyle/tiles/{z}/{x}/{y}@2x?access_token=$_mapboxAccessToken',
-                  ),
-                  CircleLayer(
-                    circles: [
-                      CircleMarker(
-                        point: _currentPosition,
-                        radius: 30,
-                        borderColor: Colors.green,
-                        borderStrokeWidth: 1,
-                        useRadiusInMeter: true,
-                        color: const Color.fromRGBO(217, 255, 0, 0.268),
-                      ),
-                    ],
-                  ),
-                  MarkerLayer(
-                    markers: [
-                      Marker(
-                        point: _currentPosition,
-                        width: 80,
-                        height: 80,
-                        alignment: const Alignment(0, -0.65),
-                        child: const Icon(
-                          Icons.location_on,
-                          color: Colors.red,
-                          size: 60,
-                        ),
-                      ),
-                      ...markersCubit.state,
-                    ],
-                  ),
-                ],
-              ),
+                ...markersCubit.state,
+              ],
+            ),
+          ],
+        ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             setState(() {
@@ -127,21 +117,21 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
   //listen to cubit changes
   void _listenToLocationCubit() {
     context.read<LocationCubit>().stream.listen((LatLng state) {
-      setState(() {
-        _currentPosition = state;
-      });
-
       // update or insert marker data to mongo
-      MongoDatabase.insert({
-        'userId': supabase.auth.currentUser!.id,
-        'location': 'POINT(${state.longitude} ${state.latitude})',
-        'date': DateTime.now().toIso8601String(),
-      });
+      // MongoDatabase.insert({
+      //   'userId': supabase.auth.currentUser!.id,
+      //   'location': 'POINT(${state.longitude} ${state.latitude})',
+      //   'date': DateTime.now().toIso8601String(),
+      // });
 
       // log coordinates
-      log('Location: ${state.longitude}, ${state.latitude}');
-
-      _animatedMapController.animateTo(dest: _currentPosition);
+      log('listen to cubit: Location: ${state.longitude}, ${state.latitude}');
+      //check if widget is mounted
+      if (mounted) {
+        _animatedMapController.animateTo(dest: state);
+      } else {
+        return;
+      }
     });
   }
 }

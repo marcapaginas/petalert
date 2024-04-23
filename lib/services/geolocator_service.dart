@@ -17,12 +17,12 @@ class GeolocatorService {
     accuracy: LocationAccuracy.high,
     distanceFilter: 5,
     //forceLocationManager: true,
-    intervalDuration: const Duration(seconds: 2),
-    foregroundNotificationConfig: const ForegroundNotificationConfig(
-      notificationText: "La aplicación está ejecutándose en segundo plano.",
-      notificationTitle: "Corriendo en segundo plano",
-      enableWakeLock: true,
-    ),
+    // intervalDuration: const Duration(seconds: 2),
+    // foregroundNotificationConfig: const ForegroundNotificationConfig(
+    //   notificationText: "La aplicación está ejecutándose en segundo plano.",
+    //   notificationTitle: "Corriendo en segundo plano",
+    //   enableWakeLock: true,
+    // ),
   );
 
   static void checkServiceAndPermission() async {
