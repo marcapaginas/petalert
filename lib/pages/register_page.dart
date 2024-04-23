@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -37,7 +39,7 @@ class RegisterPage extends StatelessWidget {
                     password: passwordController.text,
                     email: emailController.text);
 
-                print(response);
+                log(response.toString());
 
                 // if (response.error == null) {
                 //   // Registration successful

@@ -4,7 +4,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:pet_clean/blocs/alerts_cubit.dart';
 import 'package:pet_clean/blocs/location_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
-import 'package:pet_clean/blocs/map_style_cubit.dart';
 import 'package:pet_clean/blocs/markers_cubit.dart';
 import 'package:pet_clean/blocs/username_cubit.dart';
 import 'package:pet_clean/models/alert_model.dart';
