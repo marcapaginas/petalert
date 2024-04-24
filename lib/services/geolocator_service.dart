@@ -1,8 +1,20 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:geolocator/geolocator.dart';
 
 class GeolocatorService {
+  static GeolocatorService? _instance;
+
+  // private constructor
+  GeolocatorService._();
+
+  // Factory constructor to return the same instance
+  factory GeolocatorService() {
+    _instance ??= GeolocatorService._();
+    return _instance!;
+  }
+
   static StreamSubscription<Position>? positionSubscription;
   static bool? serviceEnabled;
   static LocationPermission? permission;
@@ -56,15 +68,29 @@ class GeolocatorService {
   static startBackgroundLocationService({bool foreground = false}) async {
     checkServiceAndPermission();
     if (positionSubscription != null) {
+      log('Canceling previous subscription');
       await positionSubscription?.cancel();
     }
+
     positionSubscription = Geolocator.getPositionStream(
             locationSettings:
                 foreground ? locationSettingsForeground : locationSettings)
-        .listen((event) {});
+        .listen((event) {
+      //log('Location: ${event.latitude}, ${event.longitude}');
+    });
+    log('Location service started');
+
+    // StreamSubscription<Position> positionStream = Geolocator.getPositionStream()
+    // .listen((Position position) {
+    //   // Handle position changes
+    // });
+
+    // // When no longer needed cancel the subscription
+    // positionStream.cancel();
   }
 
-  static stopBackgroundLocationService() {
-    positionSubscription?.cancel();
+  static Future<void> stopBackgroundLocationService() async {
+    await positionSubscription?.cancel();
+    return Future.value();
   }
 }

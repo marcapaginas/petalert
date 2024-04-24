@@ -4,11 +4,18 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 class MongoDatabase {
-  static Db? db;
+  static MongoDatabase? _instance;
 
-  // singleton pattern
-  MongoDatabase._privateConstructor();
-  static final MongoDatabase instance = MongoDatabase._privateConstructor();
+  // private constructor
+  MongoDatabase._();
+
+  // Factory constructor to return the same instance
+  factory MongoDatabase() {
+    _instance ??= MongoDatabase._();
+    return _instance!;
+  }
+
+  static Db? db;
 
   /// Connects to the MongoDB database.
   static Future<void> connect() async {

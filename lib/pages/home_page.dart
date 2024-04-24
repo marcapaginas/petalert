@@ -39,8 +39,11 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    GeolocatorService.startBackgroundLocationService(foreground: true);
-    _listenToPositionStream();
+    Geolocator.getCurrentPosition().then((Position position) {
+      _actionsWithPosition(position);
+    });
+    //GeolocatorService.startBackgroundLocationService(foreground: true);
+    //_listenToPositionStream();
   }
 
   void _listenToPositionStream() {

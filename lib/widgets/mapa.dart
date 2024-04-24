@@ -113,19 +113,19 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
                       mapOptionsCubit.setMetersRange(newValue);
                     },
                   ),
-                  TextButton(
-                      onPressed: () async {
-                        try {
-                          await GeolocatorService
-                              .stopBackgroundLocationService();
-                          await GeolocatorService
-                              .startBackgroundLocationService(foreground: true);
-                        } catch (e) {
-                          log('Error: $e');
-                        }
-                        log('pulsado pasear');
-                      },
-                      child: const Text('Pasear')),
+                  Switch(
+                    value: mapOptionsCubit.state.walking,
+                    onChanged: (value) {
+                      mapOptionsCubit.switchWalking();
+                      if (value) {
+                        GeolocatorService.startBackgroundLocationService(
+                            foreground: true);
+                      } else {
+                        GeolocatorService.startBackgroundLocationService(
+                            foreground: false);
+                      }
+                    },
+                  ),
                 ],
               ),
             ),
@@ -172,7 +172,7 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
       //   'date': DateTime.now().toIso8601String(),
       // });
 
-      // log('listen to cubit: Location: ${state.longitude}, ${state.latitude}');
+      log('almacenado: Location: ${state.latitude}, ${state.longitude}');
 
       if (mounted) {
         _animatedMapController.animateTo(dest: state);

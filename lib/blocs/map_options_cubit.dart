@@ -27,4 +27,8 @@ class MapOptionsCubit extends Cubit<MapOptionsState> {
       emit(state.copyWith(mapStyle: 'mapbox/streets-v11'));
     }
   }
+
+  void switchWalking() {
+    emit(state.copyWith(walking: !state.walking));
+  }
 }
