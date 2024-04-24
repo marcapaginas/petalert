@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -44,50 +45,79 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
     final mapOptionsCubit = context.watch<MapOptionsCubit>();
 
     return Scaffold(
-      body: FlutterMap(
-        mapController: _animatedMapController.mapController,
-        options: MapOptions(
-          initialCenter: locationCubit.state,
-          initialZoom: mapOptionsCubit.state.zoom,
-          onMapReady: () {
-            _listenToLocationCubit();
-          },
-        ),
+      body: Stack(
         children: [
-          TileLayer(
-            urlTemplate:
-                'https://api.mapbox.com/styles/v1/${mapOptionsCubit.state.mapStyle}/tiles/{z}/{x}/{y}@2x?access_token=$_mapboxAccessToken',
-            // urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            // userAgentPackageName: 'dev.fleaflet.flutter_map.example',
-          ),
-          CircleLayer(
-            circles: [
-              CircleMarker(
-                point: locationCubit.state,
-                radius: 30,
-                borderColor: Colors.green,
-                borderStrokeWidth: 1,
-                useRadiusInMeter: true,
-                color: const Color.fromRGBO(217, 255, 0, 0.268),
+          FlutterMap(
+            mapController: _animatedMapController.mapController,
+            options: MapOptions(
+              initialCenter: locationCubit.state,
+              initialZoom: mapOptionsCubit.state.zoom,
+              onMapReady: () {
+                _listenToLocationCubit();
+              },
+            ),
+            children: [
+              TileLayer(
+                urlTemplate:
+                    'https://api.mapbox.com/styles/v1/${mapOptionsCubit.state.mapStyle}/tiles/{z}/{x}/{y}@2x?access_token=$_mapboxAccessToken',
+                // urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                // userAgentPackageName: 'dev.fleaflet.flutter_map.example',
+              ),
+              CircleLayer(
+                circles: [
+                  CircleMarker(
+                    point: locationCubit.state,
+                    radius: mapOptionsCubit.state.metersRange,
+                    borderColor: Colors.green,
+                    borderStrokeWidth: 1,
+                    useRadiusInMeter: true,
+                    color: const Color.fromRGBO(217, 255, 0, 0.268),
+                  ),
+                ],
+              ),
+              MarkerLayer(
+                markers: [
+                  Marker(
+                    point: locationCubit.state,
+                    width: 80,
+                    height: 80,
+                    rotate: true,
+                    alignment: const Alignment(0, -0.65),
+                    child: const Icon(
+                      Icons.location_on,
+                      color: Colors.red,
+                      size: 60,
+                    ),
+                  ),
+                  ...markersCubit.state,
+                ],
               ),
             ],
           ),
-          MarkerLayer(
-            markers: [
-              Marker(
-                point: locationCubit.state,
-                width: 80,
-                height: 80,
-                rotate: true,
-                alignment: const Alignment(0, -0.65),
-                child: const Icon(
-                  Icons.location_on,
-                  color: Colors.red,
-                  size: 60,
-                ),
+          Positioned(
+            top: 0,
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              color: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+              child: Row(
+                children: [
+                  Text(
+                    'Metros: ${mapOptionsCubit.state.metersRange.toStringAsFixed(0)}',
+                    textAlign: TextAlign.end,
+                  ),
+                  Slider(
+                    value: mapOptionsCubit.state.metersRange,
+                    min: 5.0,
+                    max: 100.0,
+                    onChanged: (newValue) {
+                      mapOptionsCubit.setMetersRange(newValue);
+                    },
+                  ),
+                  TextButton(onPressed: () {}, child: const Text('Pasear')),
+                ],
               ),
-              ...markersCubit.state,
-            ],
+            ),
           ),
         ],
       ),

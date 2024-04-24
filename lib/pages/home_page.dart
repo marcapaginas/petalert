@@ -9,9 +9,9 @@ import 'package:pet_clean/blocs/location_cubit.dart';
 import 'package:pet_clean/models/alert_model.dart';
 import 'package:pet_clean/pages/alerts.dart';
 import 'package:pet_clean/pages/first_page.dart';
+import 'package:pet_clean/pages/map_page.dart';
 import 'package:pet_clean/pages/settings.dart';
 import 'package:pet_clean/services/geolocator_service.dart';
-import 'package:pet_clean/widgets/mapa.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -72,9 +72,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('PetAlert'),
+        title: const Text('PetAlert',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
         //actions: const [CustomSwitch()],
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.black,
       ),
       body: PageView(
         controller: _pageController,
@@ -85,12 +86,12 @@ class _HomePageState extends State<HomePage> {
         },
         children: <Widget>[
           Container(
-            color: Colors.blue,
+            color: Colors.green,
             child: const FirstPage(),
           ),
           Container(
             color: Colors.green,
-            child: const Mapa(),
+            child: const MapPage(),
           ),
           Container(
             color: Colors.green,
