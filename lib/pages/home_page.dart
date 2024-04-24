@@ -24,28 +24,27 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController(initialPage: 0);
 
-  late LocationSettings locationSettings = AndroidSettings(
-    accuracy: LocationAccuracy.high,
-    distanceFilter: 5,
-    intervalDuration: const Duration(seconds: 2),
-    // foregroundNotificationConfig: const ForegroundNotificationConfig(
-    //   notificationText: "La aplicación está ejecutándose en segundo plano.",
-    //   notificationTitle: "Corriendo en segundo plano",
-    //   enableWakeLock: true,
-    //   color: Colors.green,
-    // ),
-  );
+  // late LocationSettings locationSettings = AndroidSettings(
+  //   accuracy: LocationAccuracy.high,
+  //   distanceFilter: 5,
+  //   intervalDuration: const Duration(seconds: 2),
+  //   // foregroundNotificationConfig: const ForegroundNotificationConfig(
+  //   //   notificationText: "La aplicación está ejecutándose en segundo plano.",
+  //   //   notificationTitle: "Corriendo en segundo plano",
+  //   //   enableWakeLock: true,
+  //   //   color: Colors.green,
+  //   // ),
+  // );
 
   @override
   void initState() {
     super.initState();
-    GeolocatorService.startBackgroundLocationService();
+    GeolocatorService.startBackgroundLocationService(foreground: true);
     _listenToPositionStream();
   }
 
   void _listenToPositionStream() {
-    Geolocator.getPositionStream(locationSettings: locationSettings)
-        .listen((Position position) {
+    Geolocator.getPositionStream().listen((Position position) {
       _actionsWithPosition(position);
     });
   }
@@ -62,8 +61,6 @@ class _HomePageState extends State<HomePage> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      // _pageController.animateToPage(index,
-      //     duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
       _pageController.jumpToPage(index);
     });
   }
@@ -74,7 +71,6 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('PetAlert',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-        //actions: const [CustomSwitch()],
         backgroundColor: Colors.black,
       ),
       body: PageView(
@@ -98,7 +94,7 @@ class _HomePageState extends State<HomePage> {
             child: const Alerts(),
           ),
           Container(
-            color: Colors.red,
+            color: Colors.green,
             child: const Center(
               child: Settings(),
             ),

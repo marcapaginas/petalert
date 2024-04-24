@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -10,6 +9,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:pet_clean/blocs/location_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/blocs/markers_cubit.dart';
+import 'package:pet_clean/services/geolocator_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final supabase = Supabase.instance.client;
@@ -29,7 +29,6 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     dotenv.load();
-    //_getCurrentPosition();
   }
 
   @override
@@ -114,7 +113,19 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
                       mapOptionsCubit.setMetersRange(newValue);
                     },
                   ),
-                  TextButton(onPressed: () {}, child: const Text('Pasear')),
+                  TextButton(
+                      onPressed: () async {
+                        try {
+                          await GeolocatorService
+                              .stopBackgroundLocationService();
+                          await GeolocatorService
+                              .startBackgroundLocationService(foreground: true);
+                        } catch (e) {
+                          log('Error: $e');
+                        }
+                        log('pulsado pasear');
+                      },
+                      child: const Text('Pasear')),
                 ],
               ),
             ),
@@ -151,13 +162,6 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
     );
   }
 
-  // Future<void> _getCurrentPosition() async {
-  //   final position = await Geolocator.getCurrentPosition();
-  //   setState(() {
-  //     _currentPosition = LatLng(position.latitude, position.longitude);
-  //   });
-  // }
-
   //listen to cubit changes
   void _listenToLocationCubit() {
     context.read<LocationCubit>().stream.listen((LatLng state) {
@@ -168,9 +172,8 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
       //   'date': DateTime.now().toIso8601String(),
       // });
 
-      // log coordinates
-      log('listen to cubit: Location: ${state.longitude}, ${state.latitude}');
-      //check if widget is mounted
+      // log('listen to cubit: Location: ${state.longitude}, ${state.latitude}');
+
       if (mounted) {
         _animatedMapController.animateTo(dest: state);
       } else {

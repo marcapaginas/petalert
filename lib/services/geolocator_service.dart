@@ -16,13 +16,17 @@ class GeolocatorService {
   static LocationSettings locationSettings = AndroidSettings(
     accuracy: LocationAccuracy.high,
     distanceFilter: 5,
-    //forceLocationManager: true,
-    // intervalDuration: const Duration(seconds: 2),
-    // foregroundNotificationConfig: const ForegroundNotificationConfig(
-    //   notificationText: "La aplicación está ejecutándose en segundo plano.",
-    //   notificationTitle: "Corriendo en segundo plano",
-    //   enableWakeLock: true,
-    // ),
+  );
+
+  static LocationSettings locationSettingsForeground = AndroidSettings(
+    accuracy: LocationAccuracy.high,
+    distanceFilter: 5,
+    intervalDuration: const Duration(seconds: 2),
+    foregroundNotificationConfig: const ForegroundNotificationConfig(
+      notificationText: "La aplicación está ejecutándose en segundo plano.",
+      notificationTitle: "Corriendo en segundo plano",
+      enableWakeLock: true,
+    ),
   );
 
   static void checkServiceAndPermission() async {
@@ -49,13 +53,15 @@ class GeolocatorService {
     return await Geolocator.getCurrentPosition();
   }
 
-  static startBackgroundLocationService() {
-    //checkServiceAndPermission();
-    positionSubscription =
-        Geolocator.getPositionStream(locationSettings: locationSettings)
-            .listen((Position? position) {
-      //todo: add logic to save the position in the database
-    });
+  static startBackgroundLocationService({bool foreground = false}) async {
+    checkServiceAndPermission();
+    if (positionSubscription != null) {
+      await positionSubscription?.cancel();
+    }
+    positionSubscription = Geolocator.getPositionStream(
+            locationSettings:
+                foreground ? locationSettingsForeground : locationSettings)
+        .listen((event) {});
   }
 
   static stopBackgroundLocationService() {
