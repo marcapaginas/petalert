@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
         'location': 'POINT(${position.longitude} ${position.latitude})',
         'date': DateTime.now().toIso8601String(),
       });
-      log('almacenado: Location: ${position.longitude}, ${position.latitude}');
+      //log('almacenado: Location: ${position.longitude}, ${position.latitude}');
     } else {
       log('Not walking');
     }

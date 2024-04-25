@@ -6,12 +6,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:pet_clean/blocs/location_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/blocs/markers_cubit.dart';
-import 'package:pet_clean/services/geolocator_service.dart';
+import 'package:pet_clean/widgets/walking_switch.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final supabase = Supabase.instance.client;
@@ -56,13 +55,6 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
               initialCenter: locationCubit.state,
               initialZoom: mapOptionsCubit.state.zoom,
               onMapReady: () {
-                // positionSubscription =
-                //     GeolocatorService.startBackgroundLocationService(
-                //             foreground: false)
-                //         .listen((event) {
-                //   locationCubit
-                //       .setLocation(LatLng(event.latitude, event.longitude));
-                // });
                 _listenToLocationCubit();
               },
             ),
@@ -124,12 +116,7 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
                       mapOptionsCubit.setMetersRange(newValue);
                     },
                   ),
-                  Switch(
-                    value: mapOptionsCubit.state.walking,
-                    onChanged: (value) {
-                      mapOptionsCubit.switchWalking();
-                    },
-                  ),
+                  const WalkingSwitch(),
                 ],
               ),
             ),

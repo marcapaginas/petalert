@@ -25,7 +25,7 @@ class MongoDatabase {
       db = await Db.create(dotenv.env['MONGO_CONNECTION_STRING']!);
       await db!.open();
 
-      log('Connected to MongoDB');
+      //log('Connected to MongoDB');
     } catch (e) {
       log('Error connecting to MongoDB: $e');
     }
@@ -48,7 +48,7 @@ class MongoDatabase {
         data, // Datos a insertar o actualizar
         upsert: true, // Crea un nuevo documento si no se encuentra ninguno
       );
-      log('Data inserted: $data');
+      //log('Data inserted: $data');
     } catch (e) {
       log('Error inserting data: $e');
     }
