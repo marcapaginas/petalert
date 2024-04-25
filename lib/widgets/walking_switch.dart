@@ -48,15 +48,22 @@ class _WalkingSwitchState extends State<WalkingSwitch>
       splashColor: Colors.green,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.grey[200],
-          borderRadius: BorderRadius.circular(50),
-        ),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(50),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: const Offset(0, 3),
+              ),
+            ]),
         margin: const EdgeInsets.all(0),
         child: Lottie.asset(
           'assets/perrito_marron_andando.json',
           animate: mapOptionsCubit.state.walking ? true : false,
-          width: 50,
-          height: 50,
+          width: 100,
+          height: 100,
           fit: BoxFit.cover,
         ),
       ),

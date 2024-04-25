@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -43,8 +42,6 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
     final markersCubit = context.watch<MarkersCubit>();
     final locationCubit = context.watch<LocationCubit>();
     final mapOptionsCubit = context.watch<MapOptionsCubit>();
-
-    // StreamSubscription<Position>? positionSubscription;
 
     return Scaffold(
       body: Stack(
@@ -116,10 +113,14 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
                       mapOptionsCubit.setMetersRange(newValue);
                     },
                   ),
-                  const WalkingSwitch(),
                 ],
               ),
             ),
+          ),
+          const Positioned(
+            bottom: 15,
+            left: 15,
+            child: WalkingSwitch(),
           ),
         ],
       ),
