@@ -6,12 +6,17 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:pet_clean/blocs/alerts_cubit.dart';
 import 'package:pet_clean/blocs/location_cubit.dart';
+import 'package:pet_clean/blocs/map_options_cubit.dart';
+import 'package:pet_clean/database/mongo_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
 import 'package:pet_clean/pages/alerts.dart';
 import 'package:pet_clean/pages/first_page.dart';
 import 'package:pet_clean/pages/map_page.dart';
 import 'package:pet_clean/pages/settings.dart';
 import 'package:pet_clean/services/geolocator_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+final supabase = Supabase.instance.client;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -39,11 +44,11 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    Geolocator.getCurrentPosition().then((Position position) {
-      _actionsWithPosition(position);
-    });
-    //GeolocatorService.startBackgroundLocationService(foreground: true);
-    //_listenToPositionStream();
+    // Geolocator.getCurrentPosition().then((Position position) {
+    //   _actionsWithPosition(position);
+    // });
+    GeolocatorService.startBackgroundLocationService(foreground: true);
+    _listenToPositionStream();
   }
 
   void _listenToPositionStream() {
@@ -59,6 +64,16 @@ class _HomePageState extends State<HomePage> {
           .read<LocationCubit>()
           .setLocation(LatLng(position.latitude, position.longitude));
     });
+    if (context.read<MapOptionsCubit>().state.walking) {
+      MongoDatabase.insert({
+        'userId': supabase.auth.currentUser!.id,
+        'location': 'POINT(${position.longitude} ${position.latitude})',
+        'date': DateTime.now().toIso8601String(),
+      });
+      log('almacenado: Location: ${position.longitude}, ${position.latitude}');
+    } else {
+      log('Not walking');
+    }
   }
 
   void _onItemTapped(int index) {

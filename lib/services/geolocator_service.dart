@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:geolocator/geolocator.dart';
 
@@ -65,20 +64,23 @@ class GeolocatorService {
     return await Geolocator.getCurrentPosition();
   }
 
-  static startBackgroundLocationService({bool foreground = false}) async {
+  static Stream<Position> startBackgroundLocationService(
+      {bool foreground = false}) {
     checkServiceAndPermission();
-    if (positionSubscription != null) {
-      log('Canceling previous subscription');
-      await positionSubscription?.cancel();
-    }
 
-    positionSubscription = Geolocator.getPositionStream(
-            locationSettings:
-                foreground ? locationSettingsForeground : locationSettings)
-        .listen((event) {
-      //log('Location: ${event.latitude}, ${event.longitude}');
-    });
-    log('Location service started');
+    Stream<Position> position = Geolocator.getPositionStream(
+        locationSettings:
+            foreground ? locationSettingsForeground : locationSettings);
+
+    return position;
+
+    // positionSubscription = Geolocator.getPositionStream(
+    //         locationSettings:
+    //             foreground ? locationSettingsForeground : locationSettings)
+    //     .listen((event) {
+    //   //log('Location: ${event.latitude}, ${event.longitude}');
+    // });
+    // log('Location service started');
 
     // StreamSubscription<Position> positionStream = Geolocator.getPositionStream()
     // .listen((Position position) {

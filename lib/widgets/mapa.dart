@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:pet_clean/blocs/location_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
@@ -43,6 +45,8 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
     final locationCubit = context.watch<LocationCubit>();
     final mapOptionsCubit = context.watch<MapOptionsCubit>();
 
+    // StreamSubscription<Position>? positionSubscription;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -52,6 +56,13 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
               initialCenter: locationCubit.state,
               initialZoom: mapOptionsCubit.state.zoom,
               onMapReady: () {
+                // positionSubscription =
+                //     GeolocatorService.startBackgroundLocationService(
+                //             foreground: false)
+                //         .listen((event) {
+                //   locationCubit
+                //       .setLocation(LatLng(event.latitude, event.longitude));
+                // });
                 _listenToLocationCubit();
               },
             ),
@@ -117,13 +128,6 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
                     value: mapOptionsCubit.state.walking,
                     onChanged: (value) {
                       mapOptionsCubit.switchWalking();
-                      if (value) {
-                        GeolocatorService.startBackgroundLocationService(
-                            foreground: true);
-                      } else {
-                        GeolocatorService.startBackgroundLocationService(
-                            foreground: false);
-                      }
                     },
                   ),
                 ],
@@ -165,19 +169,14 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
   //listen to cubit changes
   void _listenToLocationCubit() {
     context.read<LocationCubit>().stream.listen((LatLng state) {
-      // update or insert marker data to mongo
-      // MongoDatabase.insert({
-      //   'userId': supabase.auth.currentUser!.id,
-      //   'location': 'POINT(${state.longitude} ${state.latitude})',
-      //   'date': DateTime.now().toIso8601String(),
-      // });
-
-      log('almacenado: Location: ${state.latitude}, ${state.longitude}');
-
-      if (mounted) {
-        _animatedMapController.animateTo(dest: state);
-      } else {
-        return;
+      try {
+        if (mounted) {
+          _animatedMapController.animateTo(dest: state);
+        } else {
+          return;
+        }
+      } catch (e) {
+        log('Error escuchando al cubit: $e');
       }
     });
   }
