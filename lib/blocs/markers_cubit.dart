@@ -1,16 +1,33 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:pet_clean/blocs/location_cubit.dart';
+import 'package:pet_clean/models/marker_model.dart';
 
-class MarkersCubit extends Cubit<List<Marker>> {
-  MarkersCubit() : super([]);
+class MarkersCubit extends Cubit<List<MarkerModel>> {
+  final LocationCubit locationCubit;
 
-  void addMarker(Marker marker) {
+  MarkersCubit(this.locationCubit) : super([]);
+
+  void addMarker(MarkerModel marker) {
     state.add(marker);
     emit(state);
   }
 
-  void removeMarker(Marker marker) {
+  void removeMarker(MarkerModel marker) {
     state.remove(marker);
     emit(state);
+  }
+
+  void clearMarkers() {
+    state.clear();
+    emit(state);
+  }
+
+  List<Marker> get markers {
+    return state.map((marker) => marker.marker).toList();
+  }
+
+  void getMarkers() {
+    // get markers from the database
   }
 }

@@ -39,9 +39,9 @@ class BlocsProvider extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => MarkersCubit()),
         BlocProvider(create: (context) => UsernameCubit()),
         BlocProvider(create: (context) => LocationCubit()),
+        BlocProvider(create: (context) => MarkersCubit(LocationCubit())),
         BlocProvider(create: (context) => AlertsCubit()),
         BlocProvider(create: (context) => MapOptionsCubit()),
       ],

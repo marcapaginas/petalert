@@ -10,3 +10,7 @@ final List<AlertModel> fakeAlerts = List.generate(
     date: DateTime.now(),
   ),
 );
+
+
+// generate 5 elements for marker_model.dart at 50 m from Latitude: 37.9722803, Longitude: -1.206868
+

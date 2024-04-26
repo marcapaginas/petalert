@@ -88,7 +88,7 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
                       size: 60,
                     ),
                   ),
-                  ...markersCubit.state,
+                  ...markersCubit.markers,
                 ],
               ),
             ],

@@ -82,4 +82,20 @@ class MongoDatabase {
       return [];
     }
   }
+
+  // get all markers
+  static Future<List<Map<String, dynamic>>> getMarkers() async {
+    try {
+      if (db == null) {
+        await connect();
+      }
+
+      var cursor = db!.collection('markers').find();
+      var markers = await cursor.toList();
+      return markers.map((marker) => marker).toList();
+    } catch (e) {
+      log('Error retrieving markers: $e');
+      return [];
+    }
+  }
 }

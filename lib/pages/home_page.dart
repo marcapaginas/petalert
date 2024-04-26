@@ -14,6 +14,7 @@ import 'package:pet_clean/pages/first_page.dart';
 import 'package:pet_clean/pages/map_page.dart';
 import 'package:pet_clean/pages/settings.dart';
 import 'package:pet_clean/services/geolocator_service.dart';
+import 'package:pet_clean/services/markers_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final supabase = Supabase.instance.client;
@@ -48,6 +49,7 @@ class _HomePageState extends State<HomePage> {
     //   _actionsWithPosition(position);
     // });
     GeolocatorService.startBackgroundLocationService(foreground: true);
+    MarkersService.checkForMarkers();
     _listenToPositionStream();
   }
 
