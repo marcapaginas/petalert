@@ -61,35 +61,6 @@ class MongoDatabase {
     }
   }
 
-  /// Retrieves all markers with a date within the last 5 seconds.
-  static Future<List<Map<String, dynamic>>> getRecentMarkers() async {
-    try {
-      if (db == null) {
-        await connect();
-      }
-
-      // Calculate the date 5 seconds ago
-      var now = DateTime.now();
-      var fiveSecondsAgo = now.subtract(const Duration(seconds: 5));
-
-      // Format the date to match MongoDB's format
-      var formattedDate = fiveSecondsAgo.toIso8601String();
-
-      // Construct the query
-      var query = {
-        'date': {'\$lte': formattedDate}
-      };
-
-      // Perform the query and return the results
-      var cursor = db!.collection('markers').find(query);
-      var markers = await cursor.toList();
-      return markers.map((marker) => marker).toList();
-    } catch (e) {
-      log('Error retrieving recent markers: $e');
-      return [];
-    }
-  }
-
   // get all markers
   static Future<List<MarkerModel>> getMarkers(
       {required double lat, required double lon, required double range}) async {

@@ -6,4 +6,9 @@ class UserModel {
     required this.id,
     required this.nombre,
   });
+
+  @override
+  String toString() {
+    return 'UserModel{id: $id, nombre: $nombre}';
+  }
 }

@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
+import 'package:flutter_map_geojson/flutter_map_geojson.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:pet_clean/blocs/location_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
@@ -26,6 +27,7 @@ class Mapa extends StatefulWidget {
 class _MapaState extends State<Mapa> with TickerProviderStateMixin {
   final _mapboxAccessToken = dotenv.env['MAPBOX_ACCESS_TOKEN'];
   late final _animatedMapController = AnimatedMapController(vsync: this);
+  GeoJsonParser myGeoJson = GeoJsonParser();
 
   @override
   void initState() {
@@ -44,6 +46,10 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
     final markersCubit = context.watch<MarkersCubit>();
     final locationCubit = context.watch<LocationCubit>();
     final mapOptionsCubit = context.watch<MapOptionsCubit>();
+
+    var testGeoJson = '';
+
+    myGeoJson.parseGeoJsonAsString(testGeoJson);
 
     return Scaffold(
       body: Stack(
@@ -70,35 +76,40 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
                 // urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 // userAgentPackageName: 'dev.fleaflet.flutter_map.example',
               ),
-              CircleLayer(
-                circles: [
-                  CircleMarker(
-                    point: locationCubit.state,
-                    radius: mapOptionsCubit.state.metersRange,
-                    borderColor: Colors.green,
-                    borderStrokeWidth: 1,
-                    useRadiusInMeter: true,
-                    color: const Color.fromRGBO(217, 255, 0, 0.268),
-                  ),
-                ],
-              ),
-              MarkerLayer(
-                markers: [
-                  Marker(
-                    point: locationCubit.state,
-                    width: 80,
-                    height: 80,
-                    rotate: true,
-                    alignment: const Alignment(0, -0.65),
-                    child: const Icon(
-                      Icons.location_on,
-                      color: Colors.red,
-                      size: 60,
-                    ),
-                  ),
-                  ...markersCubit.markers,
-                ],
-              ),
+
+              PolygonLayer(polygons: myGeoJson.polygons),
+              PolylineLayer(polylines: myGeoJson.polylines),
+              MarkerLayer(markers: myGeoJson.markers)
+
+              // CircleLayer(
+              //   circles: [
+              //     CircleMarker(
+              //       point: locationCubit.state,
+              //       radius: mapOptionsCubit.state.metersRange,
+              //       borderColor: Colors.green,
+              //       borderStrokeWidth: 1,
+              //       useRadiusInMeter: true,
+              //       color: const Color.fromRGBO(217, 255, 0, 0.268),
+              //     ),
+              //   ],
+              // ),
+              // MarkerLayer(
+              //   markers: [
+              //     Marker(
+              //       point: locationCubit.state,
+              //       width: 80,
+              //       height: 80,
+              //       rotate: true,
+              //       alignment: const Alignment(0, -0.65),
+              //       child: const Icon(
+              //         Icons.location_on,
+              //         color: Colors.red,
+              //         size: 60,
+              //       ),
+              //     ),
+              //     ...markersCubit.markers,
+              //   ],
+              // ),
             ],
           ),
           Positioned(

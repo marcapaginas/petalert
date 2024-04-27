@@ -1,8 +1,17 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pet_clean/models/map_options_state.dart';
+import 'package:pet_clean/models/user_location_model.dart';
 
 class MapOptionsCubit extends Cubit<MapOptionsState> {
   MapOptionsCubit() : super(MapOptionsState());
+
+  void setUserLocation(UserLocationModel userLocation) {
+    emit(state.copyWith(userLocation: userLocation));
+  }
+
+  void setOtherUsersLocations(List<UserLocationModel> otherUsersLocations) {
+    emit(state.copyWith(otherUsersLocations: otherUsersLocations));
+  }
 
   void setZoom(double zoom) {
     emit(state.copyWith(zoom: zoom));
