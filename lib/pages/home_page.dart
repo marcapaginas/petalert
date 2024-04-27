@@ -49,7 +49,6 @@ class _HomePageState extends State<HomePage> {
     //   _actionsWithPosition(position);
     // });
     GeolocatorService.startBackgroundLocationService(foreground: true);
-    MarkersService.checkForMarkers();
     _listenToPositionStream();
   }
 
@@ -69,7 +68,13 @@ class _HomePageState extends State<HomePage> {
     if (context.read<MapOptionsCubit>().state.walking) {
       MongoDatabase.insert({
         'userId': supabase.auth.currentUser!.id,
-        'location': 'POINT(${position.longitude} ${position.latitude})',
+        'longlat': [position.longitude, position.latitude],
+        'location': {
+          'type': 'Point',
+          'coordinates': [position.longitude, position.latitude]
+        },
+        'latitude': position.latitude,
+        'longitude': position.longitude,
         'date': DateTime.now().toIso8601String(),
       });
       //log('almacenado: Location: ${position.longitude}, ${position.latitude}');

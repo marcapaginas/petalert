@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:pet_clean/blocs/location_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/blocs/markers_cubit.dart';
+import 'package:pet_clean/database/mongo_database.dart';
 import 'package:pet_clean/widgets/walking_switch.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -52,6 +54,12 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
               initialCenter: locationCubit.state,
               initialZoom: mapOptionsCubit.state.zoom,
               onMapReady: () {
+                Timer.periodic(const Duration(seconds: 5), (timer) {
+                  _searchOtherUsers(
+                      lat: locationCubit.state.latitude,
+                      lon: locationCubit.state.longitude,
+                      range: mapOptionsCubit.state.metersRange);
+                });
                 _listenToLocationCubit();
               },
             ),
@@ -165,6 +173,16 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
         }
       } catch (e) {
         log('Error escuchando al cubit: $e');
+      }
+    });
+  }
+
+  void _searchOtherUsers(
+      {required double lat, required double lon, required double range}) async {
+    MongoDatabase.getMarkers(lat: lat, lon: lon, range: range).then((markers) {
+      context.read<MarkersCubit>().clearMarkers();
+      for (var markerFound in markers) {
+        context.read<MarkersCubit>().addMarker(markerFound);
       }
     });
   }

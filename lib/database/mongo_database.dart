@@ -1,7 +1,14 @@
 import 'dart:developer';
+import 'dart:ffi';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:pet_clean/blocs/location_cubit_singleton.dart';
+import 'package:pet_clean/blocs/map_options_cubit_singleton.dart';
+import 'package:pet_clean/models/marker_model.dart';
 
 class MongoDatabase {
   static MongoDatabase? _instance;
@@ -84,18 +91,93 @@ class MongoDatabase {
   }
 
   // get all markers
-  static Future<List<Map<String, dynamic>>> getMarkers() async {
+  static Future<List<MarkerModel>> getMarkers(
+      {required double lat, required double lon, required double range}) async {
     try {
       if (db == null) {
         await connect();
       }
+      List<MarkerModel> recoveredMarkers = [];
 
-      var cursor = db!.collection('markers').find();
-      var markers = await cursor.toList();
-      return markers.map((marker) => marker).toList();
+      log(' getmarkers en mongodatabaes: lat: $lat, lon: $lon, range: $range');
+
+      var query = db!.collection('markers').find({
+        'longlat': {
+          '\$near': [lon, lat],
+          '\$maxDistance': range / 100000
+        }
+      });
+
+      // var query = db!.collection('markers').find({
+      //   'location': {
+      //     '\$near': {
+      //       '\$geometry': {
+      //         'type': 'Point',
+      //         'coordinates': [lon, lat]
+      //       },
+      //       '\$maxDistance': range,
+      //     }
+      //   }
+      // });
+
+      // var query = db!.collection('markers').find({
+      //   'location': {
+      //     '\$geoWithin': {
+      //       '\$centerSphere': [
+      //         [lon, lat],
+      //         (range / 1000) / 6378.1
+      //       ]
+      //     }
+      //   }
+      // });
+
+      List<Map<String, dynamic>> records = await query.toList();
+
+      // var query = db!.collection('markers').find({
+      //   'location': {
+      //     '\$near': {
+      //       '\$geometry': {
+      //         'type': 'Point',
+      //         'coordinates': [lat, lon]
+      //       },
+      //       '\$maxDistance': range,
+      //     }
+      //   }
+      // });
+      //var query = db!.collection('markers').find();
+      //var records = await query.toList();
+
+      log('marcadores devueltos por la query: ${records.length}');
+
+      for (var record in records) {
+        recoveredMarkers.add(MarkerModel(
+          id: record['userId'].toString(),
+          marker: Marker(
+            point: LatLng(record['latitude'], record['longitude']),
+            child: const Icon(
+              Icons.location_on,
+              color: Colors.green,
+              size: 40,
+            ),
+          ),
+        ));
+      }
+      return recoveredMarkers;
     } catch (e) {
       log('Error retrieving markers: $e');
       return [];
     }
   }
+
+  // db.tuColeccion.find({
+  //   location: {
+  //     $near: {
+  //       $geometry: {
+  //         type: "Point",
+  //         coordinates: [-1.2068705, 37.9723167]
+  //       },
+  //       $maxDistance: 50
+  //     }
+  //   }
+  // })
 }
