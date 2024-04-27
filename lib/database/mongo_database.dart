@@ -101,12 +101,50 @@ class MongoDatabase {
 
       log(' getmarkers en mongodatabaes: lat: $lat, lon: $lon, range: $range');
 
-      var query = db!.collection('markers').find({
+      // parece estar descentrado, obtiene marcadores que no estan en el circulo
+      // var findParameters = {
+      //   'location': {
+      //     '\$near': {
+      //       '\$geometry': {
+      //         'type': '"Point"',
+      //         'coordinates': [lon, lat]
+      //       },
+      //       '\$maxDistance': 115,
+      //     },
+      //   },
+      // };
+
+      var findParameters = {
         'longlat': {
           '\$near': [lon, lat],
           '\$maxDistance': range / 100000
         }
-      });
+      };
+
+      var query = db!.collection('markers').find(findParameters);
+
+      List<Map<String, dynamic>> records = await query.toList();
+
+      // funciona pero no se pq hay que dividir los metros por 100000
+
+      // var query = db!.collection('markers').find({
+      //   'longlat': {
+      //     '\$near': [lon, lat],
+      //     '\$maxDistance': range / 100000
+      //   }
+      // });
+
+      // var query = db!.collection('markers').find({
+      //   'location': {
+      //     '\$near': {
+      //       '\$geometry': {
+      //         'type': 'Point',
+      //         'coordinates': [lon, lat]
+      //       },
+      //       '\$maxDistance': range * 1
+      //     }
+      //   }
+      // });
 
       // var query = db!.collection('markers').find({
       //   'location': {
@@ -131,7 +169,7 @@ class MongoDatabase {
       //   }
       // });
 
-      List<Map<String, dynamic>> records = await query.toList();
+      //List<Map<String, dynamic>> records = await query.toList();
 
       // var query = db!.collection('markers').find({
       //   'location': {
