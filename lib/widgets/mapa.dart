@@ -6,12 +6,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
-import 'package:flutter_map_geojson/flutter_map_geojson.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:pet_clean/blocs/location_cubit.dart';
+// import 'package:flutter_map_geojson/flutter_map_geojson.dart';
+// import 'package:latlong2/latlong.dart';
+// import 'package:pet_clean/blocs/location_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
-import 'package:pet_clean/blocs/markers_cubit.dart';
 import 'package:pet_clean/database/mongo_database.dart';
+// import 'package:pet_clean/blocs/markers_cubit.dart';
+// import 'package:pet_clean/database/mongo_database.dart';
+import 'package:pet_clean/models/map_options_state.dart';
 import 'package:pet_clean/widgets/walking_switch.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -27,7 +29,6 @@ class Mapa extends StatefulWidget {
 class _MapaState extends State<Mapa> with TickerProviderStateMixin {
   final _mapboxAccessToken = dotenv.env['MAPBOX_ACCESS_TOKEN'];
   late final _animatedMapController = AnimatedMapController(vsync: this);
-  GeoJsonParser myGeoJson = GeoJsonParser();
 
   @override
   void initState() {
@@ -43,13 +44,11 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final markersCubit = context.watch<MarkersCubit>();
-    final locationCubit = context.watch<LocationCubit>();
     final mapOptionsCubit = context.watch<MapOptionsCubit>();
 
-    var testGeoJson = '';
+    //var testGeoJson = mapOptionsCubit.state.geoJsonData;
 
-    myGeoJson.parseGeoJsonAsString(testGeoJson);
+    //myGeoJson.parseGeoJsonAsString(testGeoJson);
 
     return Scaffold(
       body: Stack(
@@ -57,34 +56,36 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
           FlutterMap(
             mapController: _animatedMapController.mapController,
             options: MapOptions(
-              initialCenter: locationCubit.state,
+              initialCenter: mapOptionsCubit.state.userLocation!.marker.point,
               initialZoom: mapOptionsCubit.state.zoom,
               onMapReady: () {
                 Timer.periodic(const Duration(seconds: 5), (timer) {
                   _searchOtherUsers(
-                      lat: locationCubit.state.latitude,
-                      lon: locationCubit.state.longitude,
+                      lat: mapOptionsCubit.state.userLocation!.latitude,
+                      lon: mapOptionsCubit.state.userLocation!.longitude,
                       range: mapOptionsCubit.state.metersRange);
                 });
-                _listenToLocationCubit();
+                //_listenToLocationCubit();
+                _listenToMapOptionsCubit();
               },
             ),
             children: [
               TileLayer(
-                urlTemplate:
-                    'https://api.mapbox.com/styles/v1/${mapOptionsCubit.state.mapStyle}/tiles/{z}/{x}/{y}@2x?access_token=$_mapboxAccessToken',
-                // urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                // userAgentPackageName: 'dev.fleaflet.flutter_map.example',
+                // urlTemplate:
+                //     'https://api.mapbox.com/styles/v1/${mapOptionsCubit.state.mapStyle}/tiles/{z}/{x}/{y}@2x?access_token=$_mapboxAccessToken',
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'dev.fleaflet.flutter_map.example',
               ),
 
-              PolygonLayer(polygons: myGeoJson.polygons),
-              PolylineLayer(polylines: myGeoJson.polylines),
-              MarkerLayer(markers: myGeoJson.markers)
+              PolygonLayer(polygons: mapOptionsCubit.state.polygons!),
+              PolylineLayer(polylines: mapOptionsCubit.state.polylines!),
+              CircleLayer(circles: mapOptionsCubit.state.circles!),
+              MarkerLayer(markers: mapOptionsCubit.state.markers!),
 
               // CircleLayer(
               //   circles: [
               //     CircleMarker(
-              //       point: locationCubit.state,
+              //       point: mapOptionsCubit.state.userLocation!.marker.point,
               //       radius: mapOptionsCubit.state.metersRange,
               //       borderColor: Colors.green,
               //       borderStrokeWidth: 1,
@@ -174,11 +175,26 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
   }
 
   //listen to cubit changes
-  void _listenToLocationCubit() {
-    context.read<LocationCubit>().stream.listen((LatLng state) {
+  // void _listenToLocationCubit() {
+  //   context.read<LocationCubit>().stream.listen((LatLng state) {
+  //     try {
+  //       if (mounted) {
+  //         _animatedMapController.animateTo(dest: state);
+  //       } else {
+  //         return;
+  //       }
+  //     } catch (e) {
+  //       log('Error escuchando al cubit: $e');
+  //     }
+  //   });
+  // }
+
+  void _listenToMapOptionsCubit() {
+    context.read<MapOptionsCubit>().stream.listen((MapOptionsState state) {
       try {
         if (mounted) {
-          _animatedMapController.animateTo(dest: state);
+          _animatedMapController.animateTo(
+              dest: state.userLocation!.marker.point);
         } else {
           return;
         }
@@ -190,11 +206,9 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
 
   void _searchOtherUsers(
       {required double lat, required double lon, required double range}) async {
-    MongoDatabase.getMarkers(lat: lat, lon: lon, range: range).then((markers) {
-      context.read<MarkersCubit>().clearMarkers();
-      for (var markerFound in markers) {
-        context.read<MarkersCubit>().addMarker(markerFound);
-      }
+    MongoDatabase.searchOtherUsers(lat: lat, lon: lon, range: range)
+        .then((result) {
+      context.read<MapOptionsCubit>().setOtherUsersLocations(result);
     });
   }
 }

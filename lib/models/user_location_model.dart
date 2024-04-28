@@ -4,25 +4,35 @@ import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UserLocationModel {
-  final User user;
+  final User? user;
+  final String? userId;
+  final String? email;
   final double latitude;
   final double longitude;
 
   UserLocationModel(
-      {required this.user, required this.latitude, required this.longitude});
+      {this.user,
+      this.userId,
+      this.email,
+      required this.latitude,
+      required this.longitude});
 
   @override
   String toString() {
-    return 'UserLocationModel{user: $user, latitude: $latitude, longitude: $longitude}';
+    return 'UserLocationModel{user: ${user?.id}, ${user?.email}, latitude: $latitude, longitude: $longitude}';
   }
 
   UserLocationModel copyWith({
     User? user,
+    String? userId,
+    String? email,
     double? latitude,
     double? longitude,
   }) {
     return UserLocationModel(
       user: user ?? this.user,
+      userId: userId ?? this.userId,
+      email: email ?? this.email,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
     );
@@ -42,7 +52,7 @@ class UserLocationModel {
       point: LatLng(latitude, longitude),
       child: const Icon(
         Icons.location_on,
-        size: 30,
+        size: 80,
         color: Colors.red,
       ),
     );
@@ -56,8 +66,8 @@ class UserLocationModel {
         'coordinates': [longitude, latitude],
       },
       'properties': {
-        'title': user.id,
-        'description': user.email,
+        'title': user?.id ?? 'Unknown',
+        'description': user?.email ?? 'Unknown',
       },
     };
   }

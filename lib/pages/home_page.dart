@@ -9,6 +9,7 @@ import 'package:pet_clean/blocs/location_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/database/mongo_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
+import 'package:pet_clean/models/user_location_model.dart';
 import 'package:pet_clean/pages/alerts.dart';
 import 'package:pet_clean/pages/first_page.dart';
 import 'package:pet_clean/pages/map_page.dart';
@@ -30,18 +31,6 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController(initialPage: 0);
 
-  // late LocationSettings locationSettings = AndroidSettings(
-  //   accuracy: LocationAccuracy.high,
-  //   distanceFilter: 5,
-  //   intervalDuration: const Duration(seconds: 2),
-  //   // foregroundNotificationConfig: const ForegroundNotificationConfig(
-  //   //   notificationText: "La aplicación está ejecutándose en segundo plano.",
-  //   //   notificationTitle: "Corriendo en segundo plano",
-  //   //   enableWakeLock: true,
-  //   //   color: Colors.green,
-  //   // ),
-  // );
-
   @override
   void initState() {
     super.initState();
@@ -61,9 +50,13 @@ class _HomePageState extends State<HomePage> {
   void _actionsWithPosition(Position position) async {
     log(position.toString());
     setState(() {
-      context
-          .read<LocationCubit>()
-          .setLocation(LatLng(position.latitude, position.longitude));
+      // context
+      //     .read<LocationCubit>()
+      //     .setLocation(LatLng(position.latitude, position.longitude));
+      context.read<MapOptionsCubit>().setUserLocation(UserLocationModel(
+          user: supabase.auth.currentUser!,
+          latitude: position.latitude,
+          longitude: position.longitude));
     });
     if (context.read<MapOptionsCubit>().state.walking) {
       MongoDatabase.insert({

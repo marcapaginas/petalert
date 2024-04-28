@@ -5,10 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+//import 'package:lottie/lottie.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:pet_clean/blocs/location_cubit_singleton.dart';
 import 'package:pet_clean/blocs/map_options_cubit_singleton.dart';
 import 'package:pet_clean/models/marker_model.dart';
+import 'package:pet_clean/models/user_location_model.dart';
+import 'package:pet_clean/models/user_model.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MongoDatabase {
   static MongoDatabase? _instance;
@@ -61,29 +65,14 @@ class MongoDatabase {
     }
   }
 
-  // get all markers
-  static Future<List<MarkerModel>> getMarkers(
+  // get all other users as user location models
+  static Future<List<UserLocationModel>> searchOtherUsers(
       {required double lat, required double lon, required double range}) async {
     try {
       if (db == null) {
         await connect();
       }
-      List<MarkerModel> recoveredMarkers = [];
-
-      log(' getmarkers en mongodatabaes: lat: $lat, lon: $lon, range: $range');
-
-      // parece estar descentrado, obtiene marcadores que no estan en el circulo
-      // var findParameters = {
-      //   'location': {
-      //     '\$near': {
-      //       '\$geometry': {
-      //         'type': '"Point"',
-      //         'coordinates': [lon, lat]
-      //       },
-      //       '\$maxDistance': 115,
-      //     },
-      //   },
-      // };
+      List<UserLocationModel> otherUsersFound = [];
 
       var findParameters = {
         'longlat': {
@@ -96,65 +85,43 @@ class MongoDatabase {
 
       List<Map<String, dynamic>> records = await query.toList();
 
-      // funciona pero no se pq hay que dividir los metros por 100000
+      log('otros usuarios devueltos por la query: ${records.length}');
 
-      // var query = db!.collection('markers').find({
-      //   'longlat': {
-      //     '\$near': [lon, lat],
-      //     '\$maxDistance': range / 100000
-      //   }
-      // });
+      for (var record in records) {
+        otherUsersFound.add(UserLocationModel(
+          userId: record['userId'].toString(),
+          latitude: record['latitude'],
+          longitude: record['longitude'],
+        ));
+      }
+      return otherUsersFound;
+    } catch (e) {
+      log('Error retrieving markers: $e');
+      return [];
+    }
+  }
 
-      // var query = db!.collection('markers').find({
-      //   'location': {
-      //     '\$near': {
-      //       '\$geometry': {
-      //         'type': 'Point',
-      //         'coordinates': [lon, lat]
-      //       },
-      //       '\$maxDistance': range * 1
-      //     }
-      //   }
-      // });
+  // get all markers
+  static Future<List<MarkerModel>> getMarkers(
+      {required double lat, required double lon, required double range}) async {
+    try {
+      if (db == null) {
+        await connect();
+      }
+      List<MarkerModel> recoveredMarkers = [];
 
-      // var query = db!.collection('markers').find({
-      //   'location': {
-      //     '\$near': {
-      //       '\$geometry': {
-      //         'type': 'Point',
-      //         'coordinates': [lon, lat]
-      //       },
-      //       '\$maxDistance': range,
-      //     }
-      //   }
-      // });
+      log(' getmarkers en mongodatabaes: lat: $lat, lon: $lon, range: $range');
 
-      // var query = db!.collection('markers').find({
-      //   'location': {
-      //     '\$geoWithin': {
-      //       '\$centerSphere': [
-      //         [lon, lat],
-      //         (range / 1000) / 6378.1
-      //       ]
-      //     }
-      //   }
-      // });
+      var findParameters = {
+        'longlat': {
+          '\$near': [lon, lat],
+          '\$maxDistance': range / 100000
+        }
+      };
 
-      //List<Map<String, dynamic>> records = await query.toList();
+      var query = db!.collection('markers').find(findParameters);
 
-      // var query = db!.collection('markers').find({
-      //   'location': {
-      //     '\$near': {
-      //       '\$geometry': {
-      //         'type': 'Point',
-      //         'coordinates': [lat, lon]
-      //       },
-      //       '\$maxDistance': range,
-      //     }
-      //   }
-      // });
-      //var query = db!.collection('markers').find();
-      //var records = await query.toList();
+      List<Map<String, dynamic>> records = await query.toList();
 
       log('marcadores devueltos por la query: ${records.length}');
 
