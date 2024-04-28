@@ -94,7 +94,7 @@ class MapOptionsState {
       'features': features,
     });
 
-    log('geoJsonData: $json');
+    //log('geoJsonData: $json');
 
     return json;
   }
@@ -117,8 +117,7 @@ class MapOptionsState {
   // parse geojson data
   void parseGeoJsonData(String geoJsonData) {
     GeoJsonParser parser = CustomGeoJsonParser();
-    parser.setDefaultCircleMarkerColor =
-        const Color.fromARGB(86, 255, 235, 100);
+    parser.setDefaultCircleMarkerColor = Color.fromARGB(81, 215, 203, 137);
     parser.setDefaultMarkerTapCallback((f) => log('Marker tapped: $f'));
     parser.parseGeoJsonAsString(geoJsonData);
     polygons = parser.polygons;

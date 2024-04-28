@@ -1,7 +1,4 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_geojson/flutter_map_geojson.dart';
 
 class CustomGeoJsonParser extends GeoJsonParser {
@@ -19,12 +16,15 @@ class CustomGeoJsonParser extends GeoJsonParser {
         onTap: () {
           onMarkerTap(properties);
         },
-        child: Icon(
-          Icons.location_on,
-          color: properties['description'] == 'correo@josemiguel.net'
-              ? Colors.amber
-              : defaultMarkerColor,
-          size: 40,
+        child: Transform.translate(
+          offset: const Offset(-5, -20),
+          child: Icon(
+            Icons.location_on,
+            color: properties['description'] == 'correo@josemiguel.net'
+                ? Colors.amber
+                : defaultMarkerColor,
+            size: 40,
+          ),
         ),
       ),
     );

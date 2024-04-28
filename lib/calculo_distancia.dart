@@ -27,13 +27,13 @@ bool isWithinRadius(
 
 void main() {
   // Example usage:
-  double latitude1 = 37.972377; // Latitude of point 1
-  double longitude1 = -1.207200; // Longitude of point 1
-  double latitude2 = 37.972182; // Latitude of point 2
-  double longitude2 = -1.207457; // Longitude of point 2
-  double radiusInMeters = 50; // Radius in meters
+  // double latitude1 = 37.972377; // Latitude of point 1
+  // double longitude1 = -1.207200; // Longitude of point 1
+  // double latitude2 = 37.972182; // Latitude of point 2
+  // double longitude2 = -1.207457; // Longitude of point 2
+  // double radiusInMeters = 50; // Radius in meters
 
-  bool withinRadius = isWithinRadius(
-      latitude1, longitude1, latitude2, longitude2, radiusInMeters);
-  print("Is within radius: $withinRadius");
+  // bool withinRadius = isWithinRadius(
+  //     latitude1, longitude1, latitude2, longitude2, radiusInMeters);
+  //print("Is within radius: $withinRadius");
 }

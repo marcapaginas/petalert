@@ -1,11 +1,10 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:pet_clean/blocs/alerts_cubit.dart';
-import 'package:pet_clean/blocs/location_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/database/mongo_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
@@ -15,7 +14,6 @@ import 'package:pet_clean/pages/first_page.dart';
 import 'package:pet_clean/pages/map_page.dart';
 import 'package:pet_clean/pages/settings.dart';
 import 'package:pet_clean/services/geolocator_service.dart';
-import 'package:pet_clean/services/markers_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final supabase = Supabase.instance.client;
@@ -38,7 +36,22 @@ class _HomePageState extends State<HomePage> {
     //   _actionsWithPosition(position);
     // });
     GeolocatorService.startBackgroundLocationService(foreground: true);
+    _searchOtherUsersLocations();
     _listenToPositionStream();
+  }
+
+  void _searchOtherUsersLocations() {
+    Timer.periodic(const Duration(seconds: 2), (timer) {
+      if (context.read<MapOptionsCubit>().state.userLocation != null) {
+        MongoDatabase.searchOtherUsers(
+          context.read<MapOptionsCubit>().state.userLocation!.latitude,
+          context.read<MapOptionsCubit>().state.userLocation!.longitude,
+          context.read<MapOptionsCubit>().state.metersRange,
+        ).then((result) {
+          context.read<MapOptionsCubit>().setOtherUsersLocations(result);
+        });
+      }
+    });
   }
 
   void _listenToPositionStream() {

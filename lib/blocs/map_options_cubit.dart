@@ -1,30 +1,9 @@
-import 'dart:developer';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_map_geojson/flutter_map_geojson.dart';
 import 'package:pet_clean/models/map_options_state.dart';
 import 'package:pet_clean/models/user_location_model.dart';
 
 class MapOptionsCubit extends Cubit<MapOptionsState> {
-  MapOptionsCubit() : super(MapOptionsState()) {
-    //_loadInitialData();
-  }
-
-  // void _loadInitialData() async {
-  //   // Cargar los datos de GeoJSON
-  //   String geoJsonData =  state.geoJsonData;
-
-  //   // Parsear los datos de GeoJSON
-  //   GeoJsonParser parser = GeoJsonParser();
-  //   parser.parseGeoJsonAsString(geoJsonData);
-
-  //   // Actualizar el estado con las capas generadas
-  //   emit(state.copyWith(
-  //     polygons: parser.polygons,
-  //     polylines: parser.polylines,
-  //     markers: parser.markers,
-  //   ));
-  // }
+  MapOptionsCubit() : super(MapOptionsState());
 
   void setUserLocation(UserLocationModel userLocation) {
     emit(state.copyWith(userLocation: userLocation));

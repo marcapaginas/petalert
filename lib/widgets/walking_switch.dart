@@ -67,8 +67,4 @@ class _WalkingSwitchState extends State<WalkingSwitch>
       ),
     );
   }
-
-  _stopWalkingAnimation() {
-    //_controller.forward();
-  }
 }

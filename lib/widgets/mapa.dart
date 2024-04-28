@@ -6,13 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
-// import 'package:flutter_map_geojson/flutter_map_geojson.dart';
-// import 'package:latlong2/latlong.dart';
-// import 'package:pet_clean/blocs/location_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/database/mongo_database.dart';
-// import 'package:pet_clean/blocs/markers_cubit.dart';
-// import 'package:pet_clean/database/mongo_database.dart';
 import 'package:pet_clean/models/map_options_state.dart';
 import 'package:pet_clean/widgets/walking_switch.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -27,7 +22,7 @@ class Mapa extends StatefulWidget {
 }
 
 class _MapaState extends State<Mapa> with TickerProviderStateMixin {
-  final _mapboxAccessToken = dotenv.env['MAPBOX_ACCESS_TOKEN'];
+  //final _mapboxAccessToken = dotenv.env['MAPBOX_ACCESS_TOKEN'];
   late final _animatedMapController = AnimatedMapController(vsync: this);
 
   @override
@@ -46,10 +41,6 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final mapOptionsCubit = context.watch<MapOptionsCubit>();
 
-    //var testGeoJson = mapOptionsCubit.state.geoJsonData;
-
-    //myGeoJson.parseGeoJsonAsString(testGeoJson);
-
     return Scaffold(
       body: Stack(
         children: [
@@ -59,13 +50,6 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
               initialCenter: mapOptionsCubit.state.userLocation!.marker.point,
               initialZoom: mapOptionsCubit.state.zoom,
               onMapReady: () {
-                Timer.periodic(const Duration(seconds: 5), (timer) {
-                  _searchOtherUsers(
-                      lat: mapOptionsCubit.state.userLocation!.latitude,
-                      lon: mapOptionsCubit.state.userLocation!.longitude,
-                      range: mapOptionsCubit.state.metersRange);
-                });
-                //_listenToLocationCubit();
                 _listenToMapOptionsCubit();
               },
             ),
@@ -76,41 +60,27 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'dev.fleaflet.flutter_map.example',
               ),
-
-              PolygonLayer(polygons: mapOptionsCubit.state.polygons!),
-              PolylineLayer(polylines: mapOptionsCubit.state.polylines!),
               CircleLayer(circles: mapOptionsCubit.state.circles!),
               MarkerLayer(markers: mapOptionsCubit.state.markers!),
-
-              // CircleLayer(
-              //   circles: [
-              //     CircleMarker(
-              //       point: mapOptionsCubit.state.userLocation!.marker.point,
-              //       radius: mapOptionsCubit.state.metersRange,
-              //       borderColor: Colors.green,
-              //       borderStrokeWidth: 1,
-              //       useRadiusInMeter: true,
-              //       color: const Color.fromRGBO(217, 255, 0, 0.268),
-              //     ),
-              //   ],
-              // ),
-              // MarkerLayer(
-              //   markers: [
-              //     Marker(
-              //       point: locationCubit.state,
-              //       width: 80,
-              //       height: 80,
-              //       rotate: true,
-              //       alignment: const Alignment(0, -0.65),
-              //       child: const Icon(
-              //         Icons.location_on,
-              //         color: Colors.red,
-              //         size: 60,
-              //       ),
-              //     ),
-              //     ...markersCubit.markers,
-              //   ],
-              // ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: ColoredBox(
+                  color: Colors.white,
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: const Padding(
+                      padding: EdgeInsets.all(3),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('© OpenStreetMap',
+                              style: TextStyle(fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
           Positioned(
@@ -174,21 +144,6 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
     );
   }
 
-  //listen to cubit changes
-  // void _listenToLocationCubit() {
-  //   context.read<LocationCubit>().stream.listen((LatLng state) {
-  //     try {
-  //       if (mounted) {
-  //         _animatedMapController.animateTo(dest: state);
-  //       } else {
-  //         return;
-  //       }
-  //     } catch (e) {
-  //       log('Error escuchando al cubit: $e');
-  //     }
-  //   });
-  // }
-
   void _listenToMapOptionsCubit() {
     context.read<MapOptionsCubit>().stream.listen((MapOptionsState state) {
       try {
@@ -206,8 +161,7 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
 
   void _searchOtherUsers(
       {required double lat, required double lon, required double range}) async {
-    MongoDatabase.searchOtherUsers(lat: lat, lon: lon, range: range)
-        .then((result) {
+    MongoDatabase.searchOtherUsers(lat, lon, range).then((result) {
       context.read<MapOptionsCubit>().setOtherUsersLocations(result);
     });
   }

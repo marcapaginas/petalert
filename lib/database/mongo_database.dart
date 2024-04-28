@@ -1,17 +1,8 @@
 import 'dart:developer';
-import 'dart:ffi';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
-//import 'package:lottie/lottie.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:pet_clean/blocs/location_cubit_singleton.dart';
-import 'package:pet_clean/blocs/map_options_cubit_singleton.dart';
-import 'package:pet_clean/models/marker_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
-import 'package:pet_clean/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MongoDatabase {
@@ -67,18 +58,21 @@ class MongoDatabase {
 
   // get all other users as user location models
   static Future<List<UserLocationModel>> searchOtherUsers(
-      {required double lat, required double lon, required double range}) async {
+      double lat, double lon, double range) async {
     try {
       if (db == null) {
         await connect();
       }
+
+      String? userId = Supabase.instance.client.auth.currentUser?.id;
       List<UserLocationModel> otherUsersFound = [];
 
       var findParameters = {
         'longlat': {
           '\$near': [lon, lat],
           '\$maxDistance': range / 100000
-        }
+        },
+        'userId': {'\$ne': userId},
       };
 
       var query = db!.collection('markers').find(findParameters);
@@ -100,60 +94,4 @@ class MongoDatabase {
       return [];
     }
   }
-
-  // get all markers
-  static Future<List<MarkerModel>> getMarkers(
-      {required double lat, required double lon, required double range}) async {
-    try {
-      if (db == null) {
-        await connect();
-      }
-      List<MarkerModel> recoveredMarkers = [];
-
-      log(' getmarkers en mongodatabaes: lat: $lat, lon: $lon, range: $range');
-
-      var findParameters = {
-        'longlat': {
-          '\$near': [lon, lat],
-          '\$maxDistance': range / 100000
-        }
-      };
-
-      var query = db!.collection('markers').find(findParameters);
-
-      List<Map<String, dynamic>> records = await query.toList();
-
-      log('marcadores devueltos por la query: ${records.length}');
-
-      for (var record in records) {
-        recoveredMarkers.add(MarkerModel(
-          id: record['userId'].toString(),
-          marker: Marker(
-            point: LatLng(record['latitude'], record['longitude']),
-            child: const Icon(
-              Icons.location_on,
-              color: Colors.green,
-              size: 40,
-            ),
-          ),
-        ));
-      }
-      return recoveredMarkers;
-    } catch (e) {
-      log('Error retrieving markers: $e');
-      return [];
-    }
-  }
-
-  // db.tuColeccion.find({
-  //   location: {
-  //     $near: {
-  //       $geometry: {
-  //         type: "Point",
-  //         coordinates: [-1.2068705, 37.9723167]
-  //       },
-  //       $maxDistance: 50
-  //     }
-  //   }
-  // })
 }
