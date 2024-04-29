@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pet_clean/database/supabase_database.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:pet_clean/main.dart';
 
@@ -22,9 +23,12 @@ class _AccountPageState extends State<AccountPage> {
     });
 
     try {
-      final userId = supabase.auth.currentUser!.id;
-      final data =
-          await supabase.from('profiles').select().eq('id', userId).single();
+      final userId = SupabaseDatabase.supabase.auth.currentUser!.id;
+      final data = await SupabaseDatabase.supabase
+          .from('profiles')
+          .select()
+          .eq('id', userId)
+          .single();
       _usernameController.text = (data['username'] ?? '') as String;
       _websiteController.text = (data['website'] ?? '') as String;
     } on PostgrestException catch (error) {
@@ -51,7 +55,7 @@ class _AccountPageState extends State<AccountPage> {
     });
     final userName = _usernameController.text.trim();
     final website = _websiteController.text.trim();
-    final user = supabase.auth.currentUser;
+    final user = SupabaseDatabase.supabase.auth.currentUser;
     final updates = {
       'id': user!.id,
       'username': userName,
@@ -59,7 +63,7 @@ class _AccountPageState extends State<AccountPage> {
       'updated_at': DateTime.now().toIso8601String(),
     };
     try {
-      await supabase.from('profiles').upsert(updates);
+      await SupabaseDatabase.supabase.from('profiles').upsert(updates);
       if (mounted) {
         const SnackBar(
           content: Text('Successfully updated profile!'),
@@ -84,7 +88,7 @@ class _AccountPageState extends State<AccountPage> {
 
   Future<void> _signOut() async {
     try {
-      await supabase.auth.signOut();
+      await SupabaseDatabase.supabase.auth.signOut();
     } on AuthException catch (error) {
       SnackBar(
         content: Text(error.message),

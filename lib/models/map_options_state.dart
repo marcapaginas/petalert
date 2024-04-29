@@ -16,8 +16,6 @@ class MapOptionsState {
   UserLocationModel? userLocation;
   List<UserLocationModel>? otherUsersLocations;
 
-  List<Polygon>? polygons;
-  List<Polyline>? polylines;
   List<Marker>? markers;
   List<CircleMarker>? circles;
 
@@ -28,8 +26,6 @@ class MapOptionsState {
     this.walking = false,
     this.userLocation,
     this.otherUsersLocations,
-    this.polygons,
-    this.polylines,
     this.markers,
     this.circles,
   });
@@ -41,8 +37,6 @@ class MapOptionsState {
     bool? walking,
     UserLocationModel? userLocation,
     List<UserLocationModel>? otherUsersLocations,
-    List<Polygon>? polygons,
-    List<Polyline>? polylines,
     List<Marker>? markers,
     List<CircleMarker>? circles,
   }) {
@@ -54,8 +48,6 @@ class MapOptionsState {
       walking: walking ?? this.walking,
       userLocation: userLocation ?? this.userLocation,
       otherUsersLocations: otherUsersLocations ?? this.otherUsersLocations,
-      polygons: polygons ?? this.polygons,
-      polylines: polylines ?? this.polylines,
       markers: markers ?? this.markers,
       circles: circles ?? this.circles,
     );
@@ -117,11 +109,10 @@ class MapOptionsState {
   // parse geojson data
   void parseGeoJsonData(String geoJsonData) {
     GeoJsonParser parser = CustomGeoJsonParser();
-    parser.setDefaultCircleMarkerColor = Color.fromARGB(81, 215, 203, 137);
+    parser.setDefaultCircleMarkerColor =
+        const Color.fromARGB(81, 215, 203, 137);
     parser.setDefaultMarkerTapCallback((f) => log('Marker tapped: $f'));
     parser.parseGeoJsonAsString(geoJsonData);
-    polygons = parser.polygons;
-    polylines = parser.polylines;
     markers = parser.markers;
     circles = parser.circles;
   }

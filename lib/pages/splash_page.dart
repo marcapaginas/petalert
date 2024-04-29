@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pet_clean/database/supabase_database.dart';
 import 'package:pet_clean/main.dart';
 
 class SplashPage extends StatefulWidget {
@@ -21,7 +22,7 @@ class _SplashPageState extends State<SplashPage> {
       return;
     }
 
-    final session = supabase.auth.currentSession;
+    final session = SupabaseDatabase.supabase.auth.currentSession;
     if (session != null) {
       Navigator.of(context).pushReplacementNamed('/homepage');
     } else {

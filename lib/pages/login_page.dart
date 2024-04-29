@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:pet_clean/database/supabase_database.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:pet_clean/main.dart';
 
@@ -24,7 +25,7 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         _isLoading = true;
       });
-      await supabase.auth.signInWithPassword(
+      await SupabaseDatabase.supabase.auth.signInWithPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
@@ -53,7 +54,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-    _authStateSubscription = supabase.auth.onAuthStateChange.listen((data) {
+    _authStateSubscription =
+        SupabaseDatabase.supabase.auth.onAuthStateChange.listen((data) {
       if (_redirecting) return;
       final session = data.session;
       if (session != null) {

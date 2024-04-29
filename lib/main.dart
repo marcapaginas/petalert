@@ -6,6 +6,7 @@ import 'package:pet_clean/blocs/location_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/blocs/markers_cubit.dart';
 import 'package:pet_clean/blocs/username_cubit.dart';
+import 'package:pet_clean/database/supabase_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
 import 'package:pet_clean/pages/account_page.dart';
 import 'package:pet_clean/pages/alert_detail_page.dart';
@@ -20,17 +21,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
-  await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL']!,
-    anonKey: dotenv.env['SUPABASE_KEY']!,
-  );
+  SupabaseDatabase.initialize();
   NotificationService.initialize();
   GeolocatorService.checkServiceAndPermission();
 
   runApp(const BlocsProvider());
 }
 
-final supabase = Supabase.instance.client;
+// final supabase = Supabase.instance.client;
 
 class BlocsProvider extends StatelessWidget {
   const BlocsProvider({super.key});

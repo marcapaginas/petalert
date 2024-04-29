@@ -6,7 +6,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
-import 'package:pet_clean/database/mongo_database.dart';
 import 'package:pet_clean/models/map_options_state.dart';
 import 'package:pet_clean/widgets/walking_switch.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -61,22 +60,14 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
               ),
               CircleLayer(circles: mapOptionsCubit.state.circles!),
               MarkerLayer(markers: mapOptionsCubit.state.markers!),
-              Align(
+              const Align(
                 alignment: Alignment.bottomCenter,
                 child: ColoredBox(
                   color: Colors.white,
-                  child: GestureDetector(
-                    onTap: () {},
-                    child: const Padding(
-                      padding: EdgeInsets.all(3),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('© OpenStreetMap',
-                              style: TextStyle(fontSize: 12)),
-                        ],
-                      ),
-                    ),
+                  child: Padding(
+                    padding: EdgeInsets.all(3),
+                    child:
+                        Text('© OpenStreetMap', style: TextStyle(fontSize: 12)),
                   ),
                 ),
               ),
@@ -155,13 +146,6 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
       } catch (e) {
         log('Error escuchando al cubit: $e');
       }
-    });
-  }
-
-  void _searchOtherUsers(
-      {required double lat, required double lon, required double range}) async {
-    MongoDatabase.searchOtherUsers(lat, lon, range).then((result) {
-      context.read<MapOptionsCubit>().setOtherUsersLocations(result);
     });
   }
 }
