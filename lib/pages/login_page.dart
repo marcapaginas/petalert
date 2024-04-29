@@ -58,8 +58,6 @@ class _LoginPageState extends State<LoginPage> {
       if (_redirecting) return;
       final session = data.session;
       if (session != null) {
-        //print(session);
-
         _redirecting = true;
         Navigator.of(context).pushReplacementNamed('/homepage');
       }
