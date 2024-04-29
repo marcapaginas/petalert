@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pet_clean/database/supabase_database.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:pet_clean/main.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});

@@ -16,7 +16,6 @@ import 'package:pet_clean/pages/register_page.dart';
 import 'package:pet_clean/pages/splash_page.dart';
 import 'package:pet_clean/services/geolocator_service.dart';
 import 'package:pet_clean/services/notification_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
