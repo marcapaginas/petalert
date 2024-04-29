@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map_geojson/flutter_map_geojson.dart';
+import 'package:pet_clean/database/supabase_database.dart';
 
 class CustomGeoJsonParser extends GeoJsonParser {
   @override
@@ -20,10 +21,11 @@ class CustomGeoJsonParser extends GeoJsonParser {
           offset: const Offset(-5, -20),
           child: Icon(
             Icons.location_on,
-            color: properties['description'] == 'correo@josemiguel.net'
-                ? Colors.amber
+            color: properties['userId'] ==
+                    SupabaseDatabase.supabase.auth.currentUser?.id
+                ? Colors.green
                 : defaultMarkerColor,
-            size: 40,
+            size: 50,
           ),
         ),
       ),

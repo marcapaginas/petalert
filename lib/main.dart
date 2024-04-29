@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:get/get.dart';
 import 'package:pet_clean/blocs/alerts_cubit.dart';
 import 'package:pet_clean/blocs/location_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
@@ -24,7 +25,7 @@ Future<void> main() async {
   NotificationService.initialize();
   GeolocatorService.checkServiceAndPermission();
 
-  runApp(const BlocsProvider());
+  runApp(const GetMaterialApp(home: BlocsProvider()));
 }
 
 // final supabase = Supabase.instance.client;

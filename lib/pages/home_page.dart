@@ -63,11 +63,10 @@ class _HomePageState extends State<HomePage> {
   void _actionsWithPosition(Position position) async {
     log(position.toString());
     setState(() {
-      // context
-      //     .read<LocationCubit>()
-      //     .setLocation(LatLng(position.latitude, position.longitude));
       context.read<MapOptionsCubit>().setUserLocation(UserLocationModel(
           user: supabase.auth.currentUser!,
+          userId: supabase.auth.currentUser!.id,
+          email: supabase.auth.currentUser!.email,
           latitude: position.latitude,
           longitude: position.longitude));
     });

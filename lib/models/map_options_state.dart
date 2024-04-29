@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_geojson/flutter_map_geojson.dart';
+import 'package:get/get.dart';
 import 'package:pet_clean/classes/custom_geo_json_parser.dart';
 import 'package:pet_clean/models/user_location_model.dart';
 
@@ -106,14 +106,59 @@ class MapOptionsState {
     markers = null;
   }
 
-  // parse geojson data
   void parseGeoJsonData(String geoJsonData) {
     GeoJsonParser parser = CustomGeoJsonParser();
     parser.setDefaultCircleMarkerColor =
         const Color.fromARGB(81, 215, 203, 137);
-    parser.setDefaultMarkerTapCallback((f) => log('Marker tapped: $f'));
+    parser.setDefaultMarkerTapCallback((properties) {
+      mostrarDetallesMarcador(properties);
+    });
     parser.parseGeoJsonAsString(geoJsonData);
     markers = parser.markers;
     circles = parser.circles;
+  }
+
+  Future<dynamic> mostrarDetallesMarcador(Map<String, dynamic> properties) {
+    return showModalBottomSheet(
+      context: Get.context!,
+      builder: (context) {
+        return Container(
+          height: 200,
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Padding(
+                  padding: const EdgeInsets.all(30),
+                  child: Column(
+                    children: [
+                      Text('Usuario: ${properties['userId']}',
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 10),
+                      Text('Email: ${properties['email']}',
+                          style: const TextStyle(fontSize: 16)),
+                    ],
+                  )),
+              Positioned(
+                top: -80,
+                left: 10,
+                child: Image.asset(
+                  'assets/petalert-logo.png',
+                  height: 100,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

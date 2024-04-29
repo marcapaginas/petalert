@@ -66,8 +66,8 @@ class UserLocationModel {
         'coordinates': [longitude, latitude],
       },
       'properties': {
-        'title': user?.id ?? 'Unknown',
-        'description': user?.email ?? 'Unknown',
+        'userId': userId ?? 'Unknown',
+        'email': email ?? 'Unknown',
       },
     };
   }
