@@ -6,7 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:pet_clean/blocs/alerts_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
+import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/mongo_database.dart';
+import 'package:pet_clean/database/supabase_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
 import 'package:pet_clean/pages/alerts.dart';
@@ -38,6 +40,11 @@ class _HomePageState extends State<HomePage> {
     GeolocatorService.startBackgroundLocationService(foreground: true);
     _searchOtherUsersLocations();
     _listenToPositionStream();
+    // load userdata from database
+    SupabaseDatabase.getUserData(supabase.auth.currentUser!.id)
+        .then((userData) {
+      context.read<UserDataCubit>().setUserData(userData);
+    });
   }
 
   void _searchOtherUsersLocations() {
@@ -113,7 +120,7 @@ class _HomePageState extends State<HomePage> {
         children: <Widget>[
           Container(
             color: Colors.green,
-            child: const FirstPage(),
+            child: FirstPage(),
           ),
           Container(
             color: Colors.green,

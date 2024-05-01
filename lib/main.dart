@@ -6,6 +6,7 @@ import 'package:pet_clean/blocs/alerts_cubit.dart';
 import 'package:pet_clean/blocs/location_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/blocs/markers_cubit.dart';
+import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/blocs/username_cubit.dart';
 import 'package:pet_clean/database/supabase_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
@@ -37,11 +38,9 @@ class BlocsProvider extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => UsernameCubit()),
-        BlocProvider(create: (context) => LocationCubit()),
-        BlocProvider(create: (context) => MarkersCubit()),
         BlocProvider(create: (context) => AlertsCubit()),
         BlocProvider(create: (context) => MapOptionsCubit()),
+        BlocProvider(create: (context) => UserDataCubit()),
       ],
       child: const MyApp(),
     );
