@@ -1,8 +1,5 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/supabase_database.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

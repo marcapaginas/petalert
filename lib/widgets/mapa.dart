@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
-import 'package:get/get.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/models/map_options_state.dart';
 import 'package:pet_clean/widgets/walking_switch.dart';
