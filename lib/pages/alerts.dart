@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pet_clean/blocs/alerts_cubit.dart';
+import 'package:pet_clean/database/supabase_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
 
 class Alerts extends StatefulWidget {
@@ -20,6 +21,7 @@ class _AlertsState extends State<Alerts> {
         onPressed: () {
           AlertModel newAlert = AlertModel(
             id: alertsCubit.state.length + 1,
+            userId: SupabaseDatabase.supabase.auth.currentUser!.id,
             title: 'Alerta ${alertsCubit.state.length + 1}',
             description:
                 'Descripción de la alerta ${alertsCubit.state.length + 1}',
@@ -56,7 +58,6 @@ class _AlertsState extends State<Alerts> {
                 ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(' Quitada alerta: $title')));
               },
-              // Show a red background as the item is swiped away.
               background: Container(
                 alignment: AlignmentDirectional.centerStart,
                 color: Colors.transparent,
@@ -83,13 +84,11 @@ class _AlertsState extends State<Alerts> {
                 ),
               ),
               child: Container(
-                margin: const EdgeInsets.symmetric(
-                    vertical: 4.0,
-                    horizontal: 8.0), // Agrega margen alrededor del ListTile
+                margin:
+                    const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                 decoration: BoxDecoration(
-                  color: Colors.white, // Establece el color de fondo a gris
-                  borderRadius:
-                      BorderRadius.circular(10.0), // Redondea los bordes
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
                 child: ListTile(
                   title: Text(alertsCubit.state[index].title),

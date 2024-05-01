@@ -3,11 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/blocs/alerts_cubit.dart';
-import 'package:pet_clean/blocs/location_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
-import 'package:pet_clean/blocs/markers_cubit.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
-import 'package:pet_clean/blocs/username_cubit.dart';
 import 'package:pet_clean/database/supabase_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
 import 'package:pet_clean/pages/account_page.dart';
@@ -28,8 +25,6 @@ Future<void> main() async {
 
   runApp(const GetMaterialApp(home: BlocsProvider()));
 }
-
-// final supabase = Supabase.instance.client;
 
 class BlocsProvider extends StatelessWidget {
   const BlocsProvider({super.key});

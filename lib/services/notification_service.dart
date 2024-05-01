@@ -70,9 +70,7 @@ class NotificationService {
 
   static Future<List<NotificationPermission>> requestUserPermissions(
       BuildContext context,
-      {
-      // if you only intends to request the permissions until app level, set the channelKey value to null
-      required String? channelKey,
+      {required String? channelKey,
       required List<NotificationPermission> permissionList}) async {
     // Check if the basic permission was granted by the user
     //if (!await requestBasicPermissionToSendNotifications(context)) return [];
@@ -83,8 +81,9 @@ class NotificationService {
             channelKey: channelKey, permissions: permissionList);
 
     // If all permissions are allowed, there is nothing to do
-    if (permissionsAllowed.length == permissionList.length)
+    if (permissionsAllowed.length == permissionList.length) {
       return permissionsAllowed;
+    }
 
     // Refresh the permission list with only the disallowed permissions
     List<NotificationPermission> permissionsNeeded =

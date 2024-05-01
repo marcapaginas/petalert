@@ -13,19 +13,24 @@ class CustomGeoJsonParser extends GeoJsonParser {
       void Function(Map<String, dynamic>) onMarkerTap) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      child: GestureDetector(
+      child: InkWell(
+        splashColor: Colors.amber,
         onTap: () {
           onMarkerTap(properties);
         },
         child: Transform.translate(
           offset: const Offset(-5, -20),
-          child: Icon(
-            Icons.location_on,
-            color: properties['userId'] ==
-                    SupabaseDatabase.supabase.auth.currentUser?.id
-                ? Colors.green
-                : defaultMarkerColor,
-            size: 50,
+          child: SizedBox(
+            width: 200,
+            height: 200,
+            child: Icon(
+              Icons.location_on,
+              color: properties['userId'] ==
+                      SupabaseDatabase.supabase.auth.currentUser?.id
+                  ? Colors.green
+                  : defaultMarkerColor,
+              size: 50,
+            ),
           ),
         ),
       ),

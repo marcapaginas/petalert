@@ -18,6 +18,12 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
     emit(List<AlertModel>.from(state));
   }
 
+  void markAsNotified(userId) {
+    final index = state.indexWhere((element) => element.userId == userId);
+    state[index].isNotified = true;
+    emit(List<AlertModel>.from(state));
+  }
+
   void clearAlerts() {
     emit(List<AlertModel>.empty());
   }
