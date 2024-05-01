@@ -1,6 +1,5 @@
 class AlertModel {
-  final int id;
-  final String userId;
+  final String id;
   final String title;
   final String description;
   final DateTime date;
@@ -8,7 +7,6 @@ class AlertModel {
 
   AlertModel({
     required this.id,
-    required this.userId,
     required this.title,
     required this.description,
     required this.date,
@@ -16,8 +14,7 @@ class AlertModel {
   });
 
   AlertModel copyWith({
-    int? id,
-    String? userId,
+    String? id,
     String? title,
     String? description,
     DateTime? date,
@@ -25,7 +22,6 @@ class AlertModel {
   }) {
     return AlertModel(
       id: id ?? this.id,
-      userId: userId ?? this.userId,
       title: title ?? this.title,
       description: description ?? this.description,
       date: date ?? this.date,
@@ -35,6 +31,6 @@ class AlertModel {
 
   @override
   String toString() {
-    return 'AlertModel(id: $id, userId: $userId, title: $title, description: $description, date: $date, isNotified: $isNotified)';
+    return 'AlertModel(id: $id, title: $title, description: $description, date: $date, isNotified: $isNotified)';
   }
 }

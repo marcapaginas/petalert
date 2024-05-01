@@ -20,8 +20,7 @@ class _AlertsState extends State<Alerts> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           AlertModel newAlert = AlertModel(
-            id: alertsCubit.state.length + 1,
-            userId: SupabaseDatabase.supabase.auth.currentUser!.id,
+            id: SupabaseDatabase.supabase.auth.currentUser!.id,
             title: 'Alerta ${alertsCubit.state.length + 1}',
             description:
                 'Descripción de la alerta ${alertsCubit.state.length + 1}',
@@ -35,9 +34,9 @@ class _AlertsState extends State<Alerts> {
       ),
       backgroundColor: Colors.transparent,
       body: ListView.builder(
-        itemCount: alertsCubit.state.length,
+        itemCount: alertsCubit.notNotifiedAlerts.length,
         itemBuilder: (context, index) {
-          AlertModel item = alertsCubit.state[index];
+          AlertModel item = alertsCubit.notNotifiedAlerts[index];
           var title = item.title;
 
           return InkWell(
@@ -47,11 +46,11 @@ class _AlertsState extends State<Alerts> {
               arguments: item,
             ),
             child: Dismissible(
-              key: Key(item.id.toString()),
+              key: Key(item.id),
               direction: DismissDirection.startToEnd,
               onDismissed: (direction) {
                 setState(() {
-                  alertsCubit.removeAlert(item);
+                  alertsCubit.markAsNotified(item.id);
                 });
 
                 ScaffoldMessenger.of(context).removeCurrentSnackBar();
