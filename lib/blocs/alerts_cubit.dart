@@ -39,24 +39,10 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
       return;
     }
 
-    if (state.isEmpty) {
-      emit(result.map((userLocation) {
-        return AlertModel(
-          id: userLocation.userId!,
-          title: 'Alerta',
-          description: 'Usuario cerca',
-          date: DateTime.now(),
-          isNotified: false,
-        );
-      }).toList());
-      return;
-    }
-
-    final oldAlerts = state;
-    final alerts = <AlertModel>[];
+    final alerts = List<AlertModel>.from(state);
 
     for (final userLocation in result) {
-      final existingAlert = oldAlerts.firstWhere(
+      final existingAlert = alerts.firstWhere(
         (alert) => alert.id == userLocation.userId,
         orElse: () => AlertModel(
             id: '',
@@ -66,18 +52,65 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
             isNotified: false),
       );
 
-      if (existingAlert.id.isNotEmpty) {
-        alerts.add(existingAlert);
-      } else {
+      if (existingAlert.id.isEmpty) {
         alerts.add(AlertModel(
           id: userLocation.userId!,
-          title: 'Alerta',
-          description: 'Usuario cerca',
+          title: 'Alerta ${userLocation.userId}',
+          description: 'Usuario ${userLocation.userId} cerca',
           date: DateTime.now(),
           isNotified: false,
         ));
       }
     }
+
     emit(alerts);
   }
+
+  // void setAlerts(List<UserLocationModel> result) {
+  //   if (result.isEmpty) {
+  //     emit(state);
+  //     return;
+  //   }
+
+  //   if (state.isEmpty) {
+  //     emit(result.map((userLocation) {
+  //       return AlertModel(
+  //         id: userLocation.userId!,
+  //         title: 'Alerta ${userLocation.userId}',
+  //         description: 'Usuario ${userLocation.userId} cerca',
+  //         date: DateTime.now(),
+  //         isNotified: false,
+  //       );
+  //     }).toList());
+  //     return;
+  //   }
+
+  //   final oldAlerts = state;
+  //   final alerts = <AlertModel>[];
+
+  //   for (final userLocation in result) {
+  //     final existingAlert = oldAlerts.firstWhere(
+  //       (alert) => alert.id == userLocation.userId,
+  //       orElse: () => AlertModel(
+  //           id: '',
+  //           title: '',
+  //           description: '',
+  //           date: DateTime.now(),
+  //           isNotified: false),
+  //     );
+
+  //     if (existingAlert.id.isNotEmpty) {
+  //       alerts.add(existingAlert);
+  //     } else {
+  //       alerts.add(AlertModel(
+  //         id: userLocation.userId!,
+  //         title: 'Alerta ${userLocation.userId}',
+  //         description: 'Usuario ${userLocation.userId} cerca',
+  //         date: DateTime.now(),
+  //         isNotified: false,
+  //       ));
+  //     }
+  //   }
+  //   emit(alerts);
+  // }
 }
