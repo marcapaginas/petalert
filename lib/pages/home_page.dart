@@ -168,10 +168,10 @@ class _HomePageState extends State<HomePage> {
                   label: 'Mapa',
                 ),
                 NavigationDestination(
-                  icon: state.where((alert) => !alert.isNotified).isNotEmpty
+                  icon: state.where((alert) => !alert.isDiscarded).isNotEmpty
                       ? Badge(
                           label: Text(state
-                              .where((alert) => !alert.isNotified)
+                              .where((alert) => !alert.isDiscarded)
                               .length
                               .toString()),
                           child: const Icon(Icons.notifications_sharp))

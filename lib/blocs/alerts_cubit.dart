@@ -21,13 +21,13 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
     emit(List<AlertModel>.from(state));
   }
 
-  void markAsNotified(userId) {
+  void markAsDiscarded(userId) {
     final index = state.indexWhere((element) => element.id == userId);
-    state[index].isNotified = true;
+    state[index].isDiscarded = true;
     emit(List<AlertModel>.from(state));
   }
 
-  get notNotifiedAlerts => state.where((alert) => !alert.isNotified).toList();
+  get notDiscardedAlerts => state.where((alert) => !alert.isDiscarded).toList();
 
   void clearAlerts() {
     emit(List<AlertModel>.empty());
@@ -39,27 +39,36 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
       return;
     }
 
-    final alerts = List<AlertModel>.from(state);
+    final currentAlerts = List<AlertModel>.from(state);
+    final alerts = <AlertModel>[];
 
     for (final userLocation in result) {
-      final existingAlert = alerts.firstWhere(
+      final existingAlert = currentAlerts.firstWhere(
         (alert) => alert.id == userLocation.userId,
         orElse: () => AlertModel(
             id: '',
             title: '',
             description: '',
             date: DateTime.now(),
-            isNotified: false),
+            isDiscarded: false),
       );
 
-      if (existingAlert.id.isEmpty) {
+      if (existingAlert.id.isNotEmpty) {
+        alerts.add(existingAlert);
+      } else {
         alerts.add(AlertModel(
           id: userLocation.userId!,
           title: 'Alerta ${userLocation.userId}',
           description: 'Usuario ${userLocation.userId} cerca',
           date: DateTime.now(),
-          isNotified: false,
+          isDiscarded: false,
         ));
+      }
+    }
+
+    for (final alert in currentAlerts) {
+      if (!alerts.contains(alert) && !alert.isDiscarded) {
+        alerts.add(alert);
       }
     }
 

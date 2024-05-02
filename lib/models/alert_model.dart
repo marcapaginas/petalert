@@ -3,14 +3,14 @@ class AlertModel {
   final String title;
   final String description;
   final DateTime date;
-  bool isNotified;
+  bool isDiscarded;
 
   AlertModel({
     required this.id,
     required this.title,
     required this.description,
     required this.date,
-    this.isNotified = false,
+    this.isDiscarded = false,
   });
 
   AlertModel copyWith({
@@ -18,19 +18,19 @@ class AlertModel {
     String? title,
     String? description,
     DateTime? date,
-    bool? isNotified,
+    bool? isDiscarded,
   }) {
     return AlertModel(
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
       date: date ?? this.date,
-      isNotified: isNotified ?? this.isNotified,
+      isDiscarded: isDiscarded ?? this.isDiscarded,
     );
   }
 
   @override
   String toString() {
-    return 'AlertModel(id: $id, title: $title, description: $description, date: $date, isNotified: $isNotified)';
+    return 'AlertModel(id: $id, title: $title, description: $description, date: $date, isDiscarded: $isDiscarded)';
   }
 }
