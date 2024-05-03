@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pet_clean/blocs/alerts_cubit.dart';
-// import 'package:pet_clean/database/supabase_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
 
 class Alerts extends StatefulWidget {
@@ -16,24 +15,6 @@ class _AlertsState extends State<Alerts> {
   Widget build(BuildContext context) {
     final alertsCubit = context.watch<AlertsCubit>();
 
-    // return Scaffold(
-    //   floatingActionButton: FloatingActionButton(
-    //     onPressed: () {
-    //       AlertModel newAlert = AlertModel(
-    //         id: SupabaseDatabase.supabase.auth.currentUser!.id,
-    //         title: 'Alerta ${alertsCubit.state.length + 1}',
-    //         description:
-    //             'Descripción de la alerta ${alertsCubit.state.length + 1}',
-    //         date: DateTime.now(),
-    //       );
-    //       setState(() {
-    //         alertsCubit.addAlert(newAlert);
-    //       });
-    //     },
-    //     child: const Icon(Icons.add),
-    //   ),
-    //   backgroundColor: Colors.transparent,
-    //   body: ListView.builder(
     return ListView.builder(
       itemCount: alertsCubit.notDiscardedAlerts.length,
       itemBuilder: (context, index) {
@@ -56,7 +37,7 @@ class _AlertsState extends State<Alerts> {
 
               ScaffoldMessenger.of(context).removeCurrentSnackBar();
               ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(' Quitada alerta: $title')));
+                  SnackBar(content: Text('Borrada alerta: $title')));
             },
             background: Container(
               alignment: AlignmentDirectional.centerStart,

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:bloc/bloc.dart';
 import 'package:pet_clean/models/alert_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
@@ -74,52 +72,4 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
 
     emit(alerts);
   }
-
-  // void setAlerts(List<UserLocationModel> result) {
-  //   if (result.isEmpty) {
-  //     emit(state);
-  //     return;
-  //   }
-
-  //   if (state.isEmpty) {
-  //     emit(result.map((userLocation) {
-  //       return AlertModel(
-  //         id: userLocation.userId!,
-  //         title: 'Alerta ${userLocation.userId}',
-  //         description: 'Usuario ${userLocation.userId} cerca',
-  //         date: DateTime.now(),
-  //         isNotified: false,
-  //       );
-  //     }).toList());
-  //     return;
-  //   }
-
-  //   final oldAlerts = state;
-  //   final alerts = <AlertModel>[];
-
-  //   for (final userLocation in result) {
-  //     final existingAlert = oldAlerts.firstWhere(
-  //       (alert) => alert.id == userLocation.userId,
-  //       orElse: () => AlertModel(
-  //           id: '',
-  //           title: '',
-  //           description: '',
-  //           date: DateTime.now(),
-  //           isNotified: false),
-  //     );
-
-  //     if (existingAlert.id.isNotEmpty) {
-  //       alerts.add(existingAlert);
-  //     } else {
-  //       alerts.add(AlertModel(
-  //         id: userLocation.userId!,
-  //         title: 'Alerta ${userLocation.userId}',
-  //         description: 'Usuario ${userLocation.userId} cerca',
-  //         date: DateTime.now(),
-  //         isNotified: false,
-  //       ));
-  //     }
-  //   }
-  //   emit(alerts);
-  // }
 }
