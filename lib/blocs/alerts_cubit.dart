@@ -3,7 +3,15 @@ import 'package:pet_clean/models/alert_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
 
 class AlertsCubit extends Cubit<List<AlertModel>> {
-  AlertsCubit() : super([]);
+  static final AlertsCubit _singleton = AlertsCubit._internal();
+
+  factory AlertsCubit() {
+    return _singleton;
+  }
+
+  AlertsCubit._internal() : super([]);
+
+  //AlertsCubit() : super([]);
 
   void addAlert(AlertModel alert) {
     emit(<AlertModel>[...state, alert]);

@@ -65,12 +65,10 @@ class MyApp extends StatelessWidget {
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/alert_detail') {
-          // Verificar si la ruta es '/alert_detail'
-          // Obtener el objeto AlertModel de los argumentos pasados
           final args = settings.arguments as AlertModel;
           return MaterialPageRoute(
             builder: (context) {
-              return AlertDetailPage(alert: args); // Pasar el objeto AlertModel
+              return AlertDetailPage(alert: args);
             },
           );
         }

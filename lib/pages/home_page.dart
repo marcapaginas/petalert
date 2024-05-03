@@ -11,10 +11,10 @@ import 'package:pet_clean/database/mongo_database.dart';
 import 'package:pet_clean/database/supabase_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
-import 'package:pet_clean/pages/alerts.dart';
+import 'package:pet_clean/pages/alerts_page.dart';
 import 'package:pet_clean/pages/first_page.dart';
 import 'package:pet_clean/pages/map_page.dart';
-import 'package:pet_clean/pages/settings.dart';
+import 'package:pet_clean/pages/settings_page.dart';
 import 'package:pet_clean/services/geolocator_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

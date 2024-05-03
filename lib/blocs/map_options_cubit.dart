@@ -1,9 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pet_clean/models/map_options_state.dart';
+import 'package:pet_clean/models/map_options_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
 
 class MapOptionsCubit extends Cubit<MapOptionsState> {
-  MapOptionsCubit() : super(MapOptionsState());
+  static final MapOptionsCubit _singleton = MapOptionsCubit._internal();
+
+  factory MapOptionsCubit() {
+    return _singleton;
+  }
+
+  MapOptionsCubit._internal() : super(MapOptionsState());
 
   void setUserLocation(UserLocationModel userLocation) {
     emit(state.copyWith(userLocation: userLocation));

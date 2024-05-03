@@ -5,10 +5,8 @@ import 'package:geolocator/geolocator.dart';
 class GeolocatorService {
   static GeolocatorService? _instance;
 
-  // private constructor
   GeolocatorService._();
 
-  // Factory constructor to return the same instance
   factory GeolocatorService() {
     _instance ??= GeolocatorService._();
     return _instance!;
@@ -73,22 +71,6 @@ class GeolocatorService {
             foreground ? locationSettingsForeground : locationSettings);
 
     return position;
-
-    // positionSubscription = Geolocator.getPositionStream(
-    //         locationSettings:
-    //             foreground ? locationSettingsForeground : locationSettings)
-    //     .listen((event) {
-    //   //log('Location: ${event.latitude}, ${event.longitude}');
-    // });
-    // log('Location service started');
-
-    // StreamSubscription<Position> positionStream = Geolocator.getPositionStream()
-    // .listen((Position position) {
-    //   // Handle position changes
-    // });
-
-    // // When no longer needed cancel the subscription
-    // positionStream.cancel();
   }
 
   static Future<void> stopBackgroundLocationService() async {

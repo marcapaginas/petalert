@@ -19,7 +19,7 @@ class CustomGeoJsonParser extends GeoJsonParser {
           onMarkerTap(properties);
         },
         child: Transform.translate(
-          offset: const Offset(-5, -20),
+          offset: const Offset(-10, -27),
           child: SizedBox(
             width: 200,
             height: 200,

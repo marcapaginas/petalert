@@ -86,22 +86,17 @@ class MapOptionsState {
       'features': features,
     });
 
-    //log('geoJsonData: $json');
-
     return json;
   }
 
-  // clear user location
   void clearUserLocation() {
     userLocation = null;
   }
 
-  // clear other users locations
   void clearOtherUsersLocations() {
     otherUsersLocations = null;
   }
 
-  // clear markers
   void clearMarkers() {
     markers = null;
   }

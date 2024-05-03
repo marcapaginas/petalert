@@ -6,8 +6,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
-import 'package:pet_clean/models/map_options_state.dart';
-import 'package:pet_clean/widgets/walking_switch.dart';
+import 'package:pet_clean/models/map_options_model.dart';
+import 'package:pet_clean/widgets/walking_switch_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final supabase = Supabase.instance.client;
@@ -77,28 +77,45 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
                     ),
                   ],
                 ),
-                Positioned(
-                  top: 0,
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    color: Colors.white,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    child: Row(
-                      children: [
-                        Text(
-                          'Metros: ${mapOptionsCubit.state.metersRange.toStringAsFixed(0)}',
-                          textAlign: TextAlign.end,
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: IntrinsicWidth(
+                    child: Container(
+                      height: 50,
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 5,
+                            spreadRadius: 1,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
+                        color: Colors.white,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(999)),
+                        border: Border(
+                          bottom: BorderSide(color: Colors.grey.shade300),
                         ),
-                        Slider(
-                          value: mapOptionsCubit.state.metersRange,
-                          min: 5.0,
-                          max: 100.0,
-                          onChanged: (newValue) {
-                            mapOptionsCubit.setMetersRange(newValue);
-                          },
-                        ),
-                      ],
+                      ),
+                      padding: const EdgeInsets.only(left: 10),
+                      margin: const EdgeInsets.only(top: 30),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Metros: ${mapOptionsCubit.state.metersRange.toStringAsFixed(0)}',
+                            textAlign: TextAlign.end,
+                          ),
+                          Slider(
+                            value: mapOptionsCubit.state.metersRange,
+                            min: 5.0,
+                            max: 100.0,
+                            onChanged: (newValue) {
+                              mapOptionsCubit.setMetersRange(newValue);
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

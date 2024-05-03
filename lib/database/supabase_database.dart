@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
-import 'package:pet_clean/models/user_data.dart';
+import 'package:pet_clean/models/user_data_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseDatabase {
