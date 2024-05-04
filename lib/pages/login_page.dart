@@ -36,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
         _emailController.clear();
       }
     } on AuthException catch (error) {
-      Get.snackbar("Error", "Credenciales no válidas",
+      Get.snackbar("Error", "Credenciales no válidas. Error ${error.message}",
           colorText: Colors.white,
           backgroundColor: const Color.fromARGB(206, 244, 67, 54));
     } catch (error) {

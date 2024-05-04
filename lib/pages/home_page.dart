@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -98,7 +97,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final mapOptionsCubit = context.watch<MapOptionsCubit>();
+    //final mapOptionsCubit = context.watch<MapOptionsCubit>();
 
     return Scaffold(
       appBar: AppBar(
@@ -116,7 +115,7 @@ class _HomePageState extends State<HomePage> {
         children: <Widget>[
           Container(
             color: Colors.green,
-            child: FirstPage(),
+            child: const FirstPage(),
           ),
           Container(
             color: Colors.green,

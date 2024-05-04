@@ -1,8 +1,4 @@
-import 'dart:developer';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
@@ -184,7 +180,7 @@ class _AccountPageState extends State<AccountPage> {
                             userDataCubit: userDataCubit),
                       );
                     },
-                    child: Text('Añadir mascota'),
+                    child: const Text('Añadir mascota'),
                   ),
                 ],
               )),

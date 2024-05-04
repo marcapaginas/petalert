@@ -145,7 +145,6 @@ class MapOptionsState {
                       const SizedBox(height: 10),
                       Text('Nombre: ${userData.nombre}',
                           style: const TextStyle(fontSize: 18)),
-                      // TODO completar detalles del usuario
                     ],
                   )),
               Positioned(

@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pet_clean/blocs/user_data_cubit.dart';
-import 'package:pet_clean/database/mongo_database.dart';
-import 'package:pet_clean/models/user_data_model.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class FirstPage extends StatelessWidget {
-  FirstPage({super.key});
+  const FirstPage({super.key});
 
   //late final TextEditingController _nombreController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    final userDataCubit = context.watch<UserDataCubit>();
+    //final userDataCubit = context.watch<UserDataCubit>();
 
     return Scaffold(
       backgroundColor: Colors.green,

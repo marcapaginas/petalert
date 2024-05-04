@@ -1,14 +1,10 @@
 import 'dart:developer';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/mongo_database.dart';
 import 'package:pet_clean/models/pet_model.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AddPet extends StatefulWidget {
   const AddPet({super.key, required this.userId, required this.userDataCubit});

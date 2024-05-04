@@ -35,7 +35,6 @@ class SupabaseDatabase {
 
   static Future<void> disconnect() async {
     await supabase.auth.signOut();
-    // TODO: go to login page
   }
 
   static Future<void> signUp(
