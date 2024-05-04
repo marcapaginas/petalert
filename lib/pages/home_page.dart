@@ -8,7 +8,6 @@ import 'package:pet_clean/blocs/alerts_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/mongo_database.dart';
-import 'package:pet_clean/database/supabase_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
 import 'package:pet_clean/pages/alerts_page.dart';
@@ -30,6 +29,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController(initialPage: 0);
+  late final mapOptionsCubit = context.watch<MapOptionsCubit>();
 
   @override
   void initState() {
@@ -38,10 +38,16 @@ class _HomePageState extends State<HomePage> {
     GeolocatorService.startBackgroundLocationService(foreground: true);
     _searchOtherUsersLocations();
     _listenToPositionStream();
-    SupabaseDatabase.getUserData(supabase.auth.currentUser!.id)
-        .then((userData) {
+    MongoDatabase.getUserData(supabase.auth.currentUser!.id).then((userData) {
       context.read<UserDataCubit>().setUserData(userData);
     });
+  }
+
+  @override
+  void dispose() {
+    GeolocatorService.stopBackgroundLocationService();
+
+    super.dispose();
   }
 
   void _searchOtherUsersLocations() {
@@ -68,17 +74,14 @@ class _HomePageState extends State<HomePage> {
   void _actionsWithPosition(Position position) async {
     setState(() {
       context.read<MapOptionsCubit>().setUserLocation(UserLocationModel(
-          user: supabase.auth.currentUser!,
           userId: supabase.auth.currentUser!.id,
-          email: supabase.auth.currentUser!.email,
           latitude: position.latitude,
           longitude: position.longitude));
     });
     if (context.read<MapOptionsCubit>().state.walking) {
-      MongoDatabase.insert({
+      MongoDatabase.insertMarker({
         'userId': supabase.auth.currentUser!.id,
         'longlat': [position.longitude, position.latitude],
-        'nivelAviso': 1,
         'date': DateTime.now().toIso8601String(),
       });
     } else {
@@ -95,6 +98,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final mapOptionsCubit = context.watch<MapOptionsCubit>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('PetAlert',

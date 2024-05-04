@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:pet_clean/models/pet_model.dart';
+import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -33,7 +35,7 @@ class MongoDatabase {
     log('Connection to MongoDB closed');
   }
 
-  static Future<void> insert(Map<String, dynamic> data) async {
+  static Future<void> insertMarker(Map<String, dynamic> data) async {
     try {
       if (db == null) {
         await connect();
@@ -86,6 +88,56 @@ class MongoDatabase {
     } catch (e) {
       log('Error retrieving markers: $e');
       return [];
+    }
+  }
+
+  static Future<void> saveUserData(UserData userData) async {
+    if (db == null) {
+      await connect();
+    }
+    try {
+      var collection = db!.collection('users');
+      var map = userData.toMap();
+      await collection.update(
+        {'userId': userData.userId},
+        map,
+        upsert: true,
+      );
+    } catch (e) {
+      log('Error saving user data: $e');
+    }
+  }
+
+  static Future<UserData> getUserData(String userId) async {
+    if (db == null) {
+      await connect();
+    }
+    try {
+      var collection = db!.collection('users');
+      var query = where.eq('userId', userId);
+      var result = await collection.findOne(query);
+      return UserData.fromMap(result!);
+    } catch (e) {
+      log('Error getting user data: $e');
+      return UserData.empty;
+    }
+  }
+
+  static Future<void> addPet(String userId, Pet pet) async {
+    if (db == null) {
+      await connect();
+    }
+    try {
+      var collection = db!.collection('users');
+      var query = where.eq('userId', userId);
+      var result = await collection.findOne(query);
+      var pets = result!['pets'] as List;
+      pets.add(pet.toMap());
+      await collection.update(query, {
+        '\$set': {'pets': pets}
+      });
+    } catch (e) {
+      log('Error añadiendo mascota: $e');
     }
   }
 }

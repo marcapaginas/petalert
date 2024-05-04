@@ -1,5 +1,16 @@
+import 'dart:developer';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
+import 'package:pet_clean/blocs/user_data_cubit.dart';
+import 'package:pet_clean/database/mongo_database.dart';
 import 'package:pet_clean/database/supabase_database.dart';
+import 'package:pet_clean/models/user_data_model.dart';
+import 'package:pet_clean/widgets/add_pet_widget.dart';
+import 'package:pet_clean/widgets/edit_pet_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AccountPage extends StatefulWidget {
@@ -11,11 +22,11 @@ class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
   final _usernameController = TextEditingController();
-  final _websiteController = TextEditingController();
 
   var _loading = true;
 
-  /// Called once a user id is received within `onAuthenticated()`
+  UserData? userData;
+
   Future<void> _getProfile() async {
     setState(() {
       _loading = true;
@@ -23,20 +34,14 @@ class _AccountPageState extends State<AccountPage> {
 
     try {
       final userId = SupabaseDatabase.supabase.auth.currentUser!.id;
-      final data = await SupabaseDatabase.supabase
-          .from('profiles')
-          .select()
-          .eq('id', userId)
-          .single();
-      _usernameController.text = (data['username'] ?? '') as String;
-      _websiteController.text = (data['website'] ?? '') as String;
-    } on PostgrestException catch (error) {
-      SnackBar(
-        content: Text(error.message),
-      );
+      UserData userData = await MongoDatabase.getUserData(userId);
+      if (mounted) {
+        context.read<UserDataCubit>().setUserData(userData);
+      }
+      _usernameController.text = userData.nombre;
     } catch (error) {
       const SnackBar(
-        content: Text('Unexpected error occurred'),
+        content: Text('Error obteniendo perfil de usuario'),
       );
     } finally {
       if (mounted) {
@@ -47,34 +52,23 @@ class _AccountPageState extends State<AccountPage> {
     }
   }
 
-  /// Called when user taps `Update` button
   Future<void> _updateProfile() async {
     setState(() {
       _loading = true;
     });
     final userName = _usernameController.text.trim();
-    final website = _websiteController.text.trim();
-    final user = SupabaseDatabase.supabase.auth.currentUser;
-    final updates = {
-      'id': user!.id,
-      'username': userName,
-      'website': website,
-      'updated_at': DateTime.now().toIso8601String(),
-    };
+
     try {
-      await SupabaseDatabase.supabase.from('profiles').upsert(updates);
+      await MongoDatabase.saveUserData(UserData(
+        userId: Supabase.instance.client.auth.currentUser!.id,
+        nombre: userName,
+      ));
       if (mounted) {
-        const SnackBar(
-          content: Text('Successfully updated profile!'),
-        );
+        Get.snackbar('EXITO', 'Perfil actualizado');
       }
-    } on PostgrestException catch (error) {
-      SnackBar(
-        content: Text(error.message),
-      );
     } catch (error) {
       const SnackBar(
-        content: Text('Unexpected error occurred'),
+        content: Text('Error actualizando perfil de usuario'),
       );
     } finally {
       if (mounted) {
@@ -94,7 +88,7 @@ class _AccountPageState extends State<AccountPage> {
       );
     } catch (error) {
       const SnackBar(
-        content: Text('Unexpected error occurred'),
+        content: Text('Error cerrando sesión'),
       );
     } finally {
       if (mounted) {
@@ -112,37 +106,88 @@ class _AccountPageState extends State<AccountPage> {
   @override
   void dispose() {
     _usernameController.dispose();
-    _websiteController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final userDataCubit = context.watch<UserDataCubit>();
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(
+        foregroundColor: Colors.white,
+        title: const Text('Perfil de usuario',
+            style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.black,
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
-              children: [
-                TextFormField(
-                  controller: _usernameController,
-                  decoration: const InputDecoration(labelText: 'User Name'),
-                ),
-                const SizedBox(height: 18),
-                TextFormField(
-                  controller: _websiteController,
-                  decoration: const InputDecoration(labelText: 'Website'),
-                ),
-                const SizedBox(height: 18),
-                ElevatedButton(
-                  onPressed: _loading ? null : _updateProfile,
-                  child: Text(_loading ? 'Saving...' : 'Update'),
-                ),
-                const SizedBox(height: 18),
-                TextButton(onPressed: _signOut, child: const Text('Sign Out')),
-              ],
-            ),
+          : Container(
+              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  TextFormField(
+                    controller: _usernameController,
+                    decoration: const InputDecoration(labelText: 'Nombre'),
+                  ),
+                  const SizedBox(height: 18),
+                  ElevatedButton(
+                    onPressed: _loading ? null : _updateProfile,
+                    child: Text(_loading ? 'Guardando...' : 'Actualizar'),
+                  ),
+                  const SizedBox(height: 18),
+                  TextButton(
+                      onPressed: _signOut, child: const Text('Cerrar sesión')),
+                  SizedBox(
+                    height: 200,
+                    child: ListView.builder(
+                      itemCount: userDataCubit.state.pets.length,
+                      itemBuilder: (context, index) {
+                        final pet = userDataCubit.state.pets[index];
+                        return Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: ListTile(
+                              title: Text(pet.name,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
+                              subtitle: Text(
+                                  '${pet.breed} - Comportamiento: ${pet.behavior.name}',
+                                  style: const TextStyle(color: Colors.white)),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () {
+                                  Get.bottomSheet(
+                                    EditPet(
+                                      index: index,
+                                      userDataCubit: userDataCubit,
+                                    ),
+                                  );
+                                },
+                                color: Colors.white,
+                              ),
+                              tileColor: Colors.green,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              )),
+                        );
+                      },
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Abre el formulario para añadir una nueva mascota
+                      Get.bottomSheet(
+                        AddPet(
+                            userId:
+                                Supabase.instance.client.auth.currentUser!.id,
+                            userDataCubit: userDataCubit),
+                      );
+                    },
+                    child: Text('Añadir mascota'),
+                  ),
+                ],
+              )),
     );
   }
 }

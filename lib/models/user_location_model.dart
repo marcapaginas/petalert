@@ -1,38 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UserLocationModel {
-  final User? user;
   final String? userId;
-  final String? email;
   final double latitude;
   final double longitude;
 
   UserLocationModel(
-      {this.user,
-      this.userId,
-      this.email,
-      required this.latitude,
-      required this.longitude});
+      {this.userId, required this.latitude, required this.longitude});
 
   @override
   String toString() {
-    return 'UserLocationModel{user: ${user?.id}, ${user?.email}, latitude: $latitude, longitude: $longitude}';
+    return 'UserLocationModel{user: $userId, latitude: $latitude, longitude: $longitude}';
   }
 
   UserLocationModel copyWith({
-    User? user,
     String? userId,
-    String? email,
     double? latitude,
     double? longitude,
   }) {
     return UserLocationModel(
-      user: user ?? this.user,
       userId: userId ?? this.userId,
-      email: email ?? this.email,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
     );
@@ -67,7 +56,6 @@ class UserLocationModel {
       },
       'properties': {
         'userId': userId ?? 'Unknown',
-        'email': email ?? 'Unknown',
       },
     };
   }

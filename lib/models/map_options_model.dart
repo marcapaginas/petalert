@@ -5,6 +5,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_geojson/flutter_map_geojson.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/classes/custom_geo_json_parser.dart';
+import 'package:pet_clean/database/mongo_database.dart';
+import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
 
 class MapOptionsState {
@@ -113,7 +115,10 @@ class MapOptionsState {
     circles = parser.circles;
   }
 
-  Future<dynamic> mostrarDetallesMarcador(Map<String, dynamic> properties) {
+  Future<dynamic> mostrarDetallesMarcador(
+      Map<String, dynamic> properties) async {
+    UserData userData = await MongoDatabase.getUserData(properties['userId']);
+
     return showModalBottomSheet(
       context: Get.context!,
       builder: (context) {
@@ -138,8 +143,9 @@ class MapOptionsState {
                           style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 10),
-                      Text('Email: ${properties['email']}',
-                          style: const TextStyle(fontSize: 16)),
+                      Text('Nombre: ${userData.nombre}',
+                          style: const TextStyle(fontSize: 18)),
+                      // TODO completar detalles del usuario
                     ],
                   )),
               Positioned(

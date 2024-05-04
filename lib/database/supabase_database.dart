@@ -84,7 +84,6 @@ class SupabaseDatabase {
       final data = response.map((key, value) => MapEntry(key, value));
 
       final userData = UserData(
-        id: data['id'] as int,
         userId: data['user_id'] as String,
         nombre: data['nombre'] as String,
       );
