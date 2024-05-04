@@ -17,12 +17,10 @@ class UserDataCubit extends Cubit<UserData> {
   void updateUserData({
     required String userId,
     required String nombre,
-    required String apellidos,
   }) {
     final userData = state.copyWith(
       userId: userId,
       nombre: nombre,
-      apellidos: apellidos,
     );
     emit(userData);
   }

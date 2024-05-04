@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -12,8 +13,9 @@ class RegisterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.green,
       appBar: AppBar(
-        title: const Text('Register'),
+        title: const Text('Registrar un nuevo usuario'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -21,35 +23,43 @@ class RegisterPage extends StatelessWidget {
           children: [
             TextField(
               controller: emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
+              decoration: const InputDecoration(
+                  labelText: 'Email', fillColor: Colors.white, filled: true),
             ),
+            const SizedBox(height: 16),
             TextField(
               controller: passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
+              decoration: const InputDecoration(
+                  labelText: 'Password', fillColor: Colors.white, filled: true),
               obscureText: true,
             ),
             const SizedBox(height: 16),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
               onPressed: () async {
-                // final response = await Supabase.auth.signUp(
-                //   email: emailController.text,
-                //   password: passwordController.text,
-                // );
-                final response = await Supabase.instance.client.auth.signUp(
-                    password: passwordController.text,
-                    email: emailController.text);
-
-                log(response.toString());
-
-                // if (response.error == null) {
-                //   // Registration successful
-                //   print('User registered successfully');
-                // } else {
-                //   // Handle registration error
-                //   print('Registration error: ${response.error!.message}');
-                // }
+                if (emailController.text.isEmpty ||
+                    passwordController.text.isEmpty) {
+                  Get.snackbar('Error', 'Email y password son requeridos',
+                      backgroundColor: Colors.red, colorText: Colors.white);
+                  return;
+                }
+                try {
+                  await Supabase.instance.client.auth.signUp(
+                      password: passwordController.text,
+                      email: emailController.text);
+                  Get.snackbar('Registro correcto', 'Usuario registrado',
+                      backgroundColor: Colors.green, colorText: Colors.white);
+                } catch (e) {
+                  Get.snackbar('Error',
+                      'Error con los datos introducidos: ${e.toString()}',
+                      backgroundColor: Colors.red, colorText: Colors.white);
+                }
               },
-              child: const Text('Register'),
+              child: const Text('Registrarse como usuario'),
             ),
           ],
         ),

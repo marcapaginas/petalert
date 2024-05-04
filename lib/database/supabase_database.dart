@@ -13,8 +13,6 @@ class SupabaseDatabase {
 
   static final supabase = Supabase.instance.client;
 
-  // initalize
-
   static Future<void> initialize() async {
     await dotenv.load();
     await Supabase.initialize(
@@ -31,12 +29,13 @@ class SupabaseDatabase {
         password: password,
       );
     } catch (e) {
-      log('Error connecting to Supabase: $e');
+      log('Error conectando a Supabase: $e');
     }
   }
 
   static Future<void> disconnect() async {
     await supabase.auth.signOut();
+    // TODO: go to login page
   }
 
   static Future<void> signUp(
@@ -51,9 +50,8 @@ class SupabaseDatabase {
   static void setUserData(
       Map<String, dynamic> datos, BuildContext context) async {
     String nombre = datos['nombre'];
-    String apellidos = datos['apellidos'];
 
-    if (nombre.isEmpty || apellidos.isEmpty) {
+    if (nombre.isEmpty) {
       return;
     }
 
@@ -65,7 +63,6 @@ class SupabaseDatabase {
     final data = {
       'user_id': user.id,
       'nombre': nombre,
-      'apellidos': apellidos,
     };
 
     await supabase.from('users').upsert(data, onConflict: 'user_id').onError(
@@ -90,7 +87,6 @@ class SupabaseDatabase {
         id: data['id'] as int,
         userId: data['user_id'] as String,
         nombre: data['nombre'] as String,
-        apellidos: data['apellidos'] as String,
       );
 
       return userData;

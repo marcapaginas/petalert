@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pet_clean/database/supabase_database.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -35,9 +36,9 @@ class _LoginPageState extends State<LoginPage> {
         _emailController.clear();
       }
     } on AuthException catch (error) {
-      SnackBar(
-        content: Text(error.message),
-      );
+      Get.snackbar("Error", "Credenciales no válidas",
+          colorText: Colors.white,
+          backgroundColor: const Color.fromARGB(206, 244, 67, 54));
     } catch (error) {
       const SnackBar(
         content: Text('Unexpected error occurred'),
@@ -75,33 +76,75 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign In')),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
-        children: [
-          TextFormField(
-            controller: _emailController,
-            decoration: const InputDecoration(labelText: 'Email'),
-          ),
-          const SizedBox(height: 18),
-          TextFormField(
-            controller: _passwordController,
-            decoration: const InputDecoration(labelText: 'Password'),
-            obscureText: true,
-          ),
-          const SizedBox(height: 18),
-          ElevatedButton(
-            onPressed: _isLoading ? null : _signIn,
-            child: Text(_isLoading ? 'Loading' : 'Login'),
-          ),
-          // add link to register
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pushNamed('/register');
-            },
-            child: const Text('Register'),
-          ),
-        ],
+      backgroundColor: Colors.green,
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/petalert-logo.png', height: 150),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'PetAlert',
+                  style: TextStyle(
+                    fontSize: 45,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              controller: _emailController,
+              decoration: const InputDecoration(
+                  labelText: 'Email', fillColor: Colors.white, filled: true),
+            ),
+            const SizedBox(height: 18),
+            TextFormField(
+              controller: _passwordController,
+              decoration: const InputDecoration(
+                  labelText: 'Password', fillColor: Colors.white, filled: true),
+              obscureText: true,
+            ),
+            const SizedBox(height: 18),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              onPressed: _isLoading ? null : _signIn,
+              child: Text(_isLoading ? 'Cargando' : 'Acceder'),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('/register');
+                  },
+                  child: const Text('Registrarse'),
+                ),
+                const SizedBox(width: 10),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('/forgot-password');
+                  },
+                  child: const Text('Olvidé mi contraseña'),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

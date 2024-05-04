@@ -34,13 +34,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    // Geolocator.getCurrentPosition().then((Position position) {
-    //   _actionsWithPosition(position);
-    // });
+
     GeolocatorService.startBackgroundLocationService(foreground: true);
     _searchOtherUsersLocations();
     _listenToPositionStream();
-    // load userdata from database
     SupabaseDatabase.getUserData(supabase.auth.currentUser!.id)
         .then((userData) {
       context.read<UserDataCubit>().setUserData(userData);
@@ -69,7 +66,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _actionsWithPosition(Position position) async {
-    log(position.toString());
     setState(() {
       context.read<MapOptionsCubit>().setUserLocation(UserLocationModel(
           user: supabase.auth.currentUser!,
@@ -82,17 +78,11 @@ class _HomePageState extends State<HomePage> {
       MongoDatabase.insert({
         'userId': supabase.auth.currentUser!.id,
         'longlat': [position.longitude, position.latitude],
-        'location': {
-          'type': 'Point',
-          'coordinates': [position.longitude, position.latitude]
-        },
-        'latitude': position.latitude,
-        'longitude': position.longitude,
+        'nivelAviso': 1,
         'date': DateTime.now().toIso8601String(),
       });
-      //log('almacenado: Location: ${position.longitude}, ${position.latitude}');
     } else {
-      log('Not walking');
+      // log('Not walking');
     }
   }
 
