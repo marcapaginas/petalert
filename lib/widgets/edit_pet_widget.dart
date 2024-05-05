@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
+import 'package:pet_clean/database/mongo_database.dart';
 import 'package:pet_clean/models/pet_model.dart';
 
 class EditPet extends StatefulWidget {
@@ -88,6 +89,8 @@ class _EditPetState extends State<EditPet> {
                   );
                   try {
                     widget.userDataCubit!.updatePet(widget.index, pet);
+                    MongoDatabase.updatePet(
+                        widget.userDataCubit!.state.userId, pet, widget.index);
                     Get.snackbar('Actualizado', '${pet.name} actualizado',
                         icon: const Icon(Icons.check),
                         colorText: Colors.white,

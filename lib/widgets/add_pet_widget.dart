@@ -63,8 +63,8 @@ class _AddPetState extends State<AddPet> {
           ElevatedButton(
             onPressed: () {
               final pet = Pet(
-                name: _nameController.text,
-                breed: _breedController.text,
+                name: _nameController.text.trim(),
+                breed: _breedController.text.trim(),
                 behavior: _selectedBehavior ?? PetBehavior.neutral,
               );
               try {

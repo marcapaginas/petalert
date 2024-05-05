@@ -24,11 +24,11 @@ class MapOptionsCubit extends Cubit<MapOptionsState> {
   }
 
   void zoomIn() {
-    emit(state.copyWith(zoom: state.zoom + 1));
+    emit(state.copyWith(zoom: state.zoom + 0.5));
   }
 
   void zoomOut() {
-    emit(state.copyWith(zoom: state.zoom - 1));
+    emit(state.copyWith(zoom: state.zoom - 0.5));
   }
 
   void setMetersRange(double metersRange) {

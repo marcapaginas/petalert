@@ -20,7 +20,7 @@ class Mapa extends StatefulWidget {
 }
 
 class _MapaState extends State<Mapa> with TickerProviderStateMixin {
-  //final _mapboxAccessToken = dotenv.env['MAPBOX_ACCESS_TOKEN'];
+  final _mapboxAccessToken = dotenv.env['MAPBOX_ACCESS_TOKEN'];
   late final _animatedMapController = AnimatedMapController(vsync: this);
 
   @override
@@ -56,11 +56,11 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
                   ),
                   children: [
                     TileLayer(
-                      // urlTemplate:
-                      //     'https://api.mapbox.com/styles/v1/${mapOptionsCubit.state.mapStyle}/tiles/{z}/{x}/{y}@2x?access_token=$_mapboxAccessToken',
                       urlTemplate:
-                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      userAgentPackageName: 'dev.fleaflet.flutter_map.example',
+                          'https://api.mapbox.com/styles/v1/${mapOptionsCubit.state.mapStyle}/tiles/{z}/{x}/{y}@2x?access_token=$_mapboxAccessToken',
+                      // urlTemplate:
+                      //     'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      // userAgentPackageName: 'dev.fleaflet.flutter_map.example',
                     ),
                     CircleLayer(circles: mapOptionsCubit.state.circles!),
                     MarkerLayer(markers: mapOptionsCubit.state.markers!),
