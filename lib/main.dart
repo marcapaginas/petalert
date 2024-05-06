@@ -24,7 +24,10 @@ Future<void> main() async {
   NotificationService.initialize();
   GeolocatorService.checkServiceAndPermission();
 
-  runApp(const GetMaterialApp(home: BlocsProvider()));
+  runApp(const GetMaterialApp(
+    home: BlocsProvider(),
+    debugShowCheckedModeBanner: false,
+  ));
 }
 
 class BlocsProvider extends StatelessWidget {

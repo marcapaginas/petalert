@@ -68,8 +68,8 @@ class _AddPetState extends State<AddPet> {
                 behavior: _selectedBehavior ?? PetBehavior.neutral,
               );
               try {
-                widget.userDataCubit.addPet(pet);
                 MongoDatabase.addPet(widget.userId, pet);
+                widget.userDataCubit.addPet(pet);
                 Get.snackbar('¡Hola ${pet.name}!',
                     'Se ha añadido a ${pet.name} a tu lista de mascotas',
                     colorText: Colors.white,

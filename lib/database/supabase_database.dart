@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -92,5 +93,39 @@ class SupabaseDatabase {
       log('Error getting user data: $e');
     }
     return UserData.empty;
+  }
+
+  static Future<String> uploadAvatar(File file, String name) async {
+    try {
+      return await supabase.storage
+          .from('fotos-perritos')
+          .upload('avatars/$name.jpg', file, retryAttempts: 3);
+    } catch (e) {
+      log('Error uploading avatar: $e');
+      return '';
+    }
+  }
+
+  static Future<Image> getAvatar(String name) async {
+    try {
+      final response = await supabase.storage
+          .from('fotos-perritos')
+          .download('avatars/$name.jpg');
+
+      return Image.memory(response);
+    } catch (e) {
+      log('Error getting avatar: $e');
+      return Image.asset('assets/pet.jpeg');
+    }
+  }
+
+  static Future<void> deleteAvatar(String name) async {
+    try {
+      await supabase.storage
+          .from('fotos-perritos')
+          .remove(['avatars/$name.jpg']);
+    } catch (e) {
+      log('Error deleting avatar: $e');
+    }
   }
 }

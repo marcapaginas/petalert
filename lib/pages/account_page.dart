@@ -160,6 +160,7 @@ class _AccountPageState extends State<AccountPage> {
                                       icon: const Icon(Icons.edit),
                                       onPressed: () {
                                         Get.bottomSheet(
+                                          isScrollControlled: true,
                                           EditPet(
                                             index: index,
                                             userDataCubit: userDataCubit,
