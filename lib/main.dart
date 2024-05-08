@@ -24,9 +24,14 @@ Future<void> main() async {
   NotificationService.initialize();
   GeolocatorService.checkServiceAndPermission();
 
-  runApp(const GetMaterialApp(
-    home: BlocsProvider(),
+  runApp(GetMaterialApp(
     debugShowCheckedModeBanner: false,
+    title: 'PetAlert',
+    theme: ThemeData(
+      colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+      useMaterial3: true,
+    ),
+    home: const BlocsProvider(),
   ));
 }
 
@@ -52,13 +57,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      showPerformanceOverlay: false,
-      debugShowCheckedModeBanner: false,
-      title: 'PetAlert',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-        useMaterial3: true,
-      ),
       initialRoute: '/',
       routes: <String, WidgetBuilder>{
         '/': (_) => const SplashPage(),

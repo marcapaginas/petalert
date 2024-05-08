@@ -36,24 +36,56 @@ class MongoDatabase {
     if (_db == null || !_db!.isConnected) {
       await close();
       var retry = 0;
-      while (true) {
+      const maxRetries = 5; // Adjust as needed
+      const baseDelay = Duration(seconds: 2); // Adjust base delay
+
+      while (retry < maxRetries) {
         try {
           retry++;
           var db = await Db.create(dotenv.env['MONGO_CONNECTION_STRING']!);
           await db.open();
           _db = db;
-          break;
+          return _db!; // Exit early on successful connection
+        } on MongoDartError catch (e) {
+          log('MongoDB connection error: $e');
+          await Future.delayed(
+              Duration(milliseconds: 100 * retry)); // Exponential backoff
         } catch (e) {
-          if (retryAttempts < retry) {
-            log('Exiting after "$retry" attempts');
-            rethrow;
-          }
-          await Future.delayed(Duration(milliseconds: 100 * retry));
+          // Handle other unexpected errors
+          log('Unexpected error: $e');
+          rethrow;
         }
       }
+
+      log('Failed to connect to MongoDB after $maxRetries attempts');
+      throw Exception(
+          'Failed to connect to MongoDB'); // Or provide a more specific error message
     }
     return _db!;
   }
+
+  // Future<Db> getConnection() async {
+  //   if (_db == null || !_db!.isConnected) {
+  //     await close();
+  //     var retry = 0;
+  //     while (true) {
+  //       try {
+  //         retry++;
+  //         var db = await Db.create(dotenv.env['MONGO_CONNECTION_STRING']!);
+  //         await db.open();
+  //         _db = db;
+  //         break;
+  //       } catch (e) {
+  //         if (retryAttempts < retry) {
+  //           log('Exiting after "$retry" attempts');
+  //           rethrow;
+  //         }
+  //         await Future.delayed(Duration(milliseconds: 100 * retry));
+  //       }
+  //     }
+  //   }
+  //   return _db!;
+  // }
 
   static Future<void> insertMarker(Map<String, dynamic> data) async {
     try {
@@ -191,6 +223,25 @@ class MongoDatabase {
       });
     } catch (e) {
       log('Error eliminando mascota: $e');
+    } finally {
+      await connection.close();
+    }
+  }
+
+  static Future<void> setPetAvatarURL(
+      String userId, int petPosition, String avatarURL) async {
+    try {
+      var db = await connection.db;
+      var collection = db.collection('users');
+      var query = where.eq('userId', userId);
+      var result = await collection.findOne(query);
+      var pets = result!['pets'] as List;
+      pets[petPosition]['avatarURL'] = avatarURL;
+      await collection.update(query, {
+        '\$set': {'pets': pets}
+      });
+    } catch (e) {
+      log('Error setting pet avatar URL: $e');
     } finally {
       await connection.close();
     }

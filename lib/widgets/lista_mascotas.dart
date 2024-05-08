@@ -34,7 +34,7 @@ class _ListaMascotasState extends State<ListaMascotas> {
             padding: const EdgeInsets.all(2.0),
             child: Container(
               decoration: const BoxDecoration(
-                color: Colors.green,
+                color: Color.fromARGB(255, 42, 118, 45),
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               child: ListTile(

@@ -228,6 +228,9 @@ class _EditPetState extends State<EditPet> {
 
   Future<void> setPetAvatar(String avatarURL) async {
     try {
+      // update the pet with the avatarURL
+      MongoDatabase.setPetAvatarURL(
+          widget.userDataCubit!.state.userId, widget.index, avatarURL);
       widget.userDataCubit!.setPetAvatar(widget.index, avatarURL);
     } catch (e) {
       log('Error marking pet with avatar: $e');
@@ -256,7 +259,11 @@ class _EditPetState extends State<EditPet> {
       if (source == 'gallery') {
         await pickImageFromGallery();
         log('imagen escogida de la galeria: $_image');
-        await uploadImage().then((value) => setPetAvatar(value));
+        await uploadImage().then((value) {
+          log('imagen subida: $value');
+          setPetAvatar(value);
+        });
+
         log('mascota marcada con avatar');
       } else {
         await pickImageFromCamera();
