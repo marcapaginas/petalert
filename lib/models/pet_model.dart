@@ -6,7 +6,7 @@ class Pet {
   final String breed;
   final PetBehavior behavior;
   final bool isBeingWalked;
-  final bool hasAvatar;
+  final String avatarURL;
 
   Pet({
     required this.id,
@@ -14,7 +14,7 @@ class Pet {
     required this.breed,
     required this.behavior,
     this.isBeingWalked = false,
-    this.hasAvatar = false,
+    this.avatarURL = '',
   });
 
   Map<String, dynamic> toMap() {
@@ -24,7 +24,7 @@ class Pet {
       'breed': breed,
       'behavior': behavior.index,
       'isBeingWalked': isBeingWalked ? 'true' : 'false',
-      'hasAvatar': hasAvatar ? 'true' : 'false',
+      'avatarURL': avatarURL,
     };
   }
 
@@ -35,7 +35,7 @@ class Pet {
       breed: map['breed'],
       behavior: PetBehavior.values[map['behavior']],
       isBeingWalked: map['isBeingWalked'] == 'true',
-      hasAvatar: map['hasAvatar'] == 'true',
+      avatarURL: map['avatarURL'],
     );
   }
 
@@ -45,7 +45,7 @@ class Pet {
     String? breed,
     PetBehavior? behavior,
     bool? isBeingWalked,
-    bool? hasAvatar,
+    String? avatarURL,
   }) {
     return Pet(
       id: id ?? this.id,
@@ -53,7 +53,7 @@ class Pet {
       breed: breed ?? this.breed,
       behavior: behavior ?? this.behavior,
       isBeingWalked: isBeingWalked ?? this.isBeingWalked,
-      hasAvatar: hasAvatar ?? this.hasAvatar,
+      avatarURL: avatarURL ?? this.avatarURL,
     );
   }
 }

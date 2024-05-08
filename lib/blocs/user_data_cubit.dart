@@ -49,4 +49,36 @@ class UserDataCubit extends Cubit<UserData> {
     );
     emit(userData);
   }
+
+  void setPetAvatar(int index, String avatarUrl) {
+    final userData = state.copyWith(
+      pets: List<Pet>.from(state.pets)
+        ..[index] = state.pets[index].copyWith(avatarURL: avatarUrl),
+    );
+    emit(userData);
+  }
+
+  void unsetPetAvatar(int index) {
+    final userData = state.copyWith(
+      pets: List<Pet>.from(state.pets)
+        ..[index] = state.pets[index].copyWith(avatarURL: ''),
+    );
+    emit(userData);
+  }
+
+  void markPetBeingWalked(int index) {
+    final userData = state.copyWith(
+      pets: List<Pet>.from(state.pets)
+        ..[index] = state.pets[index].copyWith(isBeingWalked: true),
+    );
+    emit(userData);
+  }
+
+  void markPetNotBeingWalked(int index) {
+    final userData = state.copyWith(
+      pets: List<Pet>.from(state.pets)
+        ..[index] = state.pets[index].copyWith(isBeingWalked: false),
+    );
+    emit(userData);
+  }
 }

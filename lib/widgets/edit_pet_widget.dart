@@ -32,6 +32,8 @@ class _EditPetState extends State<EditPet> {
     final XFile? pickedImage = await picker.pickImage(
       source: ImageSource.gallery,
       imageQuality: 80,
+      maxHeight: 512,
+      maxWidth: 512,
     );
     if (pickedImage != null) {
       setState(() {
@@ -43,19 +45,16 @@ class _EditPetState extends State<EditPet> {
   Future<void> pickImageFromCamera() async {
     final ImagePicker picker = ImagePicker();
     // Pick an image.
-    final XFile? captureImage =
-        await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
+    final XFile? captureImage = await picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 80,
+        maxHeight: 512,
+        maxWidth: 512);
     if (captureImage != null) {
       setState(() {
         _image = captureImage;
       });
     }
-  }
-
-  void removeImage() {
-    setState(() {
-      _image = null;
-    });
   }
 
   @override
@@ -183,14 +182,14 @@ class _EditPetState extends State<EditPet> {
             ElevatedButton(
               // Creating a button for picking an image
               onPressed: () {
-                pickImageFromCamera();
+                processImage('camera');
               }, // Call the function to pick an image
               child: const Text('Pick Image From Camera'),
             ),
             ElevatedButton(
               // Creating a button for picking an image
               onPressed: () {
-                pickImageFromGallery();
+                processImage('gallery');
               }, // Call the function to pick an image
               child: const Text('Pick Image From Gallery'),
             ),
@@ -198,22 +197,89 @@ class _EditPetState extends State<EditPet> {
               // Creating a button for picking an image
               onPressed: () {
                 removeImage();
+                deleteImage();
+                markPetWithoutAvatar();
               }, // Call the function to pick an image
               child: const Text('Remove Image'),
             ),
             ElevatedButton(
                 onPressed: () {
-                  try {
-                    SupabaseDatabase.uploadAvatar(File(_image!.path),
-                        '${supabase.auth.currentUser!.id}-${widget.userDataCubit!.state.pets[widget.index].id}');
-                  } catch (e) {
-                    log('Error uploading avatar: $e');
-                  }
+                  uploadImage();
                 },
                 child: const Text('Subir foto'))
           ],
         ),
       ),
     );
+  }
+
+  Future<String> uploadImage() async {
+    try {
+      String imageURL = '';
+      await SupabaseDatabase.uploadAvatar(File(_image!.path),
+              '${supabase.auth.currentUser!.id}-${widget.userDataCubit!.state.pets[widget.index].id}')
+          .then((value) => imageURL = value);
+      return imageURL;
+    } catch (e) {
+      log('Error uploading avatar: $e');
+      return '';
+    }
+  }
+
+  Future<void> setPetAvatar(String avatarURL) async {
+    try {
+      widget.userDataCubit!.setPetAvatar(widget.index, avatarURL);
+    } catch (e) {
+      log('Error marking pet with avatar: $e');
+    }
+  }
+
+  Future<void> deleteImage() async {
+    try {
+      SupabaseDatabase.deleteAvatar(
+          '${supabase.auth.currentUser!.id}-${widget.userDataCubit!.state.pets[widget.index].id}');
+    } catch (e) {
+      log('Error deleting avatar: $e');
+    }
+  }
+
+  Future<void> markPetWithoutAvatar() async {
+    try {
+      widget.userDataCubit!.unsetPetAvatar(widget.index);
+    } catch (e) {
+      log('Error marking pet without avatar: $e');
+    }
+  }
+
+  Future<void> processImage(String source) async {
+    try {
+      if (source == 'gallery') {
+        await pickImageFromGallery();
+        log('imagen escogida de la galeria: $_image');
+        await uploadImage().then((value) => setPetAvatar(value));
+        log('mascota marcada con avatar');
+      } else {
+        await pickImageFromCamera();
+        log('imagen escogida de la camara: $_image');
+        await uploadImage().then((value) => setPetAvatar(value));
+        log('mascota marcada con avatar');
+      }
+    } catch (e) {
+      log('Error procesando imagen: $e');
+    }
+  }
+
+  Future<void> removeImage() async {
+    try {
+      await deleteImage();
+      log('imagen eliminada');
+      await markPetWithoutAvatar();
+      log('mascota marcada sin avatar');
+      setState(() {
+        _image = null;
+      });
+    } catch (e) {
+      log('Error eliminando imagen: $e');
+    }
   }
 }

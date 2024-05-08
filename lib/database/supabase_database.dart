@@ -95,26 +95,29 @@ class SupabaseDatabase {
     return UserData.empty;
   }
 
-  static Future<void> uploadAvatar(File file, String name) async {
+  static Future<String> uploadAvatar(File file, String name) async {
     try {
-      // // check if file exists to delete it
-      // final response = await supabase.storage
-      //     .from('fotos-perritos')
-      //     .download('avatars/$name.jpg');
-      // if (response.isNotEmpty) {
-      //   await supabase.storage
-      //       .from('fotos-perritos')
-      //       .remove(['avatars/$name.jpg']);
-      // }
-      final result = await supabase.storage
+      // check if file exists to delete it
+      try {
+        await supabase.storage
+            .from('fotos-perritos')
+            .remove(['avatars/$name.jpg']);
+      } catch (e) {
+        // ignore
+      }
+      String filePath = 'avatars/$name.jpg';
+      await supabase.storage
           .from('fotos-perritos')
-          .upload('avatars/$name.jpg', file, retryAttempts: 3);
-      // avatars/fb8a99f2-8738-4bce-bf68-707a39106493-eee259d7-11ff-42b0-b9e2-6f852e5790a4.jpg
-      // avatars/fb8a99f2-8738-4bce-bf68-707a39106493_eee259d7-11ff-42b0-b9e2-6f852e5790a4.jpg
+          .upload(filePath, file, retryAttempts: 3);
 
-      log('Avatar uploaded to avatars/$name.jpg : $result');
+      final signedURL = await supabase.storage
+          .from('fotos-perritos')
+          .createSignedUrl(filePath, 60 * 60 * 24 * 365 * 10);
+
+      return signedURL;
     } catch (e) {
       log('Error uploading avatar: $e');
+      return '';
     }
   }
 

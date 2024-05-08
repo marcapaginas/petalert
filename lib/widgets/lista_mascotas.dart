@@ -1,11 +1,8 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/mongo_database.dart';
-import 'package:pet_clean/database/supabase_database.dart';
 import 'package:pet_clean/widgets/edit_pet_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -19,12 +16,9 @@ class ListaMascotas extends StatefulWidget {
 }
 
 class _ListaMascotasState extends State<ListaMascotas> {
-  HashMap<String, ImageProvider> petAvatars = HashMap();
-
   @override
   void initState() {
     super.initState();
-    _getPetAvatars(widget.userDataCubit);
   }
 
   @override
@@ -47,7 +41,11 @@ class _ListaMascotasState extends State<ListaMascotas> {
                   leading: CircleAvatar(
                     radius: 26,
                     backgroundImage: const AssetImage('assets/pet.jpeg'),
-                    foregroundImage: petAvatars[pet.id],
+                    foregroundImage:
+                        userDataCubit.state.pets[index].avatarURL != ''
+                            ? NetworkImage(
+                                userDataCubit.state.pets[index].avatarURL)
+                            : Image.asset('assets/pet.jpeg').image,
                   ),
                   title: Text(pet.name,
                       style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -122,14 +120,5 @@ class _ListaMascotasState extends State<ListaMascotas> {
         },
       ),
     );
-  }
-
-  void _getPetAvatars(UserDataCubit userDataCubit) async {
-    for (var pet in userDataCubit.state.pets) {
-      await SupabaseDatabase.getPetAvatar(userDataCubit.state.userId, pet.id)
-          .then((value) {
-        petAvatars[pet.id] = value;
-      });
-    }
   }
 }
