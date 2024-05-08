@@ -1,14 +1,14 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/mongo_database.dart';
+import 'package:pet_clean/database/supabase_database.dart';
 import 'package:pet_clean/models/pet_model.dart';
+import 'package:pet_clean/pages/home_page.dart';
 
 class EditPet extends StatefulWidget {
   final int index;
@@ -102,6 +102,7 @@ class _EditPetState extends State<EditPet> {
                 const Text('Comportamiento: '),
                 const SizedBox(width: 16),
                 DropdownButton<PetBehavior>(
+                  borderRadius: BorderRadius.circular(8),
                   dropdownColor: Colors.white,
                   value: _selectedBehavior,
                   items: PetBehavior.values.map((behavior) {
@@ -115,12 +116,12 @@ class _EditPetState extends State<EditPet> {
                       _selectedBehavior = value;
                     });
                   },
-                  hint: const Text('----'),
                 ),
                 const SizedBox(width: 16),
                 ElevatedButton(
                   onPressed: () {
                     final pet = Pet(
+                      id: widget.userDataCubit!.state.pets[widget.index].id,
                       name: _nameController.text,
                       breed: _breedController.text,
                       behavior: _selectedBehavior ?? PetBehavior.neutral,
@@ -171,7 +172,7 @@ class _EditPetState extends State<EditPet> {
                         Colors.white.withOpacity(0),
                         Colors.white.withOpacity(1),
                       ],
-                      transform: GradientRotation(3.14 / 2),
+                      transform: const GradientRotation(3.14 / 2),
                     ),
                   ),
                 )
@@ -200,6 +201,16 @@ class _EditPetState extends State<EditPet> {
               }, // Call the function to pick an image
               child: const Text('Remove Image'),
             ),
+            ElevatedButton(
+                onPressed: () {
+                  try {
+                    SupabaseDatabase.uploadAvatar(File(_image!.path),
+                        '${supabase.auth.currentUser!.id}-${widget.userDataCubit!.state.pets[widget.index].id}');
+                  } catch (e) {
+                    log('Error uploading avatar: $e');
+                  }
+                },
+                child: const Text('Subir foto'))
           ],
         ),
       ),

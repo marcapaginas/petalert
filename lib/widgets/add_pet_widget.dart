@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/mongo_database.dart';
 import 'package:pet_clean/models/pet_model.dart';
+import 'package:uuid/uuid.dart';
 
 class AddPet extends StatefulWidget {
   const AddPet({super.key, required this.userId, required this.userDataCubit});
@@ -62,7 +63,9 @@ class _AddPetState extends State<AddPet> {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
+              var uuid = const Uuid();
               final pet = Pet(
+                id: uuid.v4(),
                 name: _nameController.text.trim(),
                 breed: _breedController.text.trim(),
                 behavior: _selectedBehavior ?? PetBehavior.neutral,

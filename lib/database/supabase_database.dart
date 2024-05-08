@@ -95,14 +95,26 @@ class SupabaseDatabase {
     return UserData.empty;
   }
 
-  static Future<String> uploadAvatar(File file, String name) async {
+  static Future<void> uploadAvatar(File file, String name) async {
     try {
-      return await supabase.storage
+      // // check if file exists to delete it
+      // final response = await supabase.storage
+      //     .from('fotos-perritos')
+      //     .download('avatars/$name.jpg');
+      // if (response.isNotEmpty) {
+      //   await supabase.storage
+      //       .from('fotos-perritos')
+      //       .remove(['avatars/$name.jpg']);
+      // }
+      final result = await supabase.storage
           .from('fotos-perritos')
           .upload('avatars/$name.jpg', file, retryAttempts: 3);
+      // avatars/fb8a99f2-8738-4bce-bf68-707a39106493-eee259d7-11ff-42b0-b9e2-6f852e5790a4.jpg
+      // avatars/fb8a99f2-8738-4bce-bf68-707a39106493_eee259d7-11ff-42b0-b9e2-6f852e5790a4.jpg
+
+      log('Avatar uploaded to avatars/$name.jpg : $result');
     } catch (e) {
       log('Error uploading avatar: $e');
-      return '';
     }
   }
 
@@ -116,6 +128,19 @@ class SupabaseDatabase {
     } catch (e) {
       log('Error getting avatar: $e');
       return Image.asset('assets/pet.jpeg');
+    }
+  }
+
+  static Future<ImageProvider> getPetAvatar(String userId, String petId) async {
+    try {
+      final response = await supabase.storage
+          .from('fotos-perritos')
+          .download('avatars/$userId-$petId.jpg');
+
+      return MemoryImage(response);
+    } catch (e) {
+      log('Error getting avatar - avatars/$userId-$petId.jpg - : $e');
+      return const AssetImage('assets/pet.jpeg');
     }
   }
 

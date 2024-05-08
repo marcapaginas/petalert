@@ -6,7 +6,7 @@ import 'package:pet_clean/database/mongo_database.dart';
 import 'package:pet_clean/database/supabase_database.dart';
 import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/widgets/add_pet_widget.dart';
-import 'package:pet_clean/widgets/edit_pet_widget.dart';
+import 'package:pet_clean/widgets/lista_mascotas.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AccountPage extends StatefulWidget {
@@ -136,96 +136,7 @@ class _AccountPageState extends State<AccountPage> {
                   TextButton(
                       onPressed: _signOut, child: const Text('Cerrar sesión')),
                   const SizedBox(height: 25),
-                  Expanded(
-                    child: SizedBox(
-                      height: 200,
-                      child: ListView.builder(
-                        itemCount: userDataCubit.state.pets.length,
-                        itemBuilder: (context, index) {
-                          final pet = userDataCubit.state.pets[index];
-                          return Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: ListTile(
-                                title: Text(pet.name,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
-                                subtitle: Text(
-                                    '${pet.breed} - Comportamiento: ${pet.behavior.name}',
-                                    style:
-                                        const TextStyle(color: Colors.white)),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.edit),
-                                      onPressed: () {
-                                        Get.bottomSheet(
-                                          isScrollControlled: true,
-                                          EditPet(
-                                            index: index,
-                                            userDataCubit: userDataCubit,
-                                          ),
-                                        );
-                                      },
-                                      color: Colors.white,
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete),
-                                      onPressed: () {
-                                        Get.dialog(AlertDialog(
-                                          title: Text(
-                                              'Quitar a ${pet.name} de tus mascotas'),
-                                          content: const Text(
-                                              '¿Estás seguro de quitar esta mascota?'),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Get.back(closeOverlays: true);
-                                              },
-                                              child: const Text('Cancelar'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                try {
-                                                  Get.back(closeOverlays: true);
-                                                  MongoDatabase.deletePet(
-                                                      Supabase.instance.client
-                                                          .auth.currentUser!.id,
-                                                      index);
-                                                  userDataCubit
-                                                      .removePet(index);
-                                                  Get.snackbar('Exito',
-                                                      'Se ha quitado a ${pet.name} de tus mascotas',
-                                                      backgroundColor:
-                                                          Colors.green,
-                                                      colorText: Colors.white);
-                                                  Get.back(closeOverlays: true);
-                                                } catch (e) {
-                                                  Get.snackbar('Error',
-                                                      'Error quitando mascota',
-                                                      backgroundColor:
-                                                          Colors.red,
-                                                      colorText: Colors.white);
-                                                }
-                                              },
-                                              child: const Text('Quitar'),
-                                            ),
-                                          ],
-                                        ));
-                                      },
-                                      color: Colors.white,
-                                    ),
-                                  ],
-                                ),
-                                tileColor: Colors.green,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                )),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
+                  ListaMascotas(userDataCubit: userDataCubit),
                   const SizedBox(height: 25),
                   ElevatedButton(
                     onPressed: () {

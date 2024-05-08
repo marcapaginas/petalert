@@ -1,6 +1,9 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pet_clean/blocs/user_data_cubit.dart';
+import 'package:pet_clean/widgets/lista_mascotas.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -21,6 +24,8 @@ class _FirstPageState extends State<FirstPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userDataCubit = context.watch<UserDataCubit>();
+
     return Scaffold(
       backgroundColor: Colors.green,
       body: Center(
@@ -35,6 +40,7 @@ class _FirstPageState extends State<FirstPage> {
                 },
                 child: const Text('Ver perfil',
                     style: TextStyle(color: Colors.white))),
+            ListaMascotas(userDataCubit: userDataCubit)
           ],
         ),
       ),
