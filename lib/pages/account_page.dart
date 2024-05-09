@@ -136,7 +136,10 @@ class _AccountPageState extends State<AccountPage> {
                   TextButton(
                       onPressed: _signOut, child: const Text('Cerrar sesión')),
                   const SizedBox(height: 25),
-                  ListaMascotas(userDataCubit: userDataCubit),
+                  ListaMascotas(
+                    userDataCubit: userDataCubit,
+                    editar: true,
+                  ),
                   const SizedBox(height: 25),
                   ElevatedButton(
                     onPressed: () {

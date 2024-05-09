@@ -115,7 +115,7 @@ class _HomePageState extends State<HomePage> {
         children: <Widget>[
           Container(
             color: Colors.green,
-            child: const FirstPage(),
+            child: FirstPage(),
           ),
           Container(
             color: Colors.green,

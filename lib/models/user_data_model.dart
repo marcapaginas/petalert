@@ -45,6 +45,6 @@ class UserData {
 
   @override
   String toString() {
-    return 'UserData{userId: $userId, nombre: $nombre}';
+    return 'UserData(userId: $userId, nombre: $nombre, pets: $pets)';
   }
 }

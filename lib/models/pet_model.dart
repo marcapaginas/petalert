@@ -34,7 +34,7 @@ class Pet {
       name: map['name'],
       breed: map['breed'],
       behavior: PetBehavior.values[map['behavior']],
-      isBeingWalked: map['isBeingWalked'] == 'true',
+      isBeingWalked: map['isBeingWalked'] == true,
       avatarURL: map['avatarURL'],
     );
   }
@@ -55,5 +55,10 @@ class Pet {
       isBeingWalked: isBeingWalked ?? this.isBeingWalked,
       avatarURL: avatarURL ?? this.avatarURL,
     );
+  }
+
+  @override
+  String toString() {
+    return 'Pet(id: $id, name: $name, breed: $breed, behavior: $behavior, isBeingWalked: $isBeingWalked, avatarURL: $avatarURL)';
   }
 }

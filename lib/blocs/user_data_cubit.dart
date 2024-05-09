@@ -81,4 +81,13 @@ class UserDataCubit extends Cubit<UserData> {
     );
     emit(userData);
   }
+
+  void switchPetBeingWalked(int index) {
+    final userData = state.copyWith(
+      pets: List<Pet>.from(state.pets)
+        ..[index] = state.pets[index]
+            .copyWith(isBeingWalked: !state.pets[index].isBeingWalked),
+    );
+    emit(userData);
+  }
 }

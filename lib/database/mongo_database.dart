@@ -7,8 +7,6 @@ import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-MongoDatabase connection = MongoDatabase._();
-
 class MongoDatabase {
   static MongoDatabase? _instance;
 
@@ -36,8 +34,7 @@ class MongoDatabase {
     if (_db == null || !_db!.isConnected) {
       await close();
       var retry = 0;
-      const maxRetries = 5; // Adjust as needed
-      const baseDelay = Duration(seconds: 2); // Adjust base delay
+      const maxRetries = 5;
 
       while (retry < maxRetries) {
         try {
@@ -45,21 +42,18 @@ class MongoDatabase {
           var db = await Db.create(dotenv.env['MONGO_CONNECTION_STRING']!);
           await db.open();
           _db = db;
-          return _db!; // Exit early on successful connection
+          return _db!;
         } on MongoDartError catch (e) {
           log('MongoDB connection error: $e');
-          await Future.delayed(
-              Duration(milliseconds: 100 * retry)); // Exponential backoff
+          await Future.delayed(Duration(milliseconds: 100 * retry));
         } catch (e) {
-          // Handle other unexpected errors
           log('Unexpected error: $e');
           rethrow;
         }
       }
 
       log('Failed to connect to MongoDB after $maxRetries attempts');
-      throw Exception(
-          'Failed to connect to MongoDB'); // Or provide a more specific error message
+      throw Exception('Failed to connect to MongoDB');
     }
     return _db!;
   }
@@ -89,7 +83,7 @@ class MongoDatabase {
 
   static Future<void> insertMarker(Map<String, dynamic> data) async {
     try {
-      var db = await connection.db;
+      var db = await MongoDatabase().db;
       await db.collection('markers').update(
         {'userId': data['userId']}, // Filtro de consulta
         data, // Datos a insertar o actualizar
@@ -98,14 +92,14 @@ class MongoDatabase {
     } catch (e) {
       log('Error inserting data: $e');
     } finally {
-      await connection.close();
+      await MongoDatabase().close();
     }
   }
 
   static Future<List<UserLocationModel>> searchOtherUsers(
       double lat, double lon, double range) async {
     try {
-      var db = await connection.db;
+      var db = await MongoDatabase().db;
       String? userId = Supabase.instance.client.auth.currentUser?.id;
       List<UserLocationModel> otherUsersFound = [];
 
@@ -138,13 +132,13 @@ class MongoDatabase {
       log('Error retrieving markers: $e');
       return [];
     } finally {
-      await connection.close();
+      await MongoDatabase().close();
     }
   }
 
   static Future<void> saveUserData(UserData userData) async {
     try {
-      var db = await connection.db;
+      var db = await MongoDatabase().db;
       var collection = db.collection('users');
       var map = userData.toMap();
       await collection.update(
@@ -155,28 +149,29 @@ class MongoDatabase {
     } catch (e) {
       log('Error saving user data: $e');
     } finally {
-      await connection.close();
+      await MongoDatabase().close();
     }
   }
 
   static Future<UserData> getUserData(String userId) async {
     try {
-      var db = await connection.db;
+      var db = await MongoDatabase().db;
       var collection = db.collection('users');
       var query = where.eq('userId', userId);
       var result = await collection.findOne(query);
+      log(UserData.fromMap(result!).toString());
       return UserData.fromMap(result!);
     } catch (e) {
       log('Error getting user data: $e');
       return UserData.empty;
     } finally {
-      await connection.close();
+      await MongoDatabase().close();
     }
   }
 
   static Future<void> addPet(String userId, Pet pet) async {
     try {
-      var db = await connection.db;
+      var db = await MongoDatabase().db;
       var collection = db.collection('users');
       var query = where.eq('userId', userId);
       var result = await collection.findOne(query);
@@ -188,13 +183,13 @@ class MongoDatabase {
     } catch (e) {
       log('Error añadiendo mascota: $e');
     } finally {
-      await connection.close();
+      await MongoDatabase().close();
     }
   }
 
   static Future<void> updatePet(String userId, Pet pet, int petPosition) async {
     try {
-      var db = await connection.db;
+      var db = await MongoDatabase().db;
       var collection = db.collection('users');
       var query = where.eq('userId', userId);
       var result = await collection.findOne(query);
@@ -206,13 +201,13 @@ class MongoDatabase {
     } catch (e) {
       log('Error actualizando mascota: $e');
     } finally {
-      await connection.close();
+      await MongoDatabase().close();
     }
   }
 
   static Future<void> deletePet(String userId, int petPosition) async {
     try {
-      var db = await connection.db;
+      var db = await MongoDatabase().db;
       var collection = db.collection('users');
       var query = where.eq('userId', userId);
       var result = await collection.findOne(query);
@@ -224,14 +219,14 @@ class MongoDatabase {
     } catch (e) {
       log('Error eliminando mascota: $e');
     } finally {
-      await connection.close();
+      await MongoDatabase().close();
     }
   }
 
   static Future<void> setPetAvatarURL(
       String userId, int petPosition, String avatarURL) async {
     try {
-      var db = await connection.db;
+      var db = await MongoDatabase().db;
       var collection = db.collection('users');
       var query = where.eq('userId', userId);
       var result = await collection.findOne(query);
@@ -243,7 +238,43 @@ class MongoDatabase {
     } catch (e) {
       log('Error setting pet avatar URL: $e');
     } finally {
-      await connection.close();
+      await MongoDatabase().close();
+    }
+  }
+
+  static void markPetBeingWalked(String userId, int index, bool? value) async {
+    try {
+      var db = await MongoDatabase().db;
+      var collection = db.collection('users');
+      var query = where.eq('userId', userId);
+      var result = await collection.findOne(query);
+      var pets = result!['pets'] as List;
+      pets[index]['isBeingWalked'] = value;
+      await collection.update(query, {
+        '\$set': {'pets': pets}
+      });
+    } catch (e) {
+      log('Error marking pet being walked: $e');
+    } finally {
+      await MongoDatabase().close();
+    }
+  }
+
+  static void switchPetBeingWalked(String userId, int index) async {
+    try {
+      var db = await MongoDatabase().db;
+      var collection = db.collection('users');
+      var query = where.eq('userId', userId);
+      var result = await collection.findOne(query);
+      var pets = result!['pets'] as List;
+      pets[index]['isBeingWalked'] = !pets[index]['isBeingWalked'];
+      await collection.update(query, {
+        '\$set': {'pets': pets}
+      });
+    } catch (e) {
+      log('Error switching pet being walked: $e');
+    } finally {
+      await MongoDatabase().close();
     }
   }
 }
