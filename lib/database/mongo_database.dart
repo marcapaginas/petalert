@@ -159,7 +159,6 @@ class MongoDatabase {
       var collection = db.collection('users');
       var query = where.eq('userId', userId);
       var result = await collection.findOne(query);
-      log(UserData.fromMap(result!).toString());
       return UserData.fromMap(result!);
     } catch (e) {
       log('Error getting user data: $e');

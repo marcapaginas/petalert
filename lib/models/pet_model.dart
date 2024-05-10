@@ -23,7 +23,7 @@ class Pet {
       'name': name,
       'breed': breed,
       'behavior': behavior.index,
-      'isBeingWalked': isBeingWalked ? 'true' : 'false',
+      'isBeingWalked': isBeingWalked ? true : false,
       'avatarURL': avatarURL,
     };
   }

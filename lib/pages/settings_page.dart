@@ -35,6 +35,12 @@ class Settings extends StatelessWidget {
                   child: const Text('desactivar notis')),
             ],
           )),
+          ElevatedButton(
+              onPressed: () {
+                // go to account_page
+                Navigator.pushNamed(context, '/account');
+              },
+              child: const Text('Cuenta')),
           ElevatedButton.icon(
             onPressed: () => _signOut(),
             icon: const Icon(Icons.logout),
