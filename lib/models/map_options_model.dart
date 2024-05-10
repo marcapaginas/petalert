@@ -6,6 +6,7 @@ import 'package:flutter_map_geojson/flutter_map_geojson.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/classes/custom_geo_json_parser.dart';
 import 'package:pet_clean/database/mongo_database.dart';
+import 'package:pet_clean/models/pet_model.dart';
 import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
 
@@ -119,6 +120,9 @@ class MapOptionsState {
       Map<String, dynamic> properties) async {
     UserData userData = await MongoDatabase.getUserData(properties['userId']);
 
+    //filter pets that are being walked
+    List<Pet> pets = userData.pets.where((pet) => pet.isBeingWalked).toList();
+
     return showModalBottomSheet(
       context: Get.context!,
       builder: (context) {
@@ -139,12 +143,42 @@ class MapOptionsState {
                   padding: const EdgeInsets.all(30),
                   child: Column(
                     children: [
-                      Text('Usuario: ${properties['userId']}',
+                      Text('${userData.nombre} está paseando a: ',
                           style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 10),
-                      Text('Nombre: ${userData.nombre}',
-                          style: const TextStyle(fontSize: 18)),
+                      pets.isNotEmpty
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                for (var pet in pets)
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: Column(
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundImage: const AssetImage(
+                                              'assets/pet.jpeg'),
+                                          foregroundImage: pet.avatarURL != ''
+                                              ? NetworkImage(pet.avatarURL)
+                                              : null,
+                                          radius: 40,
+                                        ),
+                                        Text(
+                                          pet.name,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                const SizedBox(width: 20),
+                              ],
+                            )
+                          : const Text('No hay mascotas paseando'),
                     ],
                   )),
               Positioned(

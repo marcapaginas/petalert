@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/mongo_database.dart';
-import 'package:pet_clean/widgets/edit_pet_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ListaMascotasCirculos extends StatefulWidget {
@@ -34,36 +33,63 @@ class _ListaMascotasCirculosState extends State<ListaMascotasCirculos> {
                 1 / 3, // Esto hace que el ancho sea 1/3 del ancho total
             child: Padding(
                 padding: const EdgeInsets.all(2.0),
-                child: InkWell(
-                  customBorder: const CircleBorder(),
-                  onTap: () {
-                    MongoDatabase.switchPetBeingWalked(
-                      Supabase.instance.client.auth.currentUser!.id,
-                      index,
-                    );
-                    userDataCubit.switchPetBeingWalked(index);
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        width: 5,
-                        color: userDataCubit.state.pets[index].isBeingWalked
-                            ? Color.fromARGB(255, 101, 252, 7)
-                            : Colors.white,
+                child: Column(
+                  children: [
+                    InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: () {
+                        MongoDatabase.switchPetBeingWalked(
+                          Supabase.instance.client.auth.currentUser!.id,
+                          index,
+                        );
+                        userDataCubit.switchPetBeingWalked(index);
+                        Get.rawSnackbar(
+                          snackPosition: SnackPosition.TOP,
+                          animationDuration: const Duration(milliseconds: 500),
+                          title: 'Actualizado',
+                          message: userDataCubit.state.pets[index].isBeingWalked
+                              ? '¡${pet.name} se viene al paseo!'
+                              : '${pet.name} se queda en casa',
+                          duration: const Duration(seconds: 2),
+                        );
+                        // if (mounted) {
+                        //   ScaffoldMessenger.of(context).clearSnackBars();
+                        //   ScaffoldMessenger.of(context).showSnackBar(
+                        //     const SnackBar(content: Text('Paseando mascota')),
+                        //   );
+                        // }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            width: 5,
+                            color: userDataCubit.state.pets[index].isBeingWalked
+                                ? const Color.fromARGB(255, 101, 252, 7)
+                                : Colors.white,
+                          ),
+                          color: Colors.green,
+                          shape: BoxShape.circle,
+                        ),
+                        child: CircleAvatar(
+                          radius: 55,
+                          backgroundImage: const AssetImage('assets/pet.jpeg'),
+                          foregroundImage:
+                              userDataCubit.state.pets[index].avatarURL != ''
+                                  ? NetworkImage(
+                                      userDataCubit.state.pets[index].avatarURL)
+                                  : Image.asset('assets/pet.jpeg').image,
+                        ),
                       ),
-                      color: Colors.green,
-                      shape: BoxShape.circle,
                     ),
-                    child: CircleAvatar(
-                      radius: 55,
-                      backgroundImage: const AssetImage('assets/pet.jpeg'),
-                      foregroundImage:
-                          userDataCubit.state.pets[index].avatarURL != ''
-                              ? NetworkImage(
-                                  userDataCubit.state.pets[index].avatarURL)
-                              : Image.asset('assets/pet.jpeg').image,
+                    Text(
+                      pet.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Colors.black,
+                      ),
                     ),
-                  ),
+                  ],
                 )),
           );
         }),

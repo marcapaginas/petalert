@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pet_clean/database/mongo_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
+import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
 
 class AlertsCubit extends Cubit<List<AlertModel>> {
@@ -10,8 +12,6 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
   }
 
   AlertsCubit._internal() : super([]);
-
-  //AlertsCubit() : super([]);
 
   void addAlert(AlertModel alert) {
     emit(<AlertModel>[...state, alert]);
@@ -39,7 +39,7 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
     emit(List<AlertModel>.empty());
   }
 
-  void setAlerts(List<UserLocationModel> result) {
+  void setAlerts(List<UserLocationModel> result) async {
     if (result.isEmpty) {
       emit(state);
       return;
@@ -62,10 +62,14 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
       if (existingAlert.id.isNotEmpty) {
         alerts.add(existingAlert);
       } else {
+        // get user data using userId
+        UserData usuario =
+            await MongoDatabase.getUserData(userLocation.userId!);
         alerts.add(AlertModel(
           id: userLocation.userId!,
-          title: 'Alerta ${userLocation.userId}',
-          description: 'Usuario ${userLocation.userId} cerca',
+          title: 'Alerta',
+          description:
+              '${usuario.nombre} está cerca y está paseando a ${usuario.pets.length} mascotas',
           date: DateTime.now(),
           isDiscarded: false,
         ));
