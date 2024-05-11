@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pet_clean/database/mongo_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
@@ -62,14 +64,23 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
       if (existingAlert.id.isNotEmpty) {
         alerts.add(existingAlert);
       } else {
+        UserData usuario;
+        try {
+          usuario = await MongoDatabase.getUserData(userLocation.userId!);
+        } catch (e) {
+          log('Error getting user data: $e');
+          return;
+        }
         // get user data using userId
-        UserData usuario =
-            await MongoDatabase.getUserData(userLocation.userId!);
+
+        // count pets that are being walked
+        int petsBeingWalked =
+            usuario.pets.where((pet) => pet.isBeingWalked).toList().length;
         alerts.add(AlertModel(
           id: userLocation.userId!,
           title: 'Alerta',
           description:
-              '${usuario.nombre} está cerca y está paseando a ${usuario.pets.length} mascotas',
+              '${usuario.nombre.isNotEmpty ? usuario.nombre : 'Alguien'} está cerca y está paseando a $petsBeingWalked mascotas',
           date: DateTime.now(),
           isDiscarded: false,
         ));

@@ -35,6 +35,10 @@ class UserData {
     };
   }
 
+  get walkingPets {
+    return pets.where((pet) => pet.isBeingWalked).toList();
+  }
+
   static UserData fromMap(Map<String, dynamic> map) {
     return UserData(
       userId: map['userId'],

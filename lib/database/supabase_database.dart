@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
-import 'package:pet_clean/models/user_data_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseDatabase {
@@ -72,28 +71,28 @@ class SupabaseDatabase {
         backgroundColor: Colors.white, icon: const Icon(Icons.check));
   }
 
-  static Future<UserData> getUserData(String userId) async {
-    try {
-      final response = await supabase
-          .from('users')
-          .select()
-          .eq('user_id', userId)
-          .limit(1)
-          .single();
+  // static Future<UserData> getUserData(String userId) async {
+  //   try {
+  //     final response = await supabase
+  //         .from('users')
+  //         .select()
+  //         .eq('user_id', userId)
+  //         .limit(1)
+  //         .single();
 
-      final data = response.map((key, value) => MapEntry(key, value));
+  //     final data = response.map((key, value) => MapEntry(key, value));
 
-      final userData = UserData(
-        userId: data['user_id'] as String,
-        nombre: data['nombre'] as String,
-      );
+  //     final userData = UserData(
+  //       userId: data['user_id'] as String,
+  //       nombre: data['nombre'] as String,
+  //     );
 
-      return userData;
-    } catch (e) {
-      log('Error getting user data: $e');
-    }
-    return UserData.empty;
-  }
+  //     return userData;
+  //   } catch (e) {
+  //     log('Error getting user data: $e');
+  //   }
+  //   return UserData.empty;
+  // }
 
   static Future<String> uploadAvatar(File file, String name) async {
     try {

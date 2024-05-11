@@ -155,6 +155,7 @@ class MongoDatabase {
 
   static Future<UserData> getUserData(String userId) async {
     try {
+      log('Getting user data for user: $userId');
       var db = await MongoDatabase().db;
       var collection = db.collection('users');
       var query = where.eq('userId', userId);

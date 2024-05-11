@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,10 +10,10 @@ import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/mongo_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
+import 'package:pet_clean/pages/account_page.dart';
 import 'package:pet_clean/pages/alerts_page.dart';
 import 'package:pet_clean/pages/first_page.dart';
 import 'package:pet_clean/pages/map_page.dart';
-import 'package:pet_clean/pages/settings_page.dart';
 import 'package:pet_clean/services/geolocator_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -33,13 +34,14 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
-    GeolocatorService.startBackgroundLocationService(foreground: true);
-    _searchOtherUsersLocations();
-    _listenToPositionStream();
-    MongoDatabase.getUserData(supabase.auth.currentUser!.id).then((userData) {
-      context.read<UserDataCubit>().setUserData(userData);
-    });
+    try {
+      GeolocatorService.startBackgroundLocationService(foreground: true);
+      _searchOtherUsersLocations();
+      _listenToPositionStream();
+      _getUserData();
+    } catch (e) {
+      log(e.toString());
+    }
   }
 
   @override
@@ -97,7 +99,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    //final mapOptionsCubit = context.watch<MapOptionsCubit>();
+    final userDataCubit = context.watch<UserDataCubit>();
 
     return Scaffold(
       appBar: AppBar(
@@ -127,9 +129,7 @@ class _HomePageState extends State<HomePage> {
           ),
           Container(
             color: Colors.green,
-            child: const Center(
-              child: Settings(),
-            ),
+            child: AccountPage(userDataCubit: userDataCubit),
           ),
         ],
       ),
@@ -182,5 +182,16 @@ class _HomePageState extends State<HomePage> {
         },
       ),
     );
+  }
+
+  void _getUserData() async {
+    try {
+      await MongoDatabase.getUserData(supabase.auth.currentUser!.id)
+          .then((userData) {
+        context.read<UserDataCubit>().setUserData(userData);
+      });
+    } catch (e) {
+      log('Error getting user data: $e');
+    }
   }
 }

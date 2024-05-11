@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/mongo_database.dart';
@@ -10,7 +9,8 @@ import 'package:pet_clean/widgets/lista_mascotas.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AccountPage extends StatefulWidget {
-  const AccountPage({super.key});
+  final UserDataCubit userDataCubit;
+  const AccountPage({super.key, required this.userDataCubit});
 
   @override
   State<AccountPage> createState() => _AccountPageState();
@@ -19,34 +19,34 @@ class AccountPage extends StatefulWidget {
 class _AccountPageState extends State<AccountPage> {
   final _usernameController = TextEditingController();
 
-  var _loading = true;
+  var _loading = false;
 
-  UserData? userData;
+  // UserData? userData;
 
-  Future<void> _getProfile() async {
-    setState(() {
-      _loading = true;
-    });
+  // Future<void> _getProfile() async {
+  //   setState(() {
+  //     _loading = true;
+  //   });
 
-    try {
-      final userId = SupabaseDatabase.supabase.auth.currentUser!.id;
-      UserData userData = await MongoDatabase.getUserData(userId);
-      if (mounted) {
-        context.read<UserDataCubit>().setUserData(userData);
-      }
-      _usernameController.text = userData.nombre;
-    } catch (error) {
-      const SnackBar(
-        content: Text('Error obteniendo perfil de usuario'),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _loading = false;
-        });
-      }
-    }
-  }
+  //   try {
+  //     final userId = SupabaseDatabase.supabase.auth.currentUser!.id;
+  //     UserData userData = await MongoDatabase.getUserData(userId);
+  //     if (mounted) {
+  //       context.read<UserDataCubit>().setUserData(userData);
+  //     }
+  //     _usernameController.text = userData.nombre;
+  //   } catch (error) {
+  //     const SnackBar(
+  //       content: Text('Error obteniendo perfil de usuario'),
+  //     );
+  //   } finally {
+  //     if (mounted) {
+  //       setState(() {
+  //         _loading = false;
+  //       });
+  //     }
+  //   }
+  // }
 
   Future<void> _updateProfile() async {
     setState(() {
@@ -60,7 +60,8 @@ class _AccountPageState extends State<AccountPage> {
         nombre: userName,
       ));
       if (mounted) {
-        Get.snackbar('EXITO', 'Perfil actualizado');
+        Get.snackbar('EXITO', 'Perfil actualizado',
+            backgroundColor: Colors.green, colorText: Colors.white);
       }
     } catch (error) {
       const SnackBar(
@@ -96,7 +97,8 @@ class _AccountPageState extends State<AccountPage> {
   @override
   void initState() {
     super.initState();
-    _getProfile();
+    _usernameController.text = widget.userDataCubit.state.nombre;
+    // _getProfile();
   }
 
   @override
@@ -107,54 +109,70 @@ class _AccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    final userDataCubit = context.watch<UserDataCubit>();
-
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
         title: const Text('Perfil de usuario',
             style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.green,
+        actions: [
+          const Text('Cerrar Sesión'),
+          IconButton(
+            onPressed: _signOut,
+            icon: const Icon(Icons.logout),
+          ),
+        ],
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : Container(
-              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  TextFormField(
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: TextFormField(
                     controller: _usernameController,
                     decoration: const InputDecoration(labelText: 'Nombre'),
                   ),
-                  const SizedBox(height: 18),
-                  ElevatedButton(
-                    onPressed: _loading ? null : _updateProfile,
-                    child: Text(_loading ? 'Guardando...' : 'Actualizar'),
+                ),
+                const SizedBox(height: 18),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: _loading ? null : _updateProfile,
+                      child:
+                          Text(_loading ? 'Guardando...' : 'Actualizar nombre'),
+                    ),
                   ),
-                  const SizedBox(height: 18),
-                  TextButton(
-                      onPressed: _signOut, child: const Text('Cerrar sesión')),
-                  const SizedBox(height: 25),
-                  ListaMascotas(
-                    userDataCubit: userDataCubit,
-                    editar: true,
-                  ),
-                  const SizedBox(height: 25),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Abre el formulario para añadir una nueva mascota
-                      Get.bottomSheet(
-                        AddPet(
-                            userId:
-                                Supabase.instance.client.auth.currentUser!.id,
-                            userDataCubit: userDataCubit),
-                      );
-                    },
-                    child: const Text('Añadir mascota'),
-                  ),
-                ],
-              )),
+                ),
+                const SizedBox(height: 18),
+                ListaMascotas(
+                  userDataCubit: widget.userDataCubit,
+                  editar: true,
+                ),
+                const SizedBox(height: 25),
+                ElevatedButton(
+                  onPressed: () {
+                    // Abre el formulario para añadir una nueva mascota
+                    Get.bottomSheet(
+                      AddPet(
+                          userId: Supabase.instance.client.auth.currentUser!.id,
+                          userDataCubit: widget.userDataCubit),
+                    );
+                  },
+                  child: const Text('Añadir mascota'),
+                ),
+              ],
+            ),
     );
   }
 }

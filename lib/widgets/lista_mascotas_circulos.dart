@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
@@ -52,12 +51,6 @@ class _ListaMascotasCirculosState extends State<ListaMascotasCirculos> {
                               : '${pet.name} se queda en casa',
                           duration: const Duration(seconds: 2),
                         );
-                        // if (mounted) {
-                        //   ScaffoldMessenger.of(context).clearSnackBars();
-                        //   ScaffoldMessenger.of(context).showSnackBar(
-                        //     const SnackBar(content: Text('Paseando mascota')),
-                        //   );
-                        // }
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -71,7 +64,7 @@ class _ListaMascotasCirculosState extends State<ListaMascotasCirculos> {
                           shape: BoxShape.circle,
                         ),
                         child: CircleAvatar(
-                          radius: 55,
+                          radius: 45,
                           backgroundImage: const AssetImage('assets/pet.jpeg'),
                           foregroundImage:
                               userDataCubit.state.pets[index].avatarURL != ''

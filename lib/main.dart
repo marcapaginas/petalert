@@ -7,7 +7,6 @@ import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/supabase_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
-import 'package:pet_clean/pages/account_page.dart';
 import 'package:pet_clean/pages/alert_detail_page.dart';
 import 'package:pet_clean/pages/forgot_password_page.dart';
 import 'package:pet_clean/pages/home_page.dart';
@@ -63,7 +62,6 @@ class MyApp extends StatelessWidget {
         '/register': (_) => RegisterPage(),
         '/login': (_) => const LoginPage(),
         '/forgot-password': (_) => const ForgotPassword(),
-        '/account': (_) => const AccountPage(),
         '/homepage': (_) => const HomePage(),
       },
       onGenerateRoute: (settings) {
