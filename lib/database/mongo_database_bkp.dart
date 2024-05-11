@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mongo_dart/mongo_dart.dart';
@@ -7,11 +6,24 @@ import 'package:pet_clean/models/pet_model.dart';
 import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-// import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MongoDatabase {
-  Db? _db;
-  int maxRetries = 5;
+  static MongoDatabase? _instance;
+
+  MongoDatabase._();
+
+  factory MongoDatabase() {
+    _instance ??= MongoDatabase._();
+    return _instance!;
+  }
+
+  //int retryAttempts = 5;
+
+  static bool started = false;
+
+  static Db? _db;
+  static const int maxRetries = 5;
+  //Future<Db> get db async => getConnection();
 
   Future<Db> get db async {
     if (_db == null) {
@@ -44,6 +56,34 @@ class MongoDatabase {
       await _db!.close();
     }
   }
+
+  // Future<Db> getConnection() async {
+  //   if (_db == null || !_db!.isConnected) {
+  //     await close();
+  //     var retry = 0;
+  //     const maxRetries = 5;
+
+  //     while (retry < maxRetries) {
+  //       try {
+  //         retry++;
+  //         var db = await Db.create(dotenv.env['MONGO_CONNECTION_STRING']!);
+  //         await db.open();
+  //         _db = db;
+  //         return _db!;
+  //       } on MongoDartError catch (e) {
+  //         log('MongoDB connection error: $e');
+  //         await Future.delayed(Duration(milliseconds: 100 * retry));
+  //       } catch (e) {
+  //         log('Unexpected error: $e');
+  //         rethrow;
+  //       }
+  //     }
+
+  //     log('Failed to connect to MongoDB after $maxRetries attempts');
+  //     throw Exception('Failed to connect to MongoDB');
+  //   }
+  //   return _db!;
+  // }
 
   static Future<void> insertMarker(Map<String, dynamic> data) async {
     try {
@@ -117,14 +157,12 @@ class MongoDatabase {
 
   static Future<UserData> getUserData(String userId) async {
     try {
+      log('Getting user data for user: $userId');
       var db = await MongoDatabase().db;
       var collection = db.collection('users');
       var query = where.eq('userId', userId);
       var result = await collection.findOne(query);
       return UserData.fromMap(result!);
-    } on SocketException catch (_) {
-      log('Lost connection while getting user data');
-      return UserData.empty;
     } catch (e) {
       log('Error getting user data: $e');
       return UserData.empty;
@@ -193,6 +231,22 @@ class MongoDatabase {
       });
     } catch (e) {
       log('Error setting pet avatar URL: $e');
+    }
+  }
+
+  static void markPetBeingWalked(String userId, int index, bool? value) async {
+    try {
+      var db = await MongoDatabase().db;
+      var collection = db.collection('users');
+      var query = where.eq('userId', userId);
+      var result = await collection.findOne(query);
+      var pets = result!['pets'] as List;
+      pets[index]['isBeingWalked'] = value;
+      await collection.update(query, {
+        '\$set': {'pets': pets}
+      });
+    } catch (e) {
+      log('Error marking pet being walked: $e');
     }
   }
 

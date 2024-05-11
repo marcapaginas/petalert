@@ -25,7 +25,15 @@ Future<void> main() async {
   NotificationService.initialize();
   GeolocatorService.checkServiceAndPermission();
 
-  runApp(const BlocsProvider());
+  runApp(GetMaterialApp(
+    debugShowCheckedModeBanner: false,
+    title: 'PetAlert',
+    theme: ThemeData(
+      colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+      useMaterial3: true,
+    ),
+    home: const BlocsProvider(),
+  ));
 }
 
 class BlocsProvider extends StatelessWidget {
@@ -51,9 +59,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     ConnectionService().initialize();
 
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'PetAlert',
+    return MaterialApp(
       initialRoute: '/',
       routes: <String, WidgetBuilder>{
         '/': (_) => const SplashPage(),
@@ -63,14 +69,17 @@ class MyApp extends StatelessWidget {
         '/homepage': (_) => const HomePage(),
         '/no-connection': (_) => const NoConnectionPage(),
       },
-      getPages: [
-        GetPage(name: '/', page: () => const SplashPage()),
-        GetPage(name: '/login', page: () => const LoginPage()),
-        GetPage(name: '/register', page: () => RegisterPage()),
-        GetPage(name: '/forgot-password', page: () => const ForgotPassword()),
-        GetPage(name: '/home', page: () => const HomePage()),
-        GetPage(name: '/no-connection', page: () => const NoConnectionPage()),
-      ],
+      onGenerateRoute: (settings) {
+        if (settings.name == '/alert_detail') {
+          final args = settings.arguments as AlertModel;
+          return MaterialPageRoute(
+            builder: (context) {
+              return AlertDetailPage(alert: args);
+            },
+          );
+        }
+        return null;
+      },
     );
   }
 }

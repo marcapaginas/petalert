@@ -30,12 +30,22 @@ dependencies:
   image_picker: ^1.1.1
   uuid: ^4.4.0
   fc_native_image_resize: ^0.7.0
+  connectivity_plus: ^6.0.3
+  flutter_launcher_icons: ^0.13.1
+  
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^3.0.0
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  adaptive_icon_background: "assets/icon/petalert-icon-background.png" # only available for Android 8.0 devices and above
+  adaptive_icon_foreground: "assets/icon/petalert-icon.png" # only available for Android 8.0 devices and above
+  image_path: "assets/icon/petalert-icon.png"
+  min_sdk_android: 21
 
 flutter:
 

@@ -27,6 +27,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  Timer? _timerCheckOtherUsersLocation;
   int _selectedIndex = 0;
   final PageController _pageController = PageController(initialPage: 0);
   late final mapOptionsCubit = context.watch<MapOptionsCubit>();
@@ -35,6 +36,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     try {
+      _checkConnection();
       GeolocatorService.startBackgroundLocationService(foreground: true);
       _searchOtherUsersLocations();
       _listenToPositionStream();
@@ -47,12 +49,13 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     GeolocatorService.stopBackgroundLocationService();
-
+    _timerCheckOtherUsersLocation?.cancel();
     super.dispose();
   }
 
   void _searchOtherUsersLocations() {
-    Timer.periodic(const Duration(seconds: 2), (timer) {
+    _timerCheckOtherUsersLocation =
+        Timer.periodic(const Duration(seconds: 2), (timer) {
       if (context.read<MapOptionsCubit>().state.userLocation != null) {
         MongoDatabase.searchOtherUsers(
           context.read<MapOptionsCubit>().state.userLocation!.latitude,
@@ -194,4 +197,6 @@ class _HomePageState extends State<HomePage> {
       log('Error getting user data: $e');
     }
   }
+
+  void _checkConnection() async {}
 }
