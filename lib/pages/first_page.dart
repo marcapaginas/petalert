@@ -24,8 +24,8 @@ class FirstPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Lottie.asset('assets/perrito_marron_andando.json',
-                width: 150, height: 150),
+            Lottie.asset('assets/andando.json',
+                width: 200, height: 180, fit: BoxFit.cover),
             Center(
               child: Text(
                 '¡Hola ${userDataCubit.state.nombre}!',
