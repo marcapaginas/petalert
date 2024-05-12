@@ -1,5 +1,5 @@
 name: pet_clean
-description: "A new Flutter project."
+description: "Recibe alertas de mascotas mientras paseas por la calle"
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
