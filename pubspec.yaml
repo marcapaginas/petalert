@@ -32,6 +32,7 @@ dependencies:
   fc_native_image_resize: ^0.7.0
   connectivity_plus: ^6.0.3
   flutter_launcher_icons: ^0.13.1
+  redis: ^4.0.0
   
 
 dev_dependencies:

@@ -1,3 +1,5 @@
+import 'dart:convert' as convert;
+
 enum PetBehavior { bueno, neutral, malo }
 
 class Pet {
@@ -60,5 +62,25 @@ class Pet {
   @override
   String toString() {
     return 'Pet(id: $id, name: $name, breed: $breed, behavior: $behavior, isBeingWalked: $isBeingWalked, avatarURL: $avatarURL)';
+  }
+
+  String toJson() => convert.jsonEncode({
+        'id': id,
+        'name': name,
+        'breed': breed,
+        'behavior': behavior.index,
+        'isBeingWalked': isBeingWalked,
+        'avatarURL': avatarURL,
+      });
+
+  factory Pet.fromJson(Map<String, dynamic> json) {
+    return Pet(
+      id: json['id'],
+      name: json['name'],
+      breed: json['breed'],
+      behavior: PetBehavior.values[json['behavior']],
+      isBeingWalked: json['isBeingWalked'],
+      avatarURL: json['avatarURL'],
+    );
   }
 }
