@@ -3,12 +3,16 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 class UserLocationModel {
-  final String? userId;
+  final String userId;
   final double latitude;
   final double longitude;
+  final DateTime? lastUpdate;
 
   UserLocationModel(
-      {this.userId, required this.latitude, required this.longitude});
+      {required this.userId,
+      required this.latitude,
+      required this.longitude,
+      this.lastUpdate});
 
   @override
   String toString() {
@@ -19,11 +23,13 @@ class UserLocationModel {
     String? userId,
     double? latitude,
     double? longitude,
+    DateTime? lastUpdate,
   }) {
     return UserLocationModel(
       userId: userId ?? this.userId,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      lastUpdate: lastUpdate ?? this.lastUpdate,
     );
   }
 
@@ -55,7 +61,7 @@ class UserLocationModel {
         'coordinates': [longitude, latitude],
       },
       'properties': {
-        'userId': userId ?? 'Unknown',
+        'userId': userId,
       },
     };
   }

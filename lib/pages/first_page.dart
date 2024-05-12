@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/redis_database.dart';
+import 'package:pet_clean/models/user_location_model.dart';
 import 'package:pet_clean/widgets/lista_mascotas_circulos.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -79,8 +80,19 @@ class FirstPage extends StatelessWidget {
                   // RedisDatabase().storeUserData(
                   //     Supabase.instance.client.auth.currentUser!.id,
                   //     userDataCubit.state);
-                  RedisDatabase().getUserData(
-                      Supabase.instance.client.auth.currentUser!.id);
+                  // RedisDatabase().getUserData(
+                  //     Supabase.instance.client.auth.currentUser!.id);
+                  // RedisDatabase().storeUserLocation(UserLocationModel(
+                  //     userId: '321',
+                  //     latitude: -1.208022,
+                  //     longitude: 37.972413));
+
+                  // 37.972441, -1.207259  - 37.972413, -1.208022
+
+                  // RedisDatabase().getUserLocationsByDistance(
+                  //     -1.206450, 37.971963, 9999999);
+
+                  //RedisDatabase().getUserLocations();
                 },
                 child: const Text('Prueba'))
           ],

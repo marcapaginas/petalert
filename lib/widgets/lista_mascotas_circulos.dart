@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
-import 'package:pet_clean/database/mongo_database.dart';
+import 'package:pet_clean/database/redis_database.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ListaMascotasCirculos extends StatefulWidget {
@@ -37,11 +37,8 @@ class _ListaMascotasCirculosState extends State<ListaMascotasCirculos> {
                     InkWell(
                       customBorder: const CircleBorder(),
                       onTap: () {
-                        MongoDatabase.switchPetBeingWalked(
-                          Supabase.instance.client.auth.currentUser!.id,
-                          index,
-                        );
                         userDataCubit.switchPetBeingWalked(index);
+                        RedisDatabase().storeUserData(userDataCubit.state);
                         Get.rawSnackbar(
                           snackPosition: SnackPosition.TOP,
                           animationDuration: const Duration(milliseconds: 500),

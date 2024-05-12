@@ -7,7 +7,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:pet_clean/blocs/alerts_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
-import 'package:pet_clean/database/mongo_database.dart';
+//import 'package:pet_clean/database/mongo_database.dart';
+import 'package:pet_clean/database/redis_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
 //import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
@@ -28,6 +29,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String userId = supabase.auth.currentUser!.id;
   Timer? _timerCheckOtherUsersLocation;
   int _selectedIndex = 0;
   final PageController _pageController = PageController(initialPage: 0);
@@ -37,11 +39,10 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     try {
-      _checkConnection();
-      GeolocatorService.startBackgroundLocationService(foreground: true);
-      _searchOtherUsersLocations();
-      _listenToPositionStream();
       _getUserData();
+      GeolocatorService.startBackgroundLocationService(foreground: true);
+      _listenToPositionStream();
+      _searchOtherUsersLocations();
     } catch (e) {
       log(e.toString());
     }
@@ -54,22 +55,40 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  void _getUserData() async {
+    try {
+      final userDataCubit = context.read<UserDataCubit>();
+      await RedisDatabase()
+          .getUserData(userId)
+          .then((data) => userDataCubit.setUserData(data));
+    } catch (e) {
+      log('Error getting user data: $e');
+    }
+  }
+
   void _searchOtherUsersLocations() {
-    _timerCheckOtherUsersLocation =
-        Timer.periodic(const Duration(seconds: 2), (timer) {
-      if (mounted) {
-        if (context.read<MapOptionsCubit>().state.userLocation != null) {
-          MongoDatabase.searchOtherUsers(
-            context.read<MapOptionsCubit>().state.userLocation!.latitude,
-            context.read<MapOptionsCubit>().state.userLocation!.longitude,
-            context.read<MapOptionsCubit>().state.metersRange,
-          ).then((result) {
-            context.read<MapOptionsCubit>().setOtherUsersLocations(result);
-            context.read<AlertsCubit>().setAlerts(result);
-          });
+    try {
+      _timerCheckOtherUsersLocation =
+          Timer.periodic(const Duration(seconds: 2), (timer) {
+        if (mounted) {
+          final mapOptionsCubit = context.read<MapOptionsCubit>();
+          final alertsCubit = context.read<AlertsCubit>();
+          final userLocation = mapOptionsCubit.state.userLocation;
+          final radius = mapOptionsCubit.state.metersRange;
+          if (userLocation != null) {
+            RedisDatabase()
+                .getUserLocationsByDistance(
+                    userLocation.longitude, userLocation.latitude, radius)
+                .then((result) {
+              mapOptionsCubit.setOtherUsersLocations(result);
+              alertsCubit.setAlerts(result);
+            });
+          }
         }
-      }
-    });
+      });
+    } catch (e) {
+      log('Error searching other users locations: $e');
+    }
   }
 
   void _listenToPositionStream() {
@@ -79,20 +98,21 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _actionsWithPosition(Position position) async {
-    if (mounted) {
-      setState(() {
-        context.read<MapOptionsCubit>().setUserLocation(UserLocationModel(
-            userId: supabase.auth.currentUser!.id,
-            latitude: position.latitude,
-            longitude: position.longitude));
-      });
-      if (context.read<MapOptionsCubit>().state.walking) {
-        MongoDatabase.insertMarker({
-          'userId': supabase.auth.currentUser!.id,
-          'longlat': [position.longitude, position.latitude],
-          'date': DateTime.now().toIso8601String(),
-        });
-      }
+    final userDataCubit = context.read<UserDataCubit>();
+    final mapOptionsCubit = context.read<MapOptionsCubit>();
+
+    setState(() {
+      mapOptionsCubit.setUserLocation(UserLocationModel(
+          userId: userDataCubit.state.userId,
+          latitude: position.latitude,
+          longitude: position.longitude));
+    });
+    if (context.read<MapOptionsCubit>().state.walking) {
+      RedisDatabase().storeUserLocation(UserLocationModel(
+          userId: userDataCubit.state.userId,
+          latitude: position.latitude,
+          longitude: position.longitude,
+          lastUpdate: DateTime.now()));
     } else {
       // log('Not walking');
     }
@@ -195,17 +215,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-  void _getUserData() async {
-    try {
-      await MongoDatabase.getUserData(supabase.auth.currentUser!.id)
-          .then((userData) {
-        context.read<UserDataCubit>().setUserData(userData);
-      });
-    } catch (e) {
-      log('Error getting user data: $e');
-    }
-  }
-
-  void _checkConnection() async {}
 }

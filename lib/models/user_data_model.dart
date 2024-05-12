@@ -1,6 +1,5 @@
 import 'package:pet_clean/models/pet_model.dart';
 import 'dart:convert' as convert;
-import 'package:redis/redis.dart';
 
 class UserData {
   final String userId;

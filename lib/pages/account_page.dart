@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/mongo_database.dart';
+import 'package:pet_clean/database/redis_database.dart';
 import 'package:pet_clean/database/supabase_database.dart';
 import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/widgets/add_pet_widget.dart';
@@ -21,44 +22,17 @@ class _AccountPageState extends State<AccountPage> {
 
   var _loading = false;
 
-  // UserData? userData;
-
-  // Future<void> _getProfile() async {
-  //   setState(() {
-  //     _loading = true;
-  //   });
-
-  //   try {
-  //     final userId = SupabaseDatabase.supabase.auth.currentUser!.id;
-  //     UserData userData = await MongoDatabase.getUserData(userId);
-  //     if (mounted) {
-  //       context.read<UserDataCubit>().setUserData(userData);
-  //     }
-  //     _usernameController.text = userData.nombre;
-  //   } catch (error) {
-  //     const SnackBar(
-  //       content: Text('Error obteniendo perfil de usuario'),
-  //     );
-  //   } finally {
-  //     if (mounted) {
-  //       setState(() {
-  //         _loading = false;
-  //       });
-  //     }
-  //   }
-  // }
-
   Future<void> _updateProfile() async {
     setState(() {
       _loading = true;
     });
+    final userDataCubit = widget.userDataCubit;
     final userName = _usernameController.text.trim();
 
     try {
-      await MongoDatabase.saveUserData(UserData(
-        userId: Supabase.instance.client.auth.currentUser!.id,
-        nombre: userName,
-      ));
+      UserData user = userDataCubit.state.copyWith(nombre: userName);
+      RedisDatabase().storeUserData(user);
+      userDataCubit.setUserData(user);
       if (mounted) {
         Get.snackbar('EXITO', 'Perfil actualizado',
             backgroundColor: Colors.green, colorText: Colors.white);
@@ -98,7 +72,6 @@ class _AccountPageState extends State<AccountPage> {
   void initState() {
     super.initState();
     _usernameController.text = widget.userDataCubit.state.nombre;
-    // _getProfile();
   }
 
   @override
@@ -164,6 +137,7 @@ class _AccountPageState extends State<AccountPage> {
                   onPressed: () {
                     // Abre el formulario para añadir una nueva mascota
                     Get.bottomSheet(
+                      isScrollControlled: true,
                       AddPet(
                           userId: Supabase.instance.client.auth.currentUser!.id,
                           userDataCubit: widget.userDataCubit),

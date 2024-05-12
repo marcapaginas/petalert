@@ -1,4 +1,5 @@
 import 'dart:convert' as convert;
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:pet_clean/models/user_data_model.dart';
@@ -10,28 +11,50 @@ class RedisDatabase {
   final conn = RedisConnection();
 
   Future<Command> connectAndAuth() async {
-    final command = await conn.connect(dotenv.get('REDIS_HOST'), 14536);
-    await command.send_object(
-        ["AUTH", dotenv.get('REDIS_USERNAME'), dotenv.get('REDIS_PASSWORD')]);
+    Command command = await conn.connect(dotenv.get('REDIS_HOST_LOCAL'), 6379);
+    // await command.send_object(
+    //     ["AUTH", dotenv.get('REDIS_USERNAME'), dotenv.get('REDIS_PASSWORD')]);
     return command;
   }
 
-  Future<void> storeUserData(String userId, UserData userData) async {
-    final command = await connectAndAuth();
+  //check connection
+  Future<void> checkConnection() async {
+    try {
+      final command = await connectAndAuth();
+      final response = await command.set('ping', 'pong');
+      log('Redis connection: $response');
+    } catch (e) {
+      log('Error al conectar con Redis: $e');
+    }
+  }
 
-    await command.set('usuario:$userId', userData.toJson());
+  Future<void> storeUserData(UserData userData) async {
+    try {
+      final command = await connectAndAuth();
+      await command.set('usuario:${userData.userId}', userData.toJson());
+    } catch (e) {
+      log('Error al guardar el usuario: $e');
+    }
   }
 
   Future<UserData> getUserData(String userId) async {
-    final command = await connectAndAuth();
-    final String string = await command.get('usuario:$userId');
-    Map<String, dynamic> mapa = convert.jsonDecode(string);
-    log(mapa.toString());
-    if (mapa.isNotEmpty) {
-      log(UserData.fromJson(mapa).toString());
-      return UserData.fromJson(mapa);
+    UserData userData = UserData.empty;
+
+    try {
+      final command = await connectAndAuth();
+      final String string = await command.get('usuario:$userId');
+      final Map<String, dynamic> mapa = convert.jsonDecode(string);
+      userData = UserData.fromJson(mapa);
+    } catch (e) {
+      userData = UserData(
+        userId: userId,
+        nombre: 'Usuario',
+        pets: [],
+      );
+      await storeUserData(userData);
     }
-    return UserData.empty;
+
+    return userData;
   }
 
   Future<void> storeUserLocation(UserLocationModel userLocation) async {
@@ -41,21 +64,118 @@ class RedisDatabase {
       "userLocations",
       userLocation.longitude.toString(),
       userLocation.latitude.toString(),
-      userLocation.userId
+      userLocation.userId,
     ]);
+
+    if (userLocation.lastUpdate != null) {
+      await command.send_object([
+        "HSET",
+        "userLocationUpdates",
+        userLocation.userId,
+        userLocation.lastUpdate!.millisecondsSinceEpoch.toString(),
+      ]);
+    }
   }
 
-  Future<List<String>> getUserLocationsByDistance(
-      double longitude, double latitude, double radius, String unit) async {
+  // get al user locations
+  Future<List<UserLocationModel>> getUserLocations() async {
     final command = await connectAndAuth();
-    final response = await command.send_object([
+    final members =
+        await command.send_object(["ZRANGE", "userLocations", "0", "-1"]);
+    final locations = <UserLocationModel>[];
+
+    for (var userId in members) {
+      final coordinates =
+          await command.send_object(["GEOPOS", "userLocations", userId]);
+      if (coordinates.isNotEmpty) {
+        locations.add(UserLocationModel(
+          userId: userId,
+          longitude: double.parse(coordinates[0][0]),
+          latitude: double.parse(coordinates[0][1]),
+        ));
+      }
+    }
+    log(locations.toString());
+
+    return locations;
+  }
+
+  Future<List<UserLocationModel>> getActiveUserLocations(
+      double longitude, double latitude, double radius, int minutes) async {
+    final command = await connectAndAuth();
+    final fiveMinutesAgo = DateTime.now()
+        .subtract(Duration(minutes: minutes))
+        .millisecondsSinceEpoch;
+    final nearbyUserIds = await command.send_object([
       "GEORADIUS",
       "userLocations",
       longitude.toString(),
       latitude.toString(),
       radius.toString(),
-      unit
+      "m"
     ]);
-    return response;
+    final updates = await command
+        .send_object(["HMGET", "userLocationUpdates", ...nearbyUserIds]);
+
+    final activeUserIds = <String>[];
+    for (var i = 0; i < nearbyUserIds.length; i++) {
+      final userId = nearbyUserIds[i];
+      final lastUpdate = int.parse(updates[i]);
+      if (lastUpdate >= fiveMinutesAgo) {
+        activeUserIds.add(userId);
+      }
+    }
+
+    final locations = <UserLocationModel>[];
+    for (var userId in activeUserIds) {
+      final coordinates =
+          await command.send_object(["GEOPOS", "userLocations", userId]);
+      if (coordinates.isNotEmpty) {
+        locations.add(UserLocationModel(
+          userId: userId,
+          longitude: double.parse(coordinates[0][0]),
+          latitude: double.parse(coordinates[0][1]),
+        ));
+      }
+    }
+
+    return locations;
+  }
+
+  Future<List<UserLocationModel>> getUserLocationsByDistance(
+      double long, double lat, double radius) async {
+    log('getUserLocationsByDistance: $long, $lat, $radius');
+    final command = await connectAndAuth();
+    final response = await command.send_object([
+      "GEORADIUS",
+      "userLocations",
+      long.toString(),
+      lat.toString(),
+      radius.toString(),
+      'm',
+      "WITHCOORD", // Include coordinates in response
+    ]);
+
+    if (response.runtimeType == RedisError) {
+      throw Exception("Error fetching user locations: ${response.message}");
+    }
+
+    List<UserLocationModel> result = [];
+
+    for (var i = 0; i < response.length; i++) {
+      final List<dynamic> item = response[i];
+      final List<dynamic> coordinates = item[1];
+      final String userId = item[0];
+
+      result.add(UserLocationModel(
+        userId: userId,
+        latitude: double.parse(coordinates[1]),
+        longitude: double.parse(coordinates[0]),
+      ));
+    }
+
+    log('User locations: $result');
+
+    return result;
   }
 }

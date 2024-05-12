@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
-import 'package:pet_clean/database/mongo_database.dart';
+import 'package:pet_clean/database/redis_database.dart';
 import 'package:pet_clean/models/pet_model.dart';
 import 'package:uuid/uuid.dart';
 
@@ -22,14 +22,40 @@ class _AddPetState extends State<AddPet> {
   final _breedController = TextEditingController();
   PetBehavior? _selectedBehavior;
 
+  void _addNewPet() {
+    final userDataCubit = widget.userDataCubit;
+    final pet = Pet(
+      id: const Uuid().v4(),
+      name: _nameController.text.trim(),
+      breed: _breedController.text.trim(),
+      behavior: _selectedBehavior ?? PetBehavior.neutral,
+    );
+    final updatedPets = [...userDataCubit.state.pets, pet];
+    final updatedUserData = userDataCubit.state.copyWith(pets: updatedPets);
+    RedisDatabase().storeUserData(updatedUserData);
+    userDataCubit.setUserData(updatedUserData);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.yellow,
       padding: const EdgeInsets.all(16),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+      ),
       child: Column(
         children: [
-          const Text('Añadir mascota'),
+          const Text(
+            'Añadir mascota',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 16),
           TextFormField(
             controller: _nameController,
@@ -71,8 +97,7 @@ class _AddPetState extends State<AddPet> {
                 behavior: _selectedBehavior ?? PetBehavior.neutral,
               );
               try {
-                MongoDatabase.addPet(widget.userId, pet);
-                widget.userDataCubit.addPet(pet);
+                _addNewPet();
                 Get.snackbar('¡Hola ${pet.name}!',
                     'Se ha añadido a ${pet.name} a tu lista de mascotas',
                     colorText: Colors.white,
