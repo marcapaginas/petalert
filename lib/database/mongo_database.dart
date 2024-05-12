@@ -11,7 +11,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MongoDatabase {
   Db? _db;
-  int maxRetries = 5;
+  int maxRetries = 10;
 
   Future<Db> get db async {
     if (_db == null) {
@@ -25,9 +25,9 @@ class MongoDatabase {
           if (e is MongoDartError) {
             log('Error de MongoDB: $e');
           } else {
-            log('Error desconocido: $e');
+            log('Error desconocido en get db: $e');
           }
-          await Future.delayed(const Duration(seconds: 2));
+          await Future.delayed(const Duration(seconds: 5));
           retries++;
         }
       }
@@ -57,7 +57,7 @@ class MongoDatabase {
       if (e is MongoDartError) {
         log('Error de MongoDB: $e');
       } else {
-        log('Error desconocido: $e');
+        log('Error desconocido en insert marker: $e');
       }
     }
   }

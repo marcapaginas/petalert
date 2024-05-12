@@ -9,6 +9,7 @@ import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/mongo_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
+//import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
 import 'package:pet_clean/pages/account_page.dart';
 import 'package:pet_clean/pages/alerts_page.dart';
@@ -56,15 +57,17 @@ class _HomePageState extends State<HomePage> {
   void _searchOtherUsersLocations() {
     _timerCheckOtherUsersLocation =
         Timer.periodic(const Duration(seconds: 2), (timer) {
-      if (context.read<MapOptionsCubit>().state.userLocation != null) {
-        MongoDatabase.searchOtherUsers(
-          context.read<MapOptionsCubit>().state.userLocation!.latitude,
-          context.read<MapOptionsCubit>().state.userLocation!.longitude,
-          context.read<MapOptionsCubit>().state.metersRange,
-        ).then((result) {
-          context.read<MapOptionsCubit>().setOtherUsersLocations(result);
-          context.read<AlertsCubit>().setAlerts(result);
-        });
+      if (mounted) {
+        if (context.read<MapOptionsCubit>().state.userLocation != null) {
+          MongoDatabase.searchOtherUsers(
+            context.read<MapOptionsCubit>().state.userLocation!.latitude,
+            context.read<MapOptionsCubit>().state.userLocation!.longitude,
+            context.read<MapOptionsCubit>().state.metersRange,
+          ).then((result) {
+            context.read<MapOptionsCubit>().setOtherUsersLocations(result);
+            context.read<AlertsCubit>().setAlerts(result);
+          });
+        }
       }
     });
   }
@@ -76,18 +79,20 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _actionsWithPosition(Position position) async {
-    setState(() {
-      context.read<MapOptionsCubit>().setUserLocation(UserLocationModel(
-          userId: supabase.auth.currentUser!.id,
-          latitude: position.latitude,
-          longitude: position.longitude));
-    });
-    if (context.read<MapOptionsCubit>().state.walking) {
-      MongoDatabase.insertMarker({
-        'userId': supabase.auth.currentUser!.id,
-        'longlat': [position.longitude, position.latitude],
-        'date': DateTime.now().toIso8601String(),
+    if (mounted) {
+      setState(() {
+        context.read<MapOptionsCubit>().setUserLocation(UserLocationModel(
+            userId: supabase.auth.currentUser!.id,
+            latitude: position.latitude,
+            longitude: position.longitude));
       });
+      if (context.read<MapOptionsCubit>().state.walking) {
+        MongoDatabase.insertMarker({
+          'userId': supabase.auth.currentUser!.id,
+          'longlat': [position.longitude, position.latitude],
+          'date': DateTime.now().toIso8601String(),
+        });
+      }
     } else {
       // log('Not walking');
     }
@@ -110,32 +115,36 @@ class _HomePageState extends State<HomePage> {
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
         backgroundColor: Colors.black,
       ),
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        children: <Widget>[
-          Container(
-            color: Colors.green,
-            child: FirstPage(pageController: _pageController),
-          ),
-          Container(
-            color: Colors.green,
-            child: const MapPage(),
-          ),
-          Container(
-            color: Colors.green,
-            child: const Alerts(),
-          ),
-          Container(
-            color: Colors.green,
-            child: AccountPage(userDataCubit: userDataCubit),
-          ),
-        ],
-      ),
+      body: userDataCubit.state.userId == ''
+          ? const Center(
+              child:
+                  CircularProgressIndicator()) // Muestra un indicador de carga si los datos están cargando
+          : PageView(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+              },
+              children: <Widget>[
+                Container(
+                  color: Colors.green,
+                  child: FirstPage(pageController: _pageController),
+                ),
+                Container(
+                  color: Colors.green,
+                  child: const MapPage(),
+                ),
+                Container(
+                  color: Colors.green,
+                  child: const Alerts(),
+                ),
+                Container(
+                  color: Colors.green,
+                  child: AccountPage(userDataCubit: userDataCubit),
+                ),
+              ],
+            ),
       bottomNavigationBar: BlocBuilder<AlertsCubit, List<AlertModel>>(
         builder: (context, state) {
           return Container(

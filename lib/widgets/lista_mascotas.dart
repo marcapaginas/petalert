@@ -63,7 +63,6 @@ class _ListaMascotasState extends State<ListaMascotas> {
                                     isScrollControlled: true,
                                     EditPet(
                                       index: index,
-                                      userDataCubit: userDataCubit,
                                     ),
                                   );
                                 },
