@@ -20,13 +20,7 @@ class _WalkingSwitchState extends State<WalkingSwitch>
   void initState() {
     super.initState();
 
-    _controller = AnimationController(vsync: this)
-      ..value = 0.5
-      ..addListener(() {
-        setState(() {
-          // Rebuild the widget at each frame to update the "progress" label.
-        });
-      });
+    _controller = AnimationController(vsync: this);
   }
 
   @override

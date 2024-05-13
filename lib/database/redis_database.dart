@@ -144,8 +144,8 @@ class RedisDatabase {
 
   Future<List<UserLocationModel>> getUserLocationsByDistance(
       double long, double lat, double radius) async {
-    log('getUserLocationsByDistance: $long, $lat, $radius');
     final command = await connectAndAuth();
+    //TODO: error stream is closed sometimes
     final response = await command.send_object([
       "GEORADIUS",
       "userLocations",
@@ -173,8 +173,6 @@ class RedisDatabase {
         longitude: double.parse(coordinates[0]),
       ));
     }
-
-    log('User locations: $result');
 
     return result;
   }

@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
-import 'package:pet_clean/database/mongo_database.dart';
+import 'package:pet_clean/database/redis_database.dart';
 import 'package:pet_clean/database/supabase_database.dart';
 import 'package:pet_clean/models/pet_model.dart';
 import 'package:pet_clean/pages/home_page.dart';
@@ -213,9 +213,14 @@ class _EditPetState extends State<EditPet> {
                           userDataCubit.state.pets[widget.index].avatarURL,
                     );
                     try {
-                      MongoDatabase.updatePet(
-                          userDataCubit.state.userId, pet, widget.index);
                       userDataCubit.updatePet(widget.index, pet);
+                      RedisDatabase().storeUserData(
+                        userDataCubit.state.copyWith(pets: [
+                          ...userDataCubit.state.pets
+                            ..removeAt(widget.index)
+                            ..insert(widget.index, pet)
+                        ]),
+                      );
                       Get.snackbar('Actualizado', '${pet.name} actualizado',
                           icon: const Icon(Icons.check),
                           colorText: Colors.white,
@@ -256,8 +261,6 @@ class _EditPetState extends State<EditPet> {
   Future<void> setPetAvatar(String avatarURL) async {
     final userDataCubit = context.read<UserDataCubit>();
     try {
-      MongoDatabase.setPetAvatarURL(
-          userDataCubit.state.userId, widget.index, avatarURL);
       userDataCubit.setPetAvatar(widget.index, avatarURL);
     } catch (e) {
       log('Error marking pet with avatar: $e');

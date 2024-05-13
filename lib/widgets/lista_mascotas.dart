@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
-import 'package:pet_clean/database/mongo_database.dart';
+import 'package:pet_clean/database/redis_database.dart';
 import 'package:pet_clean/widgets/edit_pet_widget.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ListaMascotas extends StatefulWidget {
   final UserDataCubit userDataCubit;
@@ -87,11 +86,9 @@ class _ListaMascotasState extends State<ListaMascotas> {
                                         onPressed: () {
                                           try {
                                             Get.back(closeOverlays: true);
-                                            MongoDatabase.deletePet(
-                                                Supabase.instance.client.auth
-                                                    .currentUser!.id,
-                                                index);
                                             userDataCubit.removePet(index);
+                                            RedisDatabase().storeUserData(
+                                                userDataCubit.state);
                                             Get.snackbar('Exito',
                                                 'Se ha quitado a ${pet.name} de tus mascotas',
                                                 backgroundColor: Colors.green,
@@ -117,11 +114,9 @@ class _ListaMascotasState extends State<ListaMascotas> {
                             value:
                                 userDataCubit.state.pets[index].isBeingWalked,
                             onChanged: (value) {
-                              MongoDatabase.switchPetBeingWalked(
-                                Supabase.instance.client.auth.currentUser!.id,
-                                index,
-                              );
                               userDataCubit.switchPetBeingWalked(index);
+                              RedisDatabase()
+                                  .storeUserData(userDataCubit.state);
                             }),
                     tileColor: Colors.transparent,
                     shape: RoundedRectangleBorder(

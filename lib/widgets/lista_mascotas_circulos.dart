@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/redis_database.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ListaMascotasCirculos extends StatefulWidget {
   final UserDataCubit userDataCubit;
@@ -85,39 +84,5 @@ class _ListaMascotasCirculosState extends State<ListaMascotasCirculos> {
         }),
       ),
     );
-
-    // return Expanded(
-    //   child: GridView.count(
-    //     crossAxisCount: 3,
-    //     children: List.generate(userDataCubit.state.pets.length, (index) {
-    //       final pet = userDataCubit.state.pets[index];
-    //       return Padding(
-    //         padding: const EdgeInsets.all(2.0),
-    //         child: GestureDetector(
-    //           onTap: () {
-    //             if (widget.editar) {
-    //               // editar
-    //             }
-    //           },
-    //           child: Container(
-    //             decoration: BoxDecoration(
-    //               border: Border.all(color: Colors.white),
-    //               color: Colors.green,
-    //               borderRadius: BorderRadius.circular(100),
-    //             ),
-    //             child: CircleAvatar(
-    //               radius: 55,
-    //               backgroundImage: const AssetImage('assets/pet.jpeg'),
-    //               foregroundImage: userDataCubit.state.pets[index].avatarURL !=
-    //                       ''
-    //                   ? NetworkImage(userDataCubit.state.pets[index].avatarURL)
-    //                   : Image.asset('assets/pet.jpeg').image,
-    //             ),
-    //           ),
-    //         ),
-    //       );
-    //     }),
-    //   ),
-    // );
   }
 }

@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pet_clean/database/mongo_database.dart';
+import 'package:pet_clean/database/redis_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
 import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
@@ -66,7 +66,7 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
       } else {
         UserData usuario;
         try {
-          usuario = await MongoDatabase.getUserData(userLocation.userId!);
+          usuario = await RedisDatabase().getUserData(userLocation.userId);
         } catch (e) {
           log('Error getting user data: $e');
           return;
@@ -77,10 +77,10 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
         int petsBeingWalked =
             usuario.pets.where((pet) => pet.isBeingWalked).toList().length;
         alerts.add(AlertModel(
-          id: userLocation.userId!,
+          id: userLocation.userId,
           title: 'Alerta',
           description:
-              '${usuario.nombre.isNotEmpty ? usuario.nombre : 'Alguien'} está cerca y está paseando a $petsBeingWalked mascotas',
+              '${usuario.nombre.isNotEmpty ? usuario.nombre : 'Alguien'} está cerca y está paseando a $petsBeingWalked ${petsBeingWalked == 1 ? 'mascota' : 'mascotas'}',
           date: DateTime.now(),
           isDiscarded: false,
         ));

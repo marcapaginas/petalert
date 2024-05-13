@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
-import 'package:pet_clean/database/redis_database.dart';
-import 'package:pet_clean/models/user_location_model.dart';
 import 'package:pet_clean/widgets/lista_mascotas_circulos.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
