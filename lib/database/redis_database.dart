@@ -1,20 +1,25 @@
 import 'dart:convert' as convert;
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
 import 'package:redis/redis.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RedisDatabase {
   final conn = RedisConnection();
 
   Future<Command> connectAndAuth() async {
-    Command command = await conn.connect(dotenv.get('REDIS_HOST_LOCAL'), 6379);
-    // await command.send_object(
-    //     ["AUTH", dotenv.get('REDIS_USERNAME'), dotenv.get('REDIS_PASSWORD')]);
+    Command command =
+        await conn.connect(dotenv.get('REDIS_HOST_PETALERT'), 6379);
+    await command.send_object(["AUTH", 'petalert']);
     return command;
+  }
+
+  // close
+  Future<void> close() async {
+    await conn.close();
   }
 
   //check connection
@@ -34,6 +39,8 @@ class RedisDatabase {
       await command.set('usuario:${userData.userId}', userData.toJson());
     } catch (e) {
       log('Error al guardar el usuario: $e');
+    } finally {
+      await close();
     }
   }
 
@@ -52,28 +59,36 @@ class RedisDatabase {
         pets: [],
       );
       await storeUserData(userData);
+    } finally {
+      await close();
     }
 
     return userData;
   }
 
   Future<void> storeUserLocation(UserLocationModel userLocation) async {
-    final command = await connectAndAuth();
-    await command.send_object([
-      "GEOADD",
-      "userLocations",
-      userLocation.longitude.toString(),
-      userLocation.latitude.toString(),
-      userLocation.userId,
-    ]);
-
-    if (userLocation.lastUpdate != null) {
+    try {
+      final command = await connectAndAuth();
       await command.send_object([
-        "HSET",
-        "userLocationUpdates",
+        "GEOADD",
+        "userLocations",
+        userLocation.longitude.toString(),
+        userLocation.latitude.toString(),
         userLocation.userId,
-        userLocation.lastUpdate!.millisecondsSinceEpoch.toString(),
       ]);
+
+      if (userLocation.lastUpdate != null) {
+        await command.send_object([
+          "HSET",
+          "userLocationUpdates",
+          userLocation.userId,
+          userLocation.lastUpdate!.millisecondsSinceEpoch.toString(),
+        ]);
+      }
+    } catch (e) {
+      log('Error al guardar la ubicación del usuario: $e');
+    } finally {
+      await close();
     }
   }
 
@@ -144,34 +159,46 @@ class RedisDatabase {
 
   Future<List<UserLocationModel>> getUserLocationsByDistance(
       double long, double lat, double radius) async {
-    final command = await connectAndAuth();
-    //TODO: error stream is closed sometimes
-    final response = await command.send_object([
-      "GEORADIUS",
-      "userLocations",
-      long.toString(),
-      lat.toString(),
-      radius.toString(),
-      'm',
-      "WITHCOORD", // Include coordinates in response
-    ]);
-
-    if (response.runtimeType == RedisError) {
-      throw Exception("Error fetching user locations: ${response.message}");
-    }
-
     List<UserLocationModel> result = [];
+    String currentUserId = Supabase.instance.client.auth.currentUser!.id;
 
-    for (var i = 0; i < response.length; i++) {
-      final List<dynamic> item = response[i];
-      final List<dynamic> coordinates = item[1];
-      final String userId = item[0];
+    try {
+      final command = await connectAndAuth();
+      final response = await command.send_object([
+        "GEORADIUS",
+        "userLocations",
+        long.toString(),
+        lat.toString(),
+        radius.toString(),
+        'm',
+        "WITHCOORD", // Include coordinates in response
+      ]);
 
-      result.add(UserLocationModel(
-        userId: userId,
-        latitude: double.parse(coordinates[1]),
-        longitude: double.parse(coordinates[0]),
-      ));
+      if (response.runtimeType == RedisError) {
+        throw Exception("Error fetching user locations: ${response.message}");
+      }
+
+      log('Encontrados ${response.length} usuarios cercanos a latitud $lat y longitud $long');
+
+      for (var i = 0; i < response.length; i++) {
+        final List<dynamic> item = response[i];
+        final List<dynamic> coordinates = item[1];
+        final String userId = item[0];
+
+        log('userId: $userId, lat: ${coordinates[1]}, long: ${coordinates[0]}');
+
+        if (userId != currentUserId) {
+          result.add(UserLocationModel(
+            userId: userId,
+            latitude: double.parse(coordinates[1]),
+            longitude: double.parse(coordinates[0]),
+          ));
+        }
+      }
+    } catch (e) {
+      log('Error al obtener las ubicaciones de los usuarios: $e');
+    } finally {
+      await close();
     }
 
     return result;
