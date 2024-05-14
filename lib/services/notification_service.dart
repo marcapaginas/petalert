@@ -30,10 +30,10 @@ class NotificationService {
       null,
       [
         NotificationChannel(
-          channelKey: 'basic_channel',
+          channelKey: 'petalert_channel',
           channelName: 'Notificaciones Petalert',
           channelDescription:
-              'Canal de notificaciones para encuentros con otros usuarios',
+              'Canal de notificaciones para la aplicación Petalert',
           defaultColor: const Color(0xFF9D50DD),
           ledColor: Colors.white,
         )
@@ -62,6 +62,8 @@ class NotificationService {
       content: NotificationContent(
         id: id,
         channelKey: 'petalert_channel',
+        icon: 'resource://mipmap/ic_stat_dog_running',
+        largeIcon: 'asset://assets/petalert-logo.png',
         title: title,
         body: body,
       ),
@@ -110,7 +112,7 @@ class NotificationService {
           builder: (context) => AlertDialog(
                 backgroundColor: const Color(0xfffbfbfb),
                 title: const Text(
-                  'Awesome Notifications needs your permission',
+                  'Petalert necesita permisos para mostar alertas',
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
@@ -118,8 +120,8 @@ class NotificationService {
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      'To proceed, you need to enable the permissions above${channelKey?.isEmpty ?? true ? '' : ' on channel $channelKey'}:',
+                    const Text(
+                      'Para continuar, necesitas activar los permisos: ',
                       maxLines: 2,
                       textAlign: TextAlign.center,
                     ),
@@ -163,7 +165,7 @@ class NotificationService {
                     child: const Text(
                       'Allow',
                       style: TextStyle(
-                          color: Colors.deepPurple,
+                          color: Colors.green,
                           fontSize: 18,
                           fontWeight: FontWeight.bold),
                     ),

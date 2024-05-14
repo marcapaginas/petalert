@@ -1,9 +1,12 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:pet_clean/blocs/alerts_cubit.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/redis_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
+import 'package:pet_clean/services/notification_service.dart';
 
 class Alerts extends StatefulWidget {
   const Alerts({super.key});
@@ -55,7 +58,33 @@ class _AlertsState extends State<Alerts> {
               thumbIcon: MaterialStateProperty.resolveWith(
                   (states) => const Icon(Icons.notifications_active)),
               value: userDataCubit.state.backgroundNotify,
-              onChanged: (value) {
+              onChanged: (value) async {
+                if (!userDataCubit.state.backgroundNotify) {
+                  // comprobamos los permisos
+                  var permisos =
+                      await AwesomeNotifications().isNotificationAllowed();
+                  if (!permisos) {
+                    Get.snackbar(
+                      'Permisos necesarios',
+                      'Para recibir notificaciones en segundo plano, necesitas activar los permisos',
+                      snackPosition: SnackPosition.BOTTOM,
+                      duration: const Duration(seconds: 5),
+                      margin: const EdgeInsets.all(8.0),
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white,
+                      mainButton: TextButton(
+                        onPressed: () {
+                          NotificationService.initialize();
+                          Get.back();
+                        },
+                        child: const Text(
+                          'Activar',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    );
+                  }
+                }
                 userDataCubit.switchBackgroundNotify();
                 RedisDatabase().storeUserData(userDataCubit.state);
               },
@@ -142,7 +171,8 @@ class _AlertsState extends State<Alerts> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0)),
                           child: ListTile(
-                            leading: Icon(Icons.notifications_active), // Icono
+                            leading:
+                                const Icon(Icons.notifications_active), // Icono
                             title: Text(alertsCubit
                                 .notDiscardedAlerts[index].title), // Título
                             subtitle: Text(alertsCubit.notDiscardedAlerts[index]

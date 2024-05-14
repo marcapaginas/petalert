@@ -34,8 +34,8 @@ class GeolocatorService {
     foregroundNotificationConfig: const ForegroundNotificationConfig(
       notificationIcon:
           AndroidResource(name: 'ic_stat_dog_running', defType: 'mipmap'),
-      notificationText: "La aplicación está ejecutándose en segundo plano.",
-      notificationTitle: "Corriendo en segundo plano",
+      notificationText: "PetAlert está ejecutándose en segundo plano.",
+      notificationTitle: "Paseando en segundo plano",
       enableWakeLock: true,
     ),
   );

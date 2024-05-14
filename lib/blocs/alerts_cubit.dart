@@ -5,6 +5,7 @@ import 'package:pet_clean/database/redis_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
 import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
+import 'package:pet_clean/services/notification_service.dart';
 
 class AlertsCubit extends Cubit<List<AlertModel>> {
   static final AlertsCubit _singleton = AlertsCubit._internal();
@@ -62,6 +63,7 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
       );
 
       if (existingAlert.id.isNotEmpty) {
+        // ya existe la alarma
         alerts.add(existingAlert);
       } else {
         UserData usuario;
@@ -71,12 +73,12 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
           log('Error getting user data: $e');
           return;
         }
-        // get user data using userId
 
-        // count pets that are being walked
         int petsBeingWalked =
             usuario.pets.where((pet) => pet.isBeingWalked).toList().length;
+
         alerts.add(AlertModel(
+          // nueva alarma
           id: userLocation.userId,
           title: 'Alerta',
           description:
@@ -84,6 +86,15 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
           date: DateTime.now(),
           isDiscarded: false,
         ));
+
+        // si la alarma es nueva y esta activada la notificación de fondo, lanzamos la notificacion
+        if (usuario.backgroundNotify) {
+          // lanzar notificación
+          NotificationService.show(
+              title: 'Alerta',
+              body:
+                  '${usuario.nombre.isNotEmpty ? usuario.nombre : 'Alguien'} está cerca y está paseando a $petsBeingWalked ${petsBeingWalked == 1 ? 'mascota' : 'mascotas'}');
+        }
       }
     }
 
