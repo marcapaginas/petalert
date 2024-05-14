@@ -4,21 +4,24 @@ import 'dart:convert' as convert;
 class UserData {
   final String userId;
   final String nombre;
+  final bool backgroundNotify;
   final List<Pet> pets;
 
   UserData({
     required this.userId,
     required this.nombre,
+    this.backgroundNotify = false,
     this.pets = const [],
   });
 
   static get empty {
-    return UserData(userId: '', nombre: '', pets: []);
+    return UserData(userId: '', nombre: '', backgroundNotify: false, pets: []);
   }
 
   String toJson() => convert.jsonEncode({
         'userId': userId,
         'nombre': nombre,
+        'backgroundNotify': backgroundNotify,
         'pets': pets.map((pet) => pet.toJson()).toList(),
       });
 
@@ -26,6 +29,7 @@ class UserData {
     return UserData(
       userId: json['userId'],
       nombre: json['nombre'],
+      backgroundNotify: json['backgroundNotify'],
       pets: List<Pet>.from(
           json['pets']?.map((pet) => Pet.fromJson(convert.jsonDecode(pet)))),
     );
@@ -34,11 +38,13 @@ class UserData {
   UserData copyWith({
     String? userId,
     String? nombre,
+    bool? backgroundNotify,
     List<Pet>? pets,
   }) {
     return UserData(
       userId: userId ?? this.userId,
       nombre: nombre ?? this.nombre,
+      backgroundNotify: backgroundNotify ?? this.backgroundNotify,
       pets: pets ?? this.pets,
     );
   }
@@ -47,6 +53,7 @@ class UserData {
     return {
       'userId': userId,
       'nombre': nombre,
+      'backGroundNotify': backgroundNotify,
       'pets': pets.map((x) => x.toMap()).toList(),
     };
   }
@@ -59,6 +66,7 @@ class UserData {
     return UserData(
       userId: map['userId'],
       nombre: map['nombre'],
+      backgroundNotify: map['backGroundNotify'],
       pets: List<Pet>.from(map['pets']?.map((x) => Pet.fromMap(x))),
     );
   }
@@ -91,6 +99,6 @@ class UserData {
 
   @override
   String toString() {
-    return 'UserData(userId: $userId, nombre: $nombre, pets: $pets)';
+    return 'UserData(userId: $userId, nombre: $nombre, backgroundNotify: $backgroundNotify, pets: $pets)';
   }
 }

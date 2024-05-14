@@ -75,26 +75,26 @@ class FirstPage extends StatelessWidget {
               },
               child: const Text('Ir a pasear'),
             ),
-            ElevatedButton(
-                onPressed: () {
-                  // RedisDatabase().storeUserData(
-                  //     Supabase.instance.client.auth.currentUser!.id,
-                  //     userDataCubit.state);
-                  // RedisDatabase().getUserData(
-                  //     Supabase.instance.client.auth.currentUser!.id);
-                  // RedisDatabase().storeUserLocation(UserLocationModel(
-                  //     userId: '4444',
-                  //     latitude: 37.97245364300349735,
-                  //     longitude: -1.20698601007461548));
+            // ElevatedButton(
+            //     onPressed: () {
+            //       // RedisDatabase().storeUserData(
+            //       //     Supabase.instance.client.auth.currentUser!.id,
+            //       //     userDataCubit.state);
+            //       // RedisDatabase().getUserData(
+            //       //     Supabase.instance.client.auth.currentUser!.id);
+            //       // RedisDatabase().storeUserLocation(UserLocationModel(
+            //       //     userId: '4444',
+            //       //     latitude: 37.97245364300349735,
+            //       //     longitude: -1.20698601007461548));
 
-                  // 37.972441, -1.207259  - 37.972413, -1.208022
+            //       // 37.972441, -1.207259  - 37.972413, -1.208022
 
-                  // RedisDatabase().getUserLocationsByDistance(
-                  //     -1.206450, 37.971963, 9999999);
+            //       // RedisDatabase().getUserLocationsByDistance(
+            //       //     -1.206450, 37.971963, 9999999);
 
-                  //RedisDatabase().getUserLocations();
-                },
-                child: const Text('Prueba'))
+            //       //RedisDatabase().getUserLocations();
+            //     },
+            //     child: const Text('Prueba'))
           ],
         ),
       ),

@@ -23,7 +23,6 @@ dependencies:
   supabase_flutter: ^2.5.1
   flutter_bloc: ^8.1.5
   flutter_dotenv: ^5.1.0
-  mongo_dart: ^0.10.1
   flutter_map_geojson: ^1.0.8
   get: ^4.6.6
   flutter_map_cancellable_tile_provider: ^2.0.0
@@ -33,6 +32,7 @@ dependencies:
   connectivity_plus: ^6.0.3
   flutter_launcher_icons: ^0.13.1
   redis: ^4.0.0
+
   
 
 dev_dependencies:

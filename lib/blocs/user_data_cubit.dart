@@ -18,11 +18,13 @@ class UserDataCubit extends Cubit<UserData> {
   void updateUserData({
     required String userId,
     required String nombre,
+    required bool backgroundNotify,
     required List<Pet> pets,
   }) {
     final userData = state.copyWith(
       userId: userId,
       nombre: nombre,
+      backgroundNotify: backgroundNotify,
       pets: pets,
     );
     emit(userData);
@@ -87,6 +89,13 @@ class UserDataCubit extends Cubit<UserData> {
       pets: List<Pet>.from(state.pets)
         ..[index] = state.pets[index]
             .copyWith(isBeingWalked: !state.pets[index].isBeingWalked),
+    );
+    emit(userData);
+  }
+
+  void switchBackgroundNotify() {
+    final userData = state.copyWith(
+      backgroundNotify: !state.backgroundNotify,
     );
     emit(userData);
   }
