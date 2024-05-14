@@ -178,14 +178,10 @@ class RedisDatabase {
         throw Exception("Error fetching user locations: ${response.message}");
       }
 
-      log('Encontrados ${response.length} usuarios cercanos a latitud $lat y longitud $long');
-
       for (var i = 0; i < response.length; i++) {
         final List<dynamic> item = response[i];
         final List<dynamic> coordinates = item[1];
         final String userId = item[0];
-
-        log('userId: $userId, lat: ${coordinates[1]}, long: ${coordinates[0]}');
 
         if (userId != currentUserId) {
           result.add(UserLocationModel(

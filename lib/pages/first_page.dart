@@ -82,10 +82,10 @@ class FirstPage extends StatelessWidget {
                   //     userDataCubit.state);
                   // RedisDatabase().getUserData(
                   //     Supabase.instance.client.auth.currentUser!.id);
-                  RedisDatabase().storeUserLocation(UserLocationModel(
-                      userId: '4444',
-                      latitude: 37.97245364300349735,
-                      longitude: -1.20698601007461548));
+                  // RedisDatabase().storeUserLocation(UserLocationModel(
+                  //     userId: '4444',
+                  //     latitude: 37.97245364300349735,
+                  //     longitude: -1.20698601007461548));
 
                   // 37.972441, -1.207259  - 37.972413, -1.208022
 

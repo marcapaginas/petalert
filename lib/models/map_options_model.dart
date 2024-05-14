@@ -5,7 +5,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_geojson/flutter_map_geojson.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/classes/custom_geo_json_parser.dart';
-import 'package:pet_clean/database/mongo_database.dart';
+import 'package:pet_clean/database/redis_database.dart';
 import 'package:pet_clean/models/pet_model.dart';
 import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
@@ -118,7 +118,7 @@ class MapOptionsState {
 
   Future<dynamic> mostrarDetallesMarcador(
       Map<String, dynamic> properties) async {
-    UserData userData = await MongoDatabase.getUserData(properties['userId']);
+    UserData userData = await RedisDatabase().getUserData(properties['userId']);
 
     //filter pets that are being walked
     List<Pet> pets = userData.pets.where((pet) => pet.isBeingWalked).toList();
