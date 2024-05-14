@@ -44,8 +44,16 @@ class _AlertsState extends State<Alerts> {
               style: TextStyle(fontSize: 16.0, color: Colors.white),
             ),
             Switch(
-              trackColor: MaterialStateColor.resolveWith(
+              inactiveTrackColor: MaterialStateColor.resolveWith(
                   (states) => Colors.white.withOpacity(0.3)),
+              trackOutlineColor: MaterialStateProperty.resolveWith(
+                  (states) => Colors.white.withOpacity(0.3)),
+              activeColor:
+                  MaterialStateColor.resolveWith((states) => Colors.white),
+              inactiveThumbColor: MaterialStateColor.resolveWith(
+                  (states) => Colors.white.withOpacity(0.2)),
+              thumbIcon: MaterialStateProperty.resolveWith(
+                  (states) => const Icon(Icons.notifications_active)),
               value: userDataCubit.state.backgroundNotify,
               onChanged: (value) {
                 userDataCubit.switchBackgroundNotify();
@@ -128,18 +136,17 @@ class _AlertsState extends State<Alerts> {
                             ),
                           ),
                         ),
-                        child: Container(
+                        child: Card(
                           margin: const EdgeInsets.symmetric(
-                              vertical: 4.0, horizontal: 8.0),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
+                              vertical: 4.0, horizontal: 20.0),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0)),
                           child: ListTile(
-                            title: Text(
-                                alertsCubit.notDiscardedAlerts[index].title),
-                            subtitle: Text(alertsCubit
-                                .notDiscardedAlerts[index].description),
+                            leading: Icon(Icons.notifications_active), // Icono
+                            title: Text(alertsCubit
+                                .notDiscardedAlerts[index].title), // Título
+                            subtitle: Text(alertsCubit.notDiscardedAlerts[index]
+                                .description), // Texto
                           ),
                         ),
                       ),
