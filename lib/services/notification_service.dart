@@ -75,7 +75,7 @@ class NotificationService {
       {required String? channelKey,
       required List<NotificationPermission> permissionList}) async {
     // Check if the basic permission was granted by the user
-    //if (!await requestBasicPermissionToSendNotifications(context)) return [];
+    // if (!await requestBasicPermissionToSendNotifications(context)) return [];
 
     // Check which of the permissions you need are allowed at this time
     List<NotificationPermission> permissionsAllowed =
@@ -143,7 +143,7 @@ class NotificationService {
                         Navigator.pop(context);
                       },
                       child: const Text(
-                        'Deny',
+                        'Denegar',
                         style: TextStyle(color: Colors.red, fontSize: 18),
                       )),
                   TextButton(
@@ -163,7 +163,7 @@ class NotificationService {
                       Navigator.pop(Get.context!);
                     },
                     child: const Text(
-                      'Allow',
+                      'Aceptar',
                       style: TextStyle(
                           color: Colors.green,
                           fontSize: 18,

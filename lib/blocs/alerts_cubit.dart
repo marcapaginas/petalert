@@ -1,20 +1,19 @@
-import 'dart:developer';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pet_clean/database/redis_database.dart';
+import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/models/alert_model.dart';
-import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
 import 'package:pet_clean/services/notification_service.dart';
 
 class AlertsCubit extends Cubit<List<AlertModel>> {
-  static final AlertsCubit _singleton = AlertsCubit._internal();
+  final UserDataCubit userDataCubit;
+  static AlertsCubit? _singleton;
 
-  factory AlertsCubit() {
-    return _singleton;
+  factory AlertsCubit(UserDataCubit userDataCubit) {
+    _singleton ??= AlertsCubit._internal(userDataCubit);
+    return _singleton!;
   }
 
-  AlertsCubit._internal() : super([]);
+  AlertsCubit._internal(this.userDataCubit) : super([]);
 
   void addAlert(AlertModel alert) {
     emit(<AlertModel>[...state, alert]);
@@ -42,68 +41,38 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
     emit(List<AlertModel>.empty());
   }
 
-  void setAlerts(List<UserLocationModel> result) async {
-    if (result.isEmpty) {
-      emit(state);
-      return;
+  void setAlerts(List<UserLocationModel> foundLocations) {
+    final currentAlerts = List<AlertModel>.from(state);
+    final discardedAlerts =
+        currentAlerts.where((alert) => alert.isDiscarded).toList();
+
+    for (var alert in discardedAlerts) {
+      if (!foundLocations.any((location) => location.userId == alert.id)) {
+        currentAlerts.remove(alert);
+      }
     }
 
-    final currentAlerts = List<AlertModel>.from(state);
-    final alerts = <AlertModel>[];
-
-    for (final userLocation in result) {
-      final existingAlert = currentAlerts.firstWhere(
-        (alert) => alert.id == userLocation.userId,
-        orElse: () => AlertModel(
-            id: '',
-            title: '',
-            description: '',
-            date: DateTime.now(),
-            isDiscarded: false),
-      );
-
-      if (existingAlert.id.isNotEmpty) {
-        // ya existe la alarma
-        alerts.add(existingAlert);
+    for (var location in foundLocations) {
+      if (currentAlerts.any((alert) => alert.id == location.userId)) {
+        continue;
       } else {
-        UserData usuario;
-        try {
-          usuario = await RedisDatabase().getUserData(userLocation.userId);
-        } catch (e) {
-          log('Error getting user data: $e');
-          return;
-        }
-
-        int petsBeingWalked =
-            usuario.pets.where((pet) => pet.isBeingWalked).toList().length;
-
-        alerts.add(AlertModel(
-          // nueva alarma
-          id: userLocation.userId,
+        AlertModel alertforLocation = AlertModel(
+          id: location.userId,
           title: 'Alerta',
-          description:
-              '${usuario.nombre.isNotEmpty ? usuario.nombre : 'Alguien'} está cerca y está paseando a $petsBeingWalked ${petsBeingWalked == 1 ? 'mascota' : 'mascotas'}',
+          description: 'alerta usuario ${location.userId}',
           date: DateTime.now(),
           isDiscarded: false,
-        ));
-
-        // si la alarma es nueva y esta activada la notificación de fondo, lanzamos la notificacion
-        if (usuario.backgroundNotify) {
-          // lanzar notificación
+        );
+        currentAlerts.add(alertforLocation);
+        if (userDataCubit.state.backgroundNotify) {
           NotificationService.show(
               title: 'Alerta',
               body:
-                  '${usuario.nombre.isNotEmpty ? usuario.nombre : 'Alguien'} está cerca y está paseando a $petsBeingWalked ${petsBeingWalked == 1 ? 'mascota' : 'mascotas'}');
+                  '${userDataCubit.state.nombre.isNotEmpty ? userDataCubit.state.nombre : 'Alguien'} cerca, paseando a ${userDataCubit.state.pets.where((pet) => pet.isBeingWalked).toList().length} ${userDataCubit.state.pets.where((pet) => pet.isBeingWalked).toList().length == 1 ? 'mascota' : 'mascotas'}');
         }
       }
     }
 
-    for (final alert in currentAlerts) {
-      if (!alerts.contains(alert) && !alert.isDiscarded) {
-        alerts.add(alert);
-      }
-    }
-
-    emit(alerts);
+    emit(currentAlerts);
   }
 }

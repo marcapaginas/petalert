@@ -35,9 +35,10 @@ class BlocsProvider extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => AlertsCubit()),
-        BlocProvider(create: (context) => MapOptionsCubit()),
         BlocProvider(create: (context) => UserDataCubit()),
+        BlocProvider(
+            create: (context) => AlertsCubit(context.read<UserDataCubit>())),
+        BlocProvider(create: (context) => MapOptionsCubit()),
       ],
       child: const MyApp(),
     );

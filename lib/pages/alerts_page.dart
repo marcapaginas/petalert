@@ -66,7 +66,7 @@ class _AlertsState extends State<Alerts> {
                   if (!permisos) {
                     Get.snackbar(
                       'Permisos necesarios',
-                      'Para recibir notificaciones en segundo plano, necesitas activar los permisos',
+                      'Para recibir notificaciones en segundo plano, necesitas conceder los permisos',
                       snackPosition: SnackPosition.BOTTOM,
                       duration: const Duration(seconds: 5),
                       margin: const EdgeInsets.all(8.0),
@@ -120,64 +120,56 @@ class _AlertsState extends State<Alerts> {
                   itemCount: alertsCubit.notDiscardedAlerts.length,
                   itemBuilder: (context, index) {
                     AlertModel item = alertsCubit.notDiscardedAlerts[index];
-                    var title = item.title;
 
-                    return InkWell(
-                      onTap: () => Navigator.pushNamed(
-                        context,
-                        '/alert_detail',
-                        arguments: item,
-                      ),
-                      child: Dismissible(
-                        key: Key(item.id),
-                        direction: DismissDirection.startToEnd,
-                        onDismissed: (direction) {
-                          setState(() {
-                            alertsCubit.markAsDiscarded(item.id);
-                          });
+                    return Dismissible(
+                      key: Key(item.id),
+                      direction: DismissDirection.startToEnd,
+                      onDismissed: (direction) {
+                        setState(() {
+                          alertsCubit.markAsDiscarded(item.id);
+                        });
 
-                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('Borrada alerta: $title')));
-                        },
-                        background: Container(
-                          alignment: AlignmentDirectional.centerStart,
-                          color: Colors.transparent,
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 8.0, horizontal: 30.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.delete,
+                        // ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                        // ScaffoldMessenger.of(context).showSnackBar(
+                        //     SnackBar(content: Text('Borrada alerta')));
+                      },
+                      background: Container(
+                        alignment: AlignmentDirectional.centerStart,
+                        color: Colors.transparent,
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 8.0, horizontal: 30.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
+                              SizedBox(width: 8.0),
+                              Text(
+                                'Borrar',
+                                style: TextStyle(
                                   color: Colors.white,
+                                  fontWeight: FontWeight.w700,
                                 ),
-                                SizedBox(width: 8.0),
-                                Text(
-                                  'Borrar',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
-                        child: Card(
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 4.0, horizontal: 20.0),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0)),
-                          child: ListTile(
-                            leading:
-                                const Icon(Icons.notifications_active), // Icono
-                            title: Text(alertsCubit
-                                .notDiscardedAlerts[index].title), // Título
-                            subtitle: Text(alertsCubit.notDiscardedAlerts[index]
-                                .description), // Texto
-                          ),
+                      ),
+                      child: Card(
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 4.0, horizontal: 20.0),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0)),
+                        child: ListTile(
+                          leading:
+                              const Icon(Icons.notifications_active), // Icono
+                          title: Text(alertsCubit
+                              .notDiscardedAlerts[index].title), // Título
+                          subtitle: Text(alertsCubit
+                              .notDiscardedAlerts[index].description), // Texto
                         ),
                       ),
                     );
