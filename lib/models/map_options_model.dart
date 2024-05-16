@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -14,7 +15,6 @@ class MapOptionsState {
   final double zoom;
   final double metersRange;
   final String mapStyle;
-  final bool walking;
 
   UserLocationModel? userLocation;
   List<UserLocationModel>? otherUsersLocations;
@@ -26,7 +26,6 @@ class MapOptionsState {
     this.zoom = 18.5,
     this.metersRange = 50.0,
     this.mapStyle = 'mapbox/streets-v11',
-    this.walking = false,
     this.userLocation,
     this.otherUsersLocations,
     this.markers,
@@ -48,7 +47,6 @@ class MapOptionsState {
       zoom: zoom ?? this.zoom,
       metersRange: metersRange ?? this.metersRange,
       mapStyle: mapStyle ?? this.mapStyle,
-      walking: walking ?? this.walking,
       userLocation: userLocation ?? this.userLocation,
       otherUsersLocations: otherUsersLocations ?? this.otherUsersLocations,
       markers: markers ?? this.markers,
@@ -58,7 +56,7 @@ class MapOptionsState {
 
   @override
   String toString() {
-    return 'MapOptionsState{zoom: $zoom, metersRange: $metersRange, mapStyle: $mapStyle, walking: $walking, userLocation: $userLocation, otherUsersLocations: $otherUsersLocations}';
+    return 'MapOptionsState{zoom: $zoom, metersRange: $metersRange, mapStyle: $mapStyle, userLocation: $userLocation, otherUsersLocations: $otherUsersLocations}';
   }
 
   String get geoJsonData {
@@ -118,6 +116,7 @@ class MapOptionsState {
 
   Future<dynamic> mostrarDetallesMarcador(
       Map<String, dynamic> properties) async {
+    log('properties: $properties');
     UserData userData = await RedisDatabase().getUserData(properties['userId']);
 
     //filter pets that are being walked

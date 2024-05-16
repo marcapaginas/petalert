@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:pet_clean/blocs/alerts_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
+import 'package:pet_clean/blocs/walking_cubit.dart';
 import 'package:pet_clean/database/supabase_database.dart';
 // import 'package:pet_clean/models/alert_model.dart';
 // import 'package:pet_clean/pages/alert_detail_page.dart';
@@ -39,6 +40,7 @@ class BlocsProvider extends StatelessWidget {
         BlocProvider(
             create: (context) => AlertsCubit(context.read<UserDataCubit>())),
         BlocProvider(create: (context) => MapOptionsCubit()),
+        BlocProvider(create: (context) => WalkingCubit()),
       ],
       child: const MyApp(),
     );

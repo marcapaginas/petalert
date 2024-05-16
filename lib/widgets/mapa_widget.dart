@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -30,7 +31,7 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     _animatedMapController.dispose();
     super.dispose();
   }
@@ -118,12 +119,12 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
-                ),
+                ).animate().fade(delay: 300.ms, duration: 500.ms),
                 const Positioned(
                   bottom: 15,
                   left: 15,
                   child: WalkingSwitch(),
-                ),
+                ).animate().fade(delay: 300.ms, duration: 500.ms),
               ],
             ),
             floatingActionButton: Column(

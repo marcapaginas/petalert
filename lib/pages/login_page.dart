@@ -31,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Logged in!')),
+          const SnackBar(content: Text('¡Bienvenido!')),
         );
         _emailController.clear();
       }

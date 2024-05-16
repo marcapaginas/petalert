@@ -17,11 +17,6 @@ class RedisDatabase {
     return command;
   }
 
-  // close
-  Future<void> close() async {
-    await conn.close();
-  }
-
   //check connection
   Future<void> checkConnection() async {
     try {
@@ -40,15 +35,17 @@ class RedisDatabase {
     } catch (e) {
       log('Error al guardar el usuario: $e');
     } finally {
-      await close();
+      await conn.close();
     }
   }
 
   Future<UserData> getUserData(String userId) async {
     UserData userData = UserData.empty;
+    RedisConnection? redisConnection;
 
     try {
       final command = await connectAndAuth();
+      redisConnection = command.get_connection();
       final String string = await command.get('usuario:$userId');
       final Map<String, dynamic> mapa = convert.jsonDecode(string);
       userData = UserData.fromJson(mapa);
@@ -60,15 +57,20 @@ class RedisDatabase {
       );
       await storeUserData(userData);
     } finally {
-      await close();
+      if (redisConnection != null) {
+        await redisConnection.close();
+      }
     }
 
     return userData;
   }
 
   Future<void> storeUserLocation(UserLocationModel userLocation) async {
+    RedisConnection? redisConnection;
+
     try {
       final command = await connectAndAuth();
+      redisConnection = command.get_connection();
       await command.send_object([
         "GEOADD",
         "userLocations",
@@ -88,7 +90,9 @@ class RedisDatabase {
     } catch (e) {
       log('Error al guardar la ubicación del usuario: $e');
     } finally {
-      await close();
+      if (redisConnection != null) {
+        await redisConnection.close();
+      }
     }
   }
 
@@ -160,10 +164,15 @@ class RedisDatabase {
   Future<List<UserLocationModel>> getUserLocationsByDistance(
       double long, double lat, double radius) async {
     List<UserLocationModel> result = [];
+    if (Supabase.instance.client.auth.currentUser == null) {
+      return result;
+    }
     String currentUserId = Supabase.instance.client.auth.currentUser!.id;
+    RedisConnection? redisConnection;
 
     try {
       final command = await connectAndAuth();
+      redisConnection = command.get_connection();
       final response = await command.send_object([
         "GEORADIUS",
         "userLocations",
@@ -194,7 +203,9 @@ class RedisDatabase {
     } catch (e) {
       log('Error al obtener las ubicaciones de los usuarios: $e');
     } finally {
-      await close();
+      if (redisConnection != null) {
+        await redisConnection.close();
+      }
     }
 
     return result;

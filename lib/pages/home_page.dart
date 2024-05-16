@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:pet_clean/blocs/alerts_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
+import 'package:pet_clean/blocs/walking_cubit.dart';
 import 'package:pet_clean/database/redis_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
@@ -29,9 +30,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String userId = supabase.auth.currentUser!.id;
   Timer? _timerCheckOtherUsersLocation;
+  StreamSubscription<Position>? _positionStreamSubscription;
+
   int _selectedIndex = 0;
   final PageController _pageController = PageController(initialPage: 0);
-  late final mapOptionsCubit = context.watch<MapOptionsCubit>();
+  //late final mapOptionsCubit = context.watch<MapOptionsCubit>();
 
   @override
   void initState() {
@@ -39,10 +42,35 @@ class _HomePageState extends State<HomePage> {
     try {
       _getUserData();
       GeolocatorService.startBackgroundLocationService(foreground: true);
-      _listenToPositionStream();
-      _searchOtherUsersLocations();
     } catch (e) {
       log(e.toString());
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _handleWalkingState();
+  }
+
+  void _handleWalkingState() {
+    final walkingCubit = context.watch<WalkingCubit>();
+
+    if (walkingCubit.state) {
+      log('Walking');
+      if (_positionStreamSubscription == null) {
+        _listenToPositionStream();
+      } else {
+        _positionStreamSubscription?.resume();
+      }
+      if (_timerCheckOtherUsersLocation == null) {
+        _searchOtherUsersLocations();
+      }
+    } else {
+      log('Not walking');
+      _positionStreamSubscription?.pause();
+      _stopSearchingOtherUsersLocations();
     }
   }
 
@@ -78,6 +106,7 @@ class _HomePageState extends State<HomePage> {
                 .getUserLocationsByDistance(
                     userLocation.longitude, userLocation.latitude, radius)
                 .then((result) {
+              log('found ${result.length} users');
               mapOptionsCubit.setOtherUsersLocations(result);
               alertsCubit.setAlerts(result);
             });
@@ -89,15 +118,27 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _stopSearchingOtherUsersLocations() {
+    _timerCheckOtherUsersLocation?.cancel();
+    _timerCheckOtherUsersLocation = null;
+  }
+
   void _listenToPositionStream() {
-    Geolocator.getPositionStream().listen((Position position) {
+    _positionStreamSubscription =
+        Geolocator.getPositionStream().listen((Position position) {
       _actionsWithPosition(position);
     });
+  }
+
+  void _stopListeningToPositionStream() {
+    _positionStreamSubscription?.pause();
   }
 
   void _actionsWithPosition(Position position) async {
     final userDataCubit = context.read<UserDataCubit>();
     final mapOptionsCubit = context.read<MapOptionsCubit>();
+
+    log('Position: ${position.latitude}, ${position.longitude}');
 
     setState(() {
       mapOptionsCubit.setUserLocation(UserLocationModel(
@@ -105,15 +146,15 @@ class _HomePageState extends State<HomePage> {
           latitude: position.latitude,
           longitude: position.longitude));
     });
-    if (context.read<MapOptionsCubit>().state.walking) {
-      RedisDatabase().storeUserLocation(UserLocationModel(
-          userId: userDataCubit.state.userId,
-          latitude: position.latitude,
-          longitude: position.longitude,
-          lastUpdate: DateTime.now()));
-    } else {
-      // log('Not walking');
-    }
+    //if (context.read<MapOptionsCubit>().state.walking) {
+    RedisDatabase().storeUserLocation(UserLocationModel(
+        userId: userDataCubit.state.userId,
+        latitude: position.latitude,
+        longitude: position.longitude,
+        lastUpdate: DateTime.now()));
+    //} else {
+    // log('Not walking');
+    //}
   }
 
   void _onItemTapped(int index) {

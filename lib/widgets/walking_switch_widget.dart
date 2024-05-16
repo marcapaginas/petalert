@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
+import 'package:pet_clean/blocs/walking_cubit.dart';
 
 class WalkingSwitch extends StatefulWidget {
   const WalkingSwitch({
@@ -31,11 +32,11 @@ class _WalkingSwitchState extends State<WalkingSwitch>
 
   @override
   Widget build(BuildContext context) {
-    final mapOptionsCubit = context.watch<MapOptionsCubit>();
+    final walkingCubit = context.watch<WalkingCubit>();
 
     return InkWell(
       onTap: () {
-        mapOptionsCubit.switchWalking();
+        walkingCubit.toggleWalking();
       },
       splashColor: Colors.green,
       child: Container(
@@ -53,7 +54,7 @@ class _WalkingSwitchState extends State<WalkingSwitch>
         margin: const EdgeInsets.all(0),
         child: Lottie.asset(
           'assets/perrito_marron_andando.json',
-          animate: mapOptionsCubit.state.walking ? true : false,
+          animate: walkingCubit.state ? true : false,
           width: 100,
           height: 100,
           fit: BoxFit.cover,

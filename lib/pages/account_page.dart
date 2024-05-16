@@ -4,7 +4,6 @@ import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/redis_database.dart';
 import 'package:pet_clean/database/supabase_database.dart';
 import 'package:pet_clean/models/user_data_model.dart';
-import 'package:pet_clean/widgets/add_pet_widget.dart';
 import 'package:pet_clean/widgets/lista_mascotas.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -127,23 +126,28 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                 ),
                 const SizedBox(height: 18),
+                const Text(
+                  'Tus mascotas',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 ListaMascotas(
                   userDataCubit: widget.userDataCubit,
                   editar: true,
                 ),
                 const SizedBox(height: 25),
-                ElevatedButton(
-                  onPressed: () {
-                    // Abre el formulario para añadir una nueva mascota
-                    Get.bottomSheet(
-                      isScrollControlled: true,
-                      AddPet(
-                          userId: Supabase.instance.client.auth.currentUser!.id,
-                          userDataCubit: widget.userDataCubit),
-                    );
-                  },
-                  child: const Text('Añadir mascota'),
-                ),
+                // ElevatedButton(
+                //   onPressed: () {
+                //     // Abre el formulario para añadir una nueva mascota
+                //     Get.bottomSheet(
+                //       isScrollControlled: false,
+                //       const AddPet(),
+                //     );
+                //   },
+                //   child: const Text('Añadir mascota'),
+                // ),
               ],
             ),
     );

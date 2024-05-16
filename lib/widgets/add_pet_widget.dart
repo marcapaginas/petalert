@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/redis_database.dart';
@@ -8,10 +9,7 @@ import 'package:pet_clean/models/pet_model.dart';
 import 'package:uuid/uuid.dart';
 
 class AddPet extends StatefulWidget {
-  const AddPet({super.key, required this.userId, required this.userDataCubit});
-
-  final String userId;
-  final UserDataCubit userDataCubit;
+  const AddPet({super.key});
 
   @override
   State<AddPet> createState() => _AddPetState();
@@ -22,8 +20,7 @@ class _AddPetState extends State<AddPet> {
   final _breedController = TextEditingController();
   PetBehavior? _selectedBehavior;
 
-  void _addNewPet() {
-    final userDataCubit = widget.userDataCubit;
+  void _addNewPet(UserDataCubit userDataCubit) {
     final pet = Pet(
       id: const Uuid().v4(),
       name: _nameController.text.trim(),
@@ -38,6 +35,8 @@ class _AddPetState extends State<AddPet> {
 
   @override
   Widget build(BuildContext context) {
+    final userDataCubit = context.watch<UserDataCubit>();
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
@@ -97,7 +96,7 @@ class _AddPetState extends State<AddPet> {
                 behavior: _selectedBehavior ?? PetBehavior.neutral,
               );
               try {
-                _addNewPet();
+                _addNewPet(userDataCubit);
                 Get.snackbar('¡Hola ${pet.name}!',
                     'Se ha añadido a ${pet.name} a tu lista de mascotas',
                     colorText: Colors.white,
