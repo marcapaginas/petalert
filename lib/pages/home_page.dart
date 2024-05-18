@@ -17,6 +17,7 @@ import 'package:pet_clean/pages/alerts_page.dart';
 import 'package:pet_clean/pages/first_page.dart';
 import 'package:pet_clean/pages/map_page.dart';
 import 'package:pet_clean/services/geolocator_service.dart';
+import 'package:pet_clean/widgets/walking_switch_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final supabase = Supabase.instance.client;
@@ -180,34 +181,35 @@ class _HomePageState extends State<HomePage> {
         title: const Text('PetAlert',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
         backgroundColor: Colors.black,
-        actions: <Widget>[
-          ElevatedButton.icon(
-            onPressed: () {
-              if (userDataCubit.state.walkingPets.isEmpty) {
-                Get.snackbar('Error',
-                    'Debes seleccionar al menos una mascota para pasear',
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: Colors.red,
-                    colorText: Colors.white,
-                    margin: const EdgeInsets.all(8),
-                    duration: const Duration(seconds: 2));
-              } else {
-                context.read<WalkingCubit>().toggleWalking();
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: context.watch<WalkingCubit>().state
-                  ? Colors.red
-                  : Colors.green,
-              foregroundColor: Colors.white,
-            ),
-            icon: Icon(context.watch<WalkingCubit>().state
-                ? Icons.directions_walk
-                : Icons.directions_walk_sharp),
-            label:
-                Text(context.watch<WalkingCubit>().state ? 'Parar' : 'Iniciar'),
-          ),
-          const SizedBox(width: 8)
+        actions: const <Widget>[
+          // ElevatedButton.icon(
+          //   onPressed: () {
+          //     if (userDataCubit.state.walkingPets.isEmpty) {
+          //       Get.snackbar('Error',
+          //           'Debes seleccionar al menos una mascota para pasear',
+          //           snackPosition: SnackPosition.BOTTOM,
+          //           backgroundColor: Colors.red,
+          //           colorText: Colors.white,
+          //           margin: const EdgeInsets.all(8),
+          //           duration: const Duration(seconds: 2));
+          //     } else {
+          //       context.read<WalkingCubit>().toggleWalking();
+          //     }
+          //   },
+          //   style: ElevatedButton.styleFrom(
+          //     backgroundColor: context.watch<WalkingCubit>().state
+          //         ? Colors.red
+          //         : Colors.green,
+          //     foregroundColor: Colors.white,
+          //   ),
+          //   icon: Icon(context.watch<WalkingCubit>().state
+          //       ? Icons.directions_walk
+          //       : Icons.directions_walk_sharp),
+          //   label:
+          //       Text(context.watch<WalkingCubit>().state ? 'Parar' : 'Iniciar'),
+          // ),
+          WalkingSwitch(),
+          SizedBox(width: 8)
         ],
       ),
       body: userDataCubit.state.userId == ''

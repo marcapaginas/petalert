@@ -8,7 +8,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/models/map_options_model.dart';
-import 'package:pet_clean/widgets/walking_switch_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final supabase = Supabase.instance.client;
@@ -128,11 +127,6 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
-                ).animate().fade(delay: 300.ms, duration: 500.ms),
-                const Positioned(
-                  bottom: 15,
-                  left: 15,
-                  child: WalkingSwitch(),
                 ).animate().fade(delay: 300.ms, duration: 500.ms),
               ],
             ),
