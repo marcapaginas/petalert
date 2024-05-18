@@ -33,19 +33,21 @@ class _SplashPageState extends State<SplashPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.green,
-      body: Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset('assets/petalert-logo.png', width: 200),
-          const SizedBox(height: 20),
-          const CircularProgressIndicator(
-            color: Colors.white,
-          ),
-          const SizedBox(height: 20),
-          const Text('Cargando...', style: TextStyle(color: Colors.white)),
-        ],
-      )),
+      body: SafeArea(
+        child: Center(
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/petalert-logo.png', width: 200),
+            const SizedBox(height: 20),
+            const CircularProgressIndicator(
+              color: Colors.white,
+            ),
+            const SizedBox(height: 20),
+            const Text('Cargando...', style: TextStyle(color: Colors.white)),
+          ],
+        )),
+      ),
     );
   }
 }

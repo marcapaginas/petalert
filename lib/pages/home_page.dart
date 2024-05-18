@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:pet_clean/blocs/alerts_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
@@ -50,7 +51,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
     _handleWalkingState();
   }
 
@@ -60,8 +60,10 @@ class _HomePageState extends State<HomePage> {
     if (walkingCubit.state) {
       log('Walking');
       if (_positionStreamSubscription == null) {
+        log('activating position stream');
         _listenToPositionStream();
       } else {
+        log('resuming position stream');
         _positionStreamSubscription?.resume();
       }
       if (_timerCheckOtherUsersLocation == null) {
@@ -69,7 +71,8 @@ class _HomePageState extends State<HomePage> {
       }
     } else {
       log('Not walking');
-      _positionStreamSubscription?.pause();
+      log('deactivating position stream');
+      _stopListeningToPositionStream();
       _stopSearchingOtherUsersLocations();
     }
   }
@@ -77,6 +80,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     GeolocatorService.stopBackgroundLocationService();
+    _positionStreamSubscription?.cancel();
     _timerCheckOtherUsersLocation?.cancel();
     super.dispose();
   }
@@ -119,19 +123,26 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _stopSearchingOtherUsersLocations() {
-    _timerCheckOtherUsersLocation?.cancel();
+    if (_timerCheckOtherUsersLocation != null) {
+      _timerCheckOtherUsersLocation?.cancel();
+    }
     _timerCheckOtherUsersLocation = null;
   }
 
   void _listenToPositionStream() {
     _positionStreamSubscription =
-        Geolocator.getPositionStream().listen((Position position) {
+        GeolocatorService.startBackgroundLocationService(foreground: true)
+            .listen((Position position) {
       _actionsWithPosition(position);
     });
   }
 
   void _stopListeningToPositionStream() {
-    _positionStreamSubscription?.pause();
+    log('cancel position stream');
+    if (_positionStreamSubscription != null) {
+      _positionStreamSubscription?.cancel();
+    }
+    _positionStreamSubscription = null;
   }
 
   void _actionsWithPosition(Position position) async {
@@ -146,15 +157,11 @@ class _HomePageState extends State<HomePage> {
           latitude: position.latitude,
           longitude: position.longitude));
     });
-    //if (context.read<MapOptionsCubit>().state.walking) {
     RedisDatabase().storeUserLocation(UserLocationModel(
         userId: userDataCubit.state.userId,
         latitude: position.latitude,
         longitude: position.longitude,
         lastUpdate: DateTime.now()));
-    //} else {
-    // log('Not walking');
-    //}
   }
 
   void _onItemTapped(int index) {
@@ -173,6 +180,35 @@ class _HomePageState extends State<HomePage> {
         title: const Text('PetAlert',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
         backgroundColor: Colors.black,
+        actions: <Widget>[
+          ElevatedButton.icon(
+            onPressed: () {
+              if (userDataCubit.state.walkingPets.isEmpty) {
+                Get.snackbar('Error',
+                    'Debes seleccionar al menos una mascota para pasear',
+                    snackPosition: SnackPosition.BOTTOM,
+                    backgroundColor: Colors.red,
+                    colorText: Colors.white,
+                    margin: const EdgeInsets.all(8),
+                    duration: const Duration(seconds: 2));
+              } else {
+                context.read<WalkingCubit>().toggleWalking();
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: context.watch<WalkingCubit>().state
+                  ? Colors.red
+                  : Colors.green,
+              foregroundColor: Colors.white,
+            ),
+            icon: Icon(context.watch<WalkingCubit>().state
+                ? Icons.directions_walk
+                : Icons.directions_walk_sharp),
+            label:
+                Text(context.watch<WalkingCubit>().state ? 'Parar' : 'Iniciar'),
+          ),
+          const SizedBox(width: 8)
+        ],
       ),
       body: userDataCubit.state.userId == ''
           ? const Center(

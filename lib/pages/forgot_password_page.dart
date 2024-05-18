@@ -30,6 +30,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             const SizedBox(height: 16),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.green,
+                backgroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5),
                 ),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
+import 'package:pet_clean/blocs/walking_cubit.dart';
 import 'package:pet_clean/database/redis_database.dart';
 import 'package:pet_clean/models/pet_model.dart';
 import 'package:pet_clean/widgets/add_pet_widget.dart';
@@ -20,6 +22,8 @@ class ListaMascotasCirculos extends StatefulWidget {
 class _ListaMascotasCirculosState extends State<ListaMascotasCirculos> {
   @override
   Widget build(BuildContext context) {
+    var walkingCubit = context.watch<WalkingCubit>();
+
     return Expanded(child: LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         return Padding(
@@ -38,21 +42,33 @@ class _ListaMascotasCirculosState extends State<ListaMascotasCirculos> {
                       InkWell(
                         customBorder: const CircleBorder(),
                         onTap: () {
-                          widget.userDataCubit.switchPetBeingWalked(index);
-                          RedisDatabase()
-                              .storeUserData(widget.userDataCubit.state);
+                          if (walkingCubit.state) {
+                            Get.rawSnackbar(
+                              snackPosition: SnackPosition.TOP,
+                              animationDuration:
+                                  const Duration(milliseconds: 300),
+                              title: '¡Espera!',
+                              message:
+                                  'No puedes cambiar de mascota mientras estás paseando',
+                              duration: const Duration(seconds: 1),
+                            );
+                          } else {
+                            widget.userDataCubit.switchPetBeingWalked(index);
+                            RedisDatabase()
+                                .storeUserData(widget.userDataCubit.state);
 
-                          Get.rawSnackbar(
-                            snackPosition: SnackPosition.TOP,
-                            animationDuration:
-                                const Duration(milliseconds: 300),
-                            title: 'Actualizado',
-                            message: widget.userDataCubit.state.pets[index]
-                                    .isBeingWalked
-                                ? '¡${mascota.name} se viene al paseo!'
-                                : '${mascota.name} se queda en casa',
-                            duration: const Duration(seconds: 1),
-                          );
+                            Get.rawSnackbar(
+                              snackPosition: SnackPosition.TOP,
+                              animationDuration:
+                                  const Duration(milliseconds: 300),
+                              title: 'Actualizado',
+                              message: widget.userDataCubit.state.pets[index]
+                                      .isBeingWalked
+                                  ? '¡${mascota.name} se viene al paseo!'
+                                  : '${mascota.name} se queda en casa',
+                              duration: const Duration(seconds: 1),
+                            );
+                          }
                         },
                         child: Stack(
                           alignment: Alignment.topRight,

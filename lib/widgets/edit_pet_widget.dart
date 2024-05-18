@@ -124,7 +124,7 @@ class _EditPetState extends State<EditPet> {
                   width: 50.0,
                   height: 50.0,
                   decoration: const BoxDecoration(
-                    color: Colors.green, // Cambia esto al color que prefieras
+                    color: Colors.green,
                     shape: BoxShape.circle,
                   ),
                   child: InkWell(
@@ -132,8 +132,8 @@ class _EditPetState extends State<EditPet> {
                       processImage('gallery');
                     },
                     child: const Icon(
-                      Icons.photo_library, // Cambia esto al ícono que prefieras
-                      color: Colors.white, // Cambia esto al color que prefieras
+                      Icons.photo_library,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -141,7 +141,7 @@ class _EditPetState extends State<EditPet> {
                   width: 50.0,
                   height: 50.0,
                   decoration: const BoxDecoration(
-                    color: Colors.green, // Cambia esto al color que prefieras
+                    color: Colors.green,
                     shape: BoxShape.circle,
                   ),
                   child: InkWell(
@@ -151,8 +151,8 @@ class _EditPetState extends State<EditPet> {
                       markPetWithoutAvatar();
                     },
                     child: const Icon(
-                      Icons.delete, // Cambia esto al ícono que prefieras
-                      color: Colors.white, // Cambia esto al color que prefieras
+                      Icons.delete_rounded,
+                      color: Colors.white,
                     ),
                   ),
                 ),

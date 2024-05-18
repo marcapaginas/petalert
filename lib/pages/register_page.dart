@@ -34,6 +34,8 @@ class RegisterPage extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.green,
+                backgroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5),
                 ),
@@ -41,20 +43,21 @@ class RegisterPage extends StatelessWidget {
               onPressed: () async {
                 if (emailController.text.isEmpty ||
                     passwordController.text.isEmpty) {
-                  Get.snackbar('Error', 'Email y password son requeridos',
-                      backgroundColor: Colors.red, colorText: Colors.white);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Por favor, rellena todos los campos')),
+                  );
                   return;
                 }
                 try {
                   await Supabase.instance.client.auth.signUp(
                       password: passwordController.text,
                       email: emailController.text);
-                  Get.snackbar('Registro correcto', 'Usuario registrado',
-                      backgroundColor: Colors.green, colorText: Colors.white);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('Registro completado con éxito')));
                 } catch (e) {
-                  Get.snackbar('Error',
-                      'Error con los datos introducidos: ${e.toString()}',
-                      backgroundColor: Colors.red, colorText: Colors.white);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('Error al registrar el usuario')));
                 }
               },
               child: const Text('Registrarse como usuario'),

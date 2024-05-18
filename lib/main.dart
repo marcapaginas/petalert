@@ -7,8 +7,6 @@ import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/blocs/walking_cubit.dart';
 import 'package:pet_clean/database/supabase_database.dart';
-// import 'package:pet_clean/models/alert_model.dart';
-// import 'package:pet_clean/pages/alert_detail_page.dart';
 import 'package:pet_clean/pages/forgot_password_page.dart';
 import 'package:pet_clean/pages/home_page.dart';
 import 'package:pet_clean/pages/login_page.dart';
@@ -56,6 +54,10 @@ class MyApp extends StatelessWidget {
 
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.green, 
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
       title: 'PetAlert',
       initialRoute: '/',
       routes: <String, WidgetBuilder>{
@@ -66,14 +68,6 @@ class MyApp extends StatelessWidget {
         '/homepage': (_) => const HomePage(),
         '/no-connection': (_) => const NoConnectionPage(),
       },
-      getPages: [
-        GetPage(name: '/', page: () => const SplashPage()),
-        GetPage(name: '/login', page: () => const LoginPage()),
-        GetPage(name: '/register', page: () => RegisterPage()),
-        GetPage(name: '/forgot-password', page: () => const ForgotPassword()),
-        GetPage(name: '/home', page: () => const HomePage()),
-        GetPage(name: '/no-connection', page: () => const NoConnectionPage()),
-      ],
     );
   }
 }

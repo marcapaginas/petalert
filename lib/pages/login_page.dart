@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/database/supabase_database.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -77,73 +78,95 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.green,
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset('assets/petalert-logo.png', height: 150),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'PetAlert',
-                  style: TextStyle(
-                    fontSize: 45,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset('assets/petalert-logo.png', height: 150),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'PetAlert',
+                        style: TextStyle(
+                          fontSize: 45,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            TextFormField(
-              controller: _emailController,
-              decoration: const InputDecoration(
-                  labelText: 'Email', fillColor: Colors.white, filled: true),
-            ),
-            const SizedBox(height: 18),
-            TextFormField(
-              controller: _passwordController,
-              decoration: const InputDecoration(
-                  labelText: 'Password', fillColor: Colors.white, filled: true),
-              obscureText: true,
-            ),
-            const SizedBox(height: 18),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                ),
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: const InputDecoration(
+                        labelText: 'Email',
+                        fillColor: Colors.white,
+                        labelStyle: TextStyle(color: Colors.black38),
+                        prefixIcon: Icon(Icons.email),
+                        focusColor: Colors.green,
+                        focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.greenAccent)),
+                        filled: true),
+                  ),
+                  const SizedBox(height: 18),
+                  TextFormField(
+                    controller: _passwordController,
+                    decoration: const InputDecoration(
+                        labelText: 'Password',
+                        fillColor: Colors.white,
+                        labelStyle: TextStyle(color: Colors.black38),
+                        prefixIcon: Icon(Icons.password),
+                        focusColor: Colors.green,
+                        focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.greenAccent)),
+                        filled: true),
+                    obscureText: true,
+                  ),
+                  const SizedBox(height: 18),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.green,
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    onPressed: _isLoading ? null : _signIn,
+                    child: Text(_isLoading ? 'Cargando' : 'Acceder'),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pushNamed('/register');
+                        },
+                        child: const Text('Registrarse'),
+                      ),
+                      const SizedBox(width: 10),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pushNamed('/forgot-password');
+                        },
+                        child: const Text('Olvidé mi contraseña'),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              onPressed: _isLoading ? null : _signIn,
-              child: Text(_isLoading ? 'Cargando' : 'Acceder'),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed('/register');
-                  },
-                  child: const Text('Registrarse'),
-                ),
-                const SizedBox(width: 10),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed('/forgot-password');
-                  },
-                  child: const Text('Olvidé mi contraseña'),
-                ),
-              ],
-            ),
-          ],
+          ),
         ),
       ),
     );
