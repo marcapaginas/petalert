@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pet_clean/blocs/walking_cubit.dart';
 import 'package:pet_clean/widgets/mapa_widget.dart';
-import 'package:pet_clean/widgets/walking_switch_widget.dart';
 
 class MapPage extends StatelessWidget {
   const MapPage({super.key});
@@ -12,12 +12,21 @@ class MapPage extends StatelessWidget {
     final walkingCubit = context.watch<WalkingCubit>();
     return walkingCubit.state
         ? const Mapa()
-        : const Column(
+        : Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Center(
-                child: Text('Activa la opción de caminar para ver el mapa'),
+              Lottie.asset('assets/siluetas_perros.json', width: 300),
+              const SizedBox(height: 20),
+              const Center(
+                child: Text('Debes iniciar el paseo para ver el mapa.'),
               ),
-              WalkingSwitch(),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                  onPressed: () => walkingCubit.toggleWalking(),
+                  child: const Text(
+                    'Iniciar paseo',
+                    style: TextStyle(color: Colors.green),
+                  ))
             ],
           );
   }

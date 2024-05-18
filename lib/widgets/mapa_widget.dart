@@ -41,7 +41,16 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
     final mapOptionsCubit = context.watch<MapOptionsCubit>();
 
     return mapOptionsCubit.state.userLocation == null
-        ? const Center(child: CircularProgressIndicator())
+        ? const Center(
+            child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: Colors.white,
+              ),
+              Text('Cargando mapa...'),
+            ],
+          ))
         : Scaffold(
             body: Stack(
               children: [
