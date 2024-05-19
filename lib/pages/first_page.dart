@@ -68,35 +68,11 @@ class FirstPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: petWalkingCount > 0
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Directionality(
-                          textDirection: TextDirection.rtl,
-                          child: ElevatedButton.icon(
-                            icon: const Icon(Icons.arrow_back),
-                            style: const ButtonStyle(
-                              textStyle: MaterialStatePropertyAll<TextStyle>(
-                                TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              foregroundColor:
-                                  MaterialStatePropertyAll<Color>(Colors.white),
-                              backgroundColor: MaterialStatePropertyAll<Color>(
-                                  Color.fromARGB(255, 54, 151, 58)),
-                            ),
-                            onPressed: () {
-                              pageController.animateToPage(1,
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut);
-                            },
-                            label: const Text('Ir a pasear'),
-                          ).animate().fade(),
-                        ),
-                      ],
-                    )
+                  ? const Padding(
+                      padding: EdgeInsets.all(15.0),
+                      child: Text('¡Vamos a pasear!',
+                          style: TextStyle(color: Colors.white)),
+                    ).animate().fade()
                   : const Padding(
                       padding: EdgeInsets.all(15.0),
                       child: Text('Selecciona al menos una mascota para pasear',

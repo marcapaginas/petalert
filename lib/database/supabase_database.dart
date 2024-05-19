@@ -71,29 +71,6 @@ class SupabaseDatabase {
         backgroundColor: Colors.white, icon: const Icon(Icons.check));
   }
 
-  // static Future<UserData> getUserData(String userId) async {
-  //   try {
-  //     final response = await supabase
-  //         .from('users')
-  //         .select()
-  //         .eq('user_id', userId)
-  //         .limit(1)
-  //         .single();
-
-  //     final data = response.map((key, value) => MapEntry(key, value));
-
-  //     final userData = UserData(
-  //       userId: data['user_id'] as String,
-  //       nombre: data['nombre'] as String,
-  //     );
-
-  //     return userData;
-  //   } catch (e) {
-  //     log('Error getting user data: $e');
-  //   }
-  //   return UserData.empty;
-  // }
-
   static Future<String> uploadAvatar(File file, String name) async {
     try {
       // check if file exists to delete it

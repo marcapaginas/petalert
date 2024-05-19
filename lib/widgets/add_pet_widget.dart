@@ -46,70 +46,72 @@ class _AddPetState extends State<AddPet> {
           topRight: Radius.circular(16),
         ),
       ),
-      child: Column(
-        children: [
-          const Text(
-            'Añadir mascota',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            const Text(
+              'Añadir mascota',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'Nombre',
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _nameController,
+              decoration: const InputDecoration(
+                labelText: 'Nombre',
+              ),
             ),
-          ),
-          TextFormField(
-            controller: _breedController,
-            decoration: const InputDecoration(
-              labelText: 'Raza',
+            TextFormField(
+              controller: _breedController,
+              decoration: const InputDecoration(
+                labelText: 'Raza',
+              ),
             ),
-          ),
-          // select behavior
-          DropdownButton<PetBehavior>(
-            value: _selectedBehavior,
-            items: PetBehavior.values.map((behavior) {
-              return DropdownMenuItem<PetBehavior>(
-                value: behavior,
-                child: Text(behavior.name),
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                _selectedBehavior = value;
-              });
-            },
-            hint: const Text('Selecciona un comportamiento'),
-          ),
+            // select behavior
+            DropdownButton<PetBehavior>(
+              value: _selectedBehavior,
+              items: PetBehavior.values.map((behavior) {
+                return DropdownMenuItem<PetBehavior>(
+                  value: behavior,
+                  child: Text(behavior.name),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedBehavior = value;
+                });
+              },
+              hint: const Text('Selecciona un comportamiento'),
+            ),
 
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              var uuid = const Uuid();
-              final pet = Pet(
-                id: uuid.v4(),
-                name: _nameController.text.trim(),
-                breed: _breedController.text.trim(),
-                behavior: _selectedBehavior ?? PetBehavior.neutral,
-              );
-              try {
-                _addNewPet(userDataCubit);
-                Get.snackbar('¡Hola ${pet.name}!',
-                    'Se ha añadido a ${pet.name} a tu lista de mascotas',
-                    colorText: Colors.white,
-                    backgroundColor: Colors.green,
-                    icon: const Icon(Icons.check));
-                Navigator.of(context).pop();
-              } catch (e) {
-                log('Error añadiendo mascota: $e');
-              }
-            },
-            child: const Text('Añadir mascota'),
-          ),
-        ],
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                var uuid = const Uuid();
+                final pet = Pet(
+                  id: uuid.v4(),
+                  name: _nameController.text.trim(),
+                  breed: _breedController.text.trim(),
+                  behavior: _selectedBehavior ?? PetBehavior.neutral,
+                );
+                try {
+                  _addNewPet(userDataCubit);
+                  Get.snackbar('¡Hola ${pet.name}!',
+                      'Se ha añadido a ${pet.name} a tu lista de mascotas',
+                      colorText: Colors.white,
+                      backgroundColor: Colors.green,
+                      icon: const Icon(Icons.check));
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  log('Error añadiendo mascota: $e');
+                }
+              },
+              child: const Text('Añadir mascota'),
+            ),
+          ],
+        ),
       ),
     );
   }

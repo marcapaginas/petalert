@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
@@ -6,11 +7,7 @@ import 'package:pet_clean/database/redis_database.dart';
 import 'package:pet_clean/widgets/edit_pet_widget.dart';
 
 class ListaMascotas extends StatefulWidget {
-  final UserDataCubit userDataCubit;
-  final bool editar;
-
-  const ListaMascotas(
-      {super.key, required this.userDataCubit, this.editar = false});
+  const ListaMascotas({super.key});
 
   @override
   State<ListaMascotas> createState() => _ListaMascotasState();
@@ -51,73 +48,64 @@ class _ListaMascotasState extends State<ListaMascotas> {
                         style: const TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Text('${pet.breed} - ${pet.behavior.name}',
                         style: const TextStyle(color: Colors.white)),
-                    trailing: widget.editar
-                        ? Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit),
-                                onPressed: () {
-                                  Get.bottomSheet(
-                                    isScrollControlled: true,
-                                    EditPet(
-                                      index: index,
-                                    ),
-                                  );
-                                },
-                                color: Colors.white,
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () {
+                            Get.bottomSheet(
+                              isScrollControlled: true,
+                              EditPet(
+                                index: index,
                               ),
-                              IconButton(
-                                icon: const Icon(Icons.delete),
-                                onPressed: () {
-                                  Get.dialog(AlertDialog(
-                                    title: Text(
-                                        'Quitar a ${pet.name} de tus mascotas'),
-                                    content: const Text(
-                                        '¿Estás seguro de quitar esta mascota?'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Get.back(closeOverlays: true);
-                                        },
-                                        child: const Text('Cancelar'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          try {
-                                            Get.back(closeOverlays: true);
-                                            userDataCubit.removePet(index);
-                                            RedisDatabase().storeUserData(
-                                                userDataCubit.state);
-                                            Get.snackbar('Exito',
-                                                'Se ha quitado a ${pet.name} de tus mascotas',
-                                                backgroundColor: Colors.green,
-                                                colorText: Colors.white);
-                                            Get.back(closeOverlays: true);
-                                          } catch (e) {
-                                            Get.snackbar('Error',
-                                                'Error quitando mascota',
-                                                backgroundColor: Colors.red,
-                                                colorText: Colors.white);
-                                          }
-                                        },
-                                        child: const Text('Quitar'),
-                                      ),
-                                    ],
-                                  ));
-                                },
-                                color: Colors.white,
-                              ),
-                            ],
-                          )
-                        : Checkbox(
-                            value:
-                                userDataCubit.state.pets[index].isBeingWalked,
-                            onChanged: (value) {
-                              userDataCubit.switchPetBeingWalked(index);
-                              RedisDatabase()
-                                  .storeUserData(userDataCubit.state);
-                            }),
+                            );
+                          },
+                          color: Colors.white,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () {
+                            Get.dialog(AlertDialog(
+                              title:
+                                  Text('Quitar a ${pet.name} de tus mascotas'),
+                              content: const Text(
+                                  '¿Estás seguro de quitar esta mascota?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Get.back(closeOverlays: true);
+                                  },
+                                  child: const Text('Cancelar'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    try {
+                                      Get.back(closeOverlays: true);
+                                      userDataCubit.removePet(index);
+                                      RedisDatabase()
+                                          .storeUserData(userDataCubit.state);
+                                      Get.snackbar('Exito',
+                                          'Se ha quitado a ${pet.name} de tus mascotas',
+                                          backgroundColor: Colors.green,
+                                          colorText: Colors.white);
+                                      Get.back(closeOverlays: true);
+                                    } catch (e) {
+                                      Get.snackbar(
+                                          'Error', 'Error quitando mascota',
+                                          backgroundColor: Colors.red,
+                                          colorText: Colors.white);
+                                    }
+                                  },
+                                  child: const Text('Quitar'),
+                                ),
+                              ],
+                            ));
+                          },
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
                     tileColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -125,7 +113,10 @@ class _ListaMascotasState extends State<ListaMascotas> {
               ),
             );
           },
-        ),
+        ).animate().fade().slide(
+              begin: const Offset(0, 0.1),
+              duration: const Duration(milliseconds: 300),
+            ),
       ),
     );
   }

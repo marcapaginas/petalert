@@ -42,6 +42,11 @@ class RedisDatabase {
   Future<UserData> getUserData(String userId) async {
     UserData userData = UserData.empty;
     RedisConnection? redisConnection;
+    userData = UserData(
+      userId: userId,
+      nombre: 'Usuario',
+      pets: [],
+    );
 
     try {
       final command = await connectAndAuth();
@@ -50,12 +55,7 @@ class RedisDatabase {
       final Map<String, dynamic> mapa = convert.jsonDecode(string);
       userData = UserData.fromJson(mapa);
     } catch (e) {
-      userData = UserData(
-        userId: userId,
-        nombre: 'Usuario',
-        pets: [],
-      );
-      await storeUserData(userData);
+      log('Error al obtener el usuario: $e');
     } finally {
       if (redisConnection != null) {
         await redisConnection.close();

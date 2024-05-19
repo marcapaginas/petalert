@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
+import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/blocs/walking_cubit.dart';
 
 class WalkingSwitch extends StatefulWidget {
@@ -34,13 +34,43 @@ class _WalkingSwitchState extends State<WalkingSwitch>
   @override
   Widget build(BuildContext context) {
     final walkingCubit = context.watch<WalkingCubit>();
+    final userDataCubit = context.read<UserDataCubit>();
 
     return GestureDetector(
       onTap: () {
-        walkingCubit.toggleWalking();
+        if (userDataCubit.state.walkingPets.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Selecciona al menos una mascota para pasear'),
+            ),
+          );
+        } else {
+          walkingCubit.toggleWalking();
+        }
       },
       child: Row(
         children: [
+          !walkingCubit.state
+              ? const SizedBox(width: 10)
+              : Animate(
+                  effects: [
+                    const FadeEffect(duration: Duration(seconds: 2)),
+                    SlideEffect(
+                      begin: const Offset(-1, 0),
+                      duration: 2.seconds,
+                    ),
+                  ],
+                  child: Transform.translate(
+                    offset: const Offset(0, -10),
+                    child: Lottie.asset(
+                      'assets/perrito_marron_andando.json',
+                      animate: walkingCubit.state ? true : false,
+                      width: 80,
+                      height: 800,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
           Container(
             alignment: Alignment.center,
             width: 125,
@@ -57,18 +87,6 @@ class _WalkingSwitchState extends State<WalkingSwitch>
               ),
             ),
           ),
-          !walkingCubit.state
-              ? const SizedBox(width: 10)
-              : Transform.translate(
-                  offset: const Offset(0, -10),
-                  child: Lottie.asset(
-                    'assets/perrito_marron_andando.json',
-                    animate: walkingCubit.state ? true : false,
-                    width: 80,
-                    height: 800,
-                    fit: BoxFit.cover,
-                  ),
-                ).animate().fade().slideX(duration: 2.seconds),
         ],
       ),
     );

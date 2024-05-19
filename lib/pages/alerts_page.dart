@@ -128,10 +128,6 @@ class _AlertsState extends State<Alerts> {
                         setState(() {
                           alertsCubit.markAsDiscarded(item.id);
                         });
-
-                        // ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                        // ScaffoldMessenger.of(context).showSnackBar(
-                        //     SnackBar(content: Text('Borrada alerta')));
                       },
                       background: Container(
                         alignment: AlignmentDirectional.centerStart,

@@ -1,6 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
+import 'package:pet_clean/database/redis_database.dart';
 import 'package:pet_clean/models/alert_model.dart';
+import 'package:pet_clean/models/pet_model.dart';
+import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
 import 'package:pet_clean/services/notification_service.dart';
 
@@ -41,7 +44,7 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
     emit(List<AlertModel>.empty());
   }
 
-  void setAlerts(List<UserLocationModel> foundLocations) {
+  void setAlerts(List<UserLocationModel> foundLocations) async {
     final currentAlerts = List<AlertModel>.from(state);
     final discardedAlerts =
         currentAlerts.where((alert) => alert.isDiscarded).toList();
@@ -56,10 +59,14 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
       if (currentAlerts.any((alert) => alert.id == location.userId)) {
         continue;
       } else {
+        final UserData userFoundData =
+            await RedisDatabase().getUserData(location.userId);
+
         AlertModel alertforLocation = AlertModel(
           id: location.userId,
-          title: 'Alerta',
-          description: 'alerta usuario ${location.userId}',
+          title: '${userFoundData.nombre} está cerca',
+          description:
+              'Está paseando a ${_formatPetNames(userFoundData.pets.where((pet) => pet.isBeingWalked).toList())}',
           date: DateTime.now(),
           isDiscarded: false,
         );
@@ -74,5 +81,17 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
     }
 
     emit(currentAlerts);
+  }
+
+  String _formatPetNames(List<Pet> pets) {
+    var names = pets.map((pet) => pet.name).toList();
+    if (names.length > 1) {
+      var last = names.removeLast();
+      return '${names.join(', ')} y $last';
+    } else if (names.length == 1) {
+      return names[0];
+    } else {
+      return '';
+    }
   }
 }

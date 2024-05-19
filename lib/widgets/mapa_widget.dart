@@ -119,6 +119,9 @@ class _MapaState extends State<Mapa> with TickerProviderStateMixin {
                             value: mapOptionsCubit.state.metersRange,
                             min: 5.0,
                             max: 100.0,
+                            divisions: 19,
+                            thumbColor: Colors.green,
+                            activeColor: Colors.green.shade200,
                             onChanged: (newValue) {
                               mapOptionsCubit.setMetersRange(newValue);
                             },

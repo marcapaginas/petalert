@@ -103,7 +103,10 @@ class _AccountPageState extends State<AccountPage> {
                   padding: const EdgeInsets.all(15.0),
                   child: TextFormField(
                     controller: _usernameController,
-                    decoration: const InputDecoration(labelText: 'Nombre'),
+                    decoration: const InputDecoration(
+                        labelText: 'Nombre',
+                        helperText:
+                            'Ingresa tu nombre o apodo, será visible para otros usuarios'),
                   ),
                 ),
                 const SizedBox(height: 18),
@@ -133,10 +136,7 @@ class _AccountPageState extends State<AccountPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                ListaMascotas(
-                  userDataCubit: widget.userDataCubit,
-                  editar: true,
-                ),
+                const ListaMascotas(),
                 const SizedBox(height: 25),
                 // ElevatedButton(
                 //   onPressed: () {

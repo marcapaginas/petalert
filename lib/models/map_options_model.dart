@@ -10,6 +10,7 @@ import 'package:pet_clean/database/redis_database.dart';
 import 'package:pet_clean/models/pet_model.dart';
 import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
+import 'package:pet_clean/widgets/marker_detail_widget.dart';
 
 class MapOptionsState {
   final double zoom;
@@ -119,14 +120,10 @@ class MapOptionsState {
     log('properties: $properties');
     UserData userData = await RedisDatabase().getUserData(properties['userId']);
 
-    //filter pets that are being walked
-    List<Pet> pets = userData.pets.where((pet) => pet.isBeingWalked).toList();
-
     return showModalBottomSheet(
       context: Get.context!,
       builder: (context) {
         return Container(
-          height: 200,
           width: double.infinity,
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -138,48 +135,7 @@ class MapOptionsState {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              Padding(
-                  padding: const EdgeInsets.all(30),
-                  child: Column(
-                    children: [
-                      Text('${userData.nombre} está paseando a: ',
-                          style: const TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 10),
-                      pets.isNotEmpty
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                for (var pet in pets)
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: Column(
-                                      children: [
-                                        CircleAvatar(
-                                          backgroundImage: const AssetImage(
-                                              'assets/pet.jpeg'),
-                                          foregroundImage: pet.avatarURL != ''
-                                              ? NetworkImage(pet.avatarURL)
-                                              : null,
-                                          radius: 40,
-                                        ),
-                                        Text(
-                                          pet.name,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                const SizedBox(width: 20),
-                              ],
-                            )
-                          : const Text('No hay mascotas paseando'),
-                    ],
-                  )),
+              MarkerDetailWidget(userData: userData),
               Positioned(
                 top: -80,
                 left: 10,
