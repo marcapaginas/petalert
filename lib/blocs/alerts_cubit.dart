@@ -62,20 +62,20 @@ class AlertsCubit extends Cubit<List<AlertModel>> {
         final UserData userFoundData =
             await RedisDatabase().getUserData(location.userId);
 
+        String title = '${userFoundData.nombre} está cerca';
+        String description =
+            'Está paseando a ${_formatPetNames(userFoundData.pets.where((pet) => pet.isBeingWalked).toList())}';
+
         AlertModel alertforLocation = AlertModel(
           id: location.userId,
-          title: '${userFoundData.nombre} está cerca',
-          description:
-              'Está paseando a ${_formatPetNames(userFoundData.pets.where((pet) => pet.isBeingWalked).toList())}',
+          title: title,
+          description: description,
           date: DateTime.now(),
           isDiscarded: false,
         );
         currentAlerts.add(alertforLocation);
         if (userDataCubit.state.backgroundNotify) {
-          NotificationService.show(
-              title: 'Alerta',
-              body:
-                  '${userDataCubit.state.nombre.isNotEmpty ? userDataCubit.state.nombre : 'Alguien'} cerca, paseando a ${userDataCubit.state.pets.where((pet) => pet.isBeingWalked).toList().length} ${userDataCubit.state.pets.where((pet) => pet.isBeingWalked).toList().length == 1 ? 'mascota' : 'mascotas'}');
+          NotificationService.show(title: title, body: description);
         }
       }
     }

@@ -18,6 +18,10 @@ class AddPet extends StatefulWidget {
 class _AddPetState extends State<AddPet> {
   final _nameController = TextEditingController();
   final _breedController = TextEditingController();
+  final _notesController = TextEditingController();
+  int? _selectedAge;
+  PetSex? _selectedSex;
+
   PetBehavior? _selectedBehavior;
 
   void _addNewPet(UserDataCubit userDataCubit) {
@@ -25,7 +29,10 @@ class _AddPetState extends State<AddPet> {
       id: const Uuid().v4(),
       name: _nameController.text.trim(),
       breed: _breedController.text.trim(),
+      age: _selectedAge!,
+      petSex: _selectedSex ?? PetSex.macho,
       behavior: _selectedBehavior ?? PetBehavior.neutral,
+      notes: _notesController.text.trim(),
     );
     final updatedPets = [...userDataCubit.state.pets, pet];
     final updatedUserData = userDataCubit.state.copyWith(pets: updatedPets);
@@ -69,6 +76,38 @@ class _AddPetState extends State<AddPet> {
                 labelText: 'Raza',
               ),
             ),
+            const SizedBox(height: 16),
+            DropdownButton<int>(
+              value: _selectedAge,
+              items: List<int>.generate(31, (i) => i).map((int value) {
+                return DropdownMenuItem<int>(
+                  value: value,
+                  child: Text(value.toString()),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedAge = value;
+                });
+              },
+            ),
+            DropdownButton<PetSex>(
+              value: _selectedSex,
+              items: PetSex.values.map((sex) {
+                return DropdownMenuItem<PetSex>(
+                  value: sex,
+                  child: Text(sex.name),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedSex = value;
+                });
+              },
+              hint: const Text('Selecciona un sexo'),
+            ),
+
+            const SizedBox(height: 16),
             // select behavior
             DropdownButton<PetBehavior>(
               value: _selectedBehavior,
@@ -85,6 +124,14 @@ class _AddPetState extends State<AddPet> {
               },
               hint: const Text('Selecciona un comportamiento'),
             ),
+            TextFormField(
+              controller: _notesController,
+              minLines: 2,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'Notas',
+              ),
+            ),
 
             const SizedBox(height: 16),
             ElevatedButton(
@@ -94,7 +141,10 @@ class _AddPetState extends State<AddPet> {
                   id: uuid.v4(),
                   name: _nameController.text.trim(),
                   breed: _breedController.text.trim(),
+                  age: _selectedAge!,
+                  petSex: _selectedSex ?? PetSex.macho,
                   behavior: _selectedBehavior ?? PetBehavior.neutral,
+                  notes: _notesController.text.trim(),
                 );
                 try {
                   _addNewPet(userDataCubit);

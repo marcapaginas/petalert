@@ -23,7 +23,10 @@ class EditPet extends StatefulWidget {
 class _EditPetState extends State<EditPet> {
   late TextEditingController _nameController;
   late TextEditingController _breedController;
+  late TextEditingController _notesController;
+  int? _selectedAge = 0;
   PetBehavior? _selectedBehavior;
+  PetSex? _selectedSex;
 
   XFile? _image;
 
@@ -69,7 +72,11 @@ class _EditPetState extends State<EditPet> {
         text: userDataCubit.state.pets[widget.index].name);
     _breedController = TextEditingController(
         text: userDataCubit.state.pets[widget.index].breed);
+    _selectedSex = userDataCubit.state.pets[widget.index].petSex;
+    _notesController = TextEditingController(
+        text: userDataCubit.state.pets[widget.index].notes);
     _selectedBehavior = userDataCubit.state.pets[widget.index].behavior;
+    _selectedAge = userDataCubit.state.pets[widget.index].age;
   }
 
   @override
@@ -174,6 +181,27 @@ class _EditPetState extends State<EditPet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const Text('Género:'),
+                const SizedBox(width: 16),
+                DropdownButton<PetSex>(
+                  value: _selectedSex,
+                  items: PetSex.values.map((sex) {
+                    return DropdownMenuItem<PetSex>(
+                      value: sex,
+                      child: Text(sex.name),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedSex = value;
+                    });
+                  },
+                  hint: const Text('Selecciona un sexo'),
+                ),
+              ],
+            ),
+            Row(
+              children: [
                 const Text('Comportamiento: '),
                 const SizedBox(width: 16),
                 DropdownButton<PetBehavior>(
@@ -193,50 +221,87 @@ class _EditPetState extends State<EditPet> {
                   },
                 ),
                 const SizedBox(width: 16),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () {
-                    final pet = Pet(
-                      id: userDataCubit.state.pets[widget.index].id,
-                      name: _nameController.text,
-                      breed: _breedController.text,
-                      behavior: _selectedBehavior!,
-                      isBeingWalked:
-                          userDataCubit.state.pets[widget.index].isBeingWalked,
-                      avatarURL:
-                          userDataCubit.state.pets[widget.index].avatarURL,
+                const Text('Edad:'),
+                const SizedBox(width: 16),
+                DropdownButton<int>(
+                  value: _selectedAge,
+                  items: List<int>.generate(31, (i) => i).map((int value) {
+                    return DropdownMenuItem<int>(
+                      value: value,
+                      child: Text(value.toString()),
                     );
-                    try {
-                      userDataCubit.updatePet(widget.index, pet);
-                      RedisDatabase().storeUserData(
-                        userDataCubit.state.copyWith(pets: [
-                          ...userDataCubit.state.pets
-                            ..removeAt(widget.index)
-                            ..insert(widget.index, pet)
-                        ]),
-                      );
-                      Get.snackbar('Actualizado', '${pet.name} actualizado',
-                          icon: const Icon(Icons.check),
-                          colorText: Colors.white,
-                          backgroundColor: Colors.green);
-                      Navigator.of(context).pop();
-                    } catch (e) {
-                      log('Error actualizando mascota: $e');
-                      Get.snackbar('Error', 'Error actualizando mascota',
-                          icon: const Icon(Icons.error),
-                          colorText: Colors.white,
-                          backgroundColor: Colors.red);
-                    }
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedAge = value;
+                    });
                   },
-                  child: const Text('Actualizar'),
                 ),
               ],
+            ),
+            const SizedBox(height: 8),
+            // dropdown button with numbers from 0 to 30
+            TextFormField(
+              controller: _notesController,
+              minLines: 2,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                helperText: '* Estas notas las verán otros usuarios',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  borderSide: BorderSide(color: Colors.green),
+                ),
+                labelText: 'Notas',
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: () {
+                  final pet = Pet(
+                    id: userDataCubit.state.pets[widget.index].id,
+                    name: _nameController.text,
+                    breed: _breedController.text,
+                    age: _selectedAge!,
+                    petSex: _selectedSex ?? PetSex.macho,
+                    behavior: _selectedBehavior!,
+                    isBeingWalked:
+                        userDataCubit.state.pets[widget.index].isBeingWalked,
+                    avatarURL: userDataCubit.state.pets[widget.index].avatarURL,
+                    notes: _notesController.text,
+                  );
+                  try {
+                    userDataCubit.updatePet(widget.index, pet);
+                    RedisDatabase().storeUserData(
+                      userDataCubit.state.copyWith(pets: [
+                        ...userDataCubit.state.pets
+                          ..removeAt(widget.index)
+                          ..insert(widget.index, pet)
+                      ]),
+                    );
+                    Get.snackbar('Actualizado', '${pet.name} actualizado',
+                        icon: const Icon(Icons.check),
+                        colorText: Colors.white,
+                        backgroundColor: Colors.green);
+                    Navigator.of(context).pop();
+                  } catch (e) {
+                    log('Error actualizando mascota: $e');
+                    Get.snackbar('Error', 'Error actualizando mascota',
+                        icon: const Icon(Icons.error),
+                        colorText: Colors.white,
+                        backgroundColor: Colors.red);
+                  }
+                },
+                child: const Text('Actualizar'),
+              ),
             ),
           ],
         ),
