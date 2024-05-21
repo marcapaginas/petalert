@@ -1,8 +1,6 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:get/get.dart';
 import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/widgets/pet_detail_widget.dart';
 
@@ -83,7 +81,7 @@ class _MarkerDetailWidgetState extends State<MarkerDetailWidget> {
                                     ),
                                   ),
                                 ),
-                              const SizedBox(width: 20),
+                              if (pets.length > 1) const SizedBox(width: 20),
                             ],
                           )
                         : const Text('No hay mascotas paseando'),

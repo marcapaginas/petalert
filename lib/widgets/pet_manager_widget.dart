@@ -10,23 +10,26 @@ import 'package:pet_clean/database/redis_database.dart';
 import 'package:pet_clean/database/supabase_database.dart';
 import 'package:pet_clean/models/pet_model.dart';
 import 'package:pet_clean/pages/home_page.dart';
+import 'package:uuid/uuid.dart';
 
-class EditPet extends StatefulWidget {
-  final int index;
+class PetManagerWidget extends StatefulWidget {
+  final int? index;
+  final String type;
 
-  const EditPet({super.key, required this.index});
+  const PetManagerWidget({super.key, this.index, this.type = 'edit'});
 
   @override
-  State<EditPet> createState() => _EditPetState();
+  State<PetManagerWidget> createState() => _PetManagerState();
 }
 
-class _EditPetState extends State<EditPet> {
+class _PetManagerState extends State<PetManagerWidget> {
   late TextEditingController _nameController;
   late TextEditingController _breedController;
   late TextEditingController _notesController;
-  int? _selectedAge = 0;
+  PetAge? _selectedAge;
   PetBehavior? _selectedBehavior;
   PetSex? _selectedSex;
+  final String _newPetID = const Uuid().v4();
 
   XFile? _image;
 
@@ -44,7 +47,6 @@ class _EditPetState extends State<EditPet> {
       setState(() {
         _image = pickedImage;
       });
-      log('Image path: ${_image!.path}');
     }
   }
 
@@ -67,16 +69,25 @@ class _EditPetState extends State<EditPet> {
   @override
   void initState() {
     super.initState();
-    final userDataCubit = context.read<UserDataCubit>();
-    _nameController = TextEditingController(
-        text: userDataCubit.state.pets[widget.index].name);
-    _breedController = TextEditingController(
-        text: userDataCubit.state.pets[widget.index].breed);
-    _selectedSex = userDataCubit.state.pets[widget.index].petSex;
-    _notesController = TextEditingController(
-        text: userDataCubit.state.pets[widget.index].notes);
-    _selectedBehavior = userDataCubit.state.pets[widget.index].behavior;
-    _selectedAge = userDataCubit.state.pets[widget.index].age;
+    if (widget.index != null && widget.type == 'edit') {
+      final userDataCubit = context.read<UserDataCubit>();
+      _nameController = TextEditingController(
+          text: userDataCubit.state.pets[widget.index!].name);
+      _breedController = TextEditingController(
+          text: userDataCubit.state.pets[widget.index!].breed);
+      _selectedSex = userDataCubit.state.pets[widget.index!].petSex;
+      _notesController = TextEditingController(
+          text: userDataCubit.state.pets[widget.index!].notes);
+      _selectedBehavior = userDataCubit.state.pets[widget.index!].behavior;
+      _selectedAge = userDataCubit.state.pets[widget.index!].age;
+    } else {
+      _nameController = TextEditingController();
+      _breedController = TextEditingController();
+      _notesController = TextEditingController();
+      _selectedBehavior = PetBehavior.bueno;
+      _selectedSex = PetSex.macho;
+      _selectedAge = PetAge.adulto;
+    }
   }
 
   @override
@@ -93,17 +104,23 @@ class _EditPetState extends State<EditPet> {
         ),
         child: Column(
           children: [
-            const Text('Editar mascota',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            Text(widget.type == 'edit' ? 'Editar mascota' : 'Añadir mascota',
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             const SizedBox(height: 16),
             CircleAvatar(
               radius: 80,
               backgroundImage: const AssetImage('assets/pet.jpeg'),
-              foregroundImage:
-                  userDataCubit.state.pets[widget.index].avatarURL.isNotEmpty
+              foregroundImage: widget.type == 'edit'
+                  ? userDataCubit.state.pets[widget.index!].avatarURL.isNotEmpty
                       ? NetworkImage(
-                          userDataCubit.state.pets[widget.index].avatarURL)
+                          userDataCubit.state.pets[widget.index!].avatarURL)
+                      : _image != null
+                          ? FileImage(File(_image!.path))
+                          : Image.asset('assets/pet.jpeg').image
+                  : _image != null
+                      ? FileImage(File(_image!.path))
                       : Image.asset('assets/pet.jpeg').image,
             ),
             const SizedBox(height: 16),
@@ -188,7 +205,7 @@ class _EditPetState extends State<EditPet> {
                   items: PetSex.values.map((sex) {
                     return DropdownMenuItem<PetSex>(
                       value: sex,
-                      child: Text(sex.name),
+                      child: Text(petSexValues[sex]!),
                     );
                   }).toList(),
                   onChanged: (value) {
@@ -201,17 +218,18 @@ class _EditPetState extends State<EditPet> {
               ],
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text('Comportamiento: '),
-                const SizedBox(width: 16),
+                const SizedBox(width: 8),
                 DropdownButton<PetBehavior>(
                   borderRadius: BorderRadius.circular(8),
-                  dropdownColor: Colors.white,
                   value: _selectedBehavior,
                   items: PetBehavior.values.map((behavior) {
                     return DropdownMenuItem<PetBehavior>(
                       value: behavior,
-                      child: Text(behavior.name),
+                      child: Text(petBehaviorValues[behavior]!,
+                          style: const TextStyle(fontSize: 14)),
                     );
                   }).toList(),
                   onChanged: (value) {
@@ -220,15 +238,20 @@ class _EditPetState extends State<EditPet> {
                     });
                   },
                 ),
-                const SizedBox(width: 16),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
                 const Text('Edad:'),
                 const SizedBox(width: 16),
-                DropdownButton<int>(
+                DropdownButton<PetAge>(
+                  borderRadius: BorderRadius.circular(8),
                   value: _selectedAge,
-                  items: List<int>.generate(31, (i) => i).map((int value) {
-                    return DropdownMenuItem<int>(
-                      value: value,
-                      child: Text(value.toString()),
+                  items: PetAge.values.map((age) {
+                    return DropdownMenuItem<PetAge>(
+                      value: age,
+                      child: Text(petAgeValues[age]!),
                     );
                   }).toList(),
                   onChanged: (value) {
@@ -255,7 +278,7 @@ class _EditPetState extends State<EditPet> {
               ),
             ),
             const SizedBox(height: 8),
-            Container(
+            SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -266,41 +289,11 @@ class _EditPetState extends State<EditPet> {
                   ),
                 ),
                 onPressed: () {
-                  final pet = Pet(
-                    id: userDataCubit.state.pets[widget.index].id,
-                    name: _nameController.text,
-                    breed: _breedController.text,
-                    age: _selectedAge!,
-                    petSex: _selectedSex ?? PetSex.macho,
-                    behavior: _selectedBehavior!,
-                    isBeingWalked:
-                        userDataCubit.state.pets[widget.index].isBeingWalked,
-                    avatarURL: userDataCubit.state.pets[widget.index].avatarURL,
-                    notes: _notesController.text,
-                  );
-                  try {
-                    userDataCubit.updatePet(widget.index, pet);
-                    RedisDatabase().storeUserData(
-                      userDataCubit.state.copyWith(pets: [
-                        ...userDataCubit.state.pets
-                          ..removeAt(widget.index)
-                          ..insert(widget.index, pet)
-                      ]),
-                    );
-                    Get.snackbar('Actualizado', '${pet.name} actualizado',
-                        icon: const Icon(Icons.check),
-                        colorText: Colors.white,
-                        backgroundColor: Colors.green);
-                    Navigator.of(context).pop();
-                  } catch (e) {
-                    log('Error actualizando mascota: $e');
-                    Get.snackbar('Error', 'Error actualizando mascota',
-                        icon: const Icon(Icons.error),
-                        colorText: Colors.white,
-                        backgroundColor: Colors.red);
-                  }
+                  widget.type == 'edit'
+                      ? _updatePet(userDataCubit, context)
+                      : _addPet(userDataCubit, context);
                 },
-                child: const Text('Actualizar'),
+                child: Text(widget.type == 'edit' ? 'Actualizar' : 'Añadir'),
               ),
             ),
           ],
@@ -309,12 +302,95 @@ class _EditPetState extends State<EditPet> {
     );
   }
 
+  void _updatePet(UserDataCubit userDataCubit, BuildContext context) async {
+    String imageURL = '';
+    if (_image != null) {
+      imageURL = await uploadImage();
+    }
+
+    final pet = Pet(
+      id: userDataCubit.state.pets[widget.index!].id,
+      name: _nameController.text,
+      breed: _breedController.text,
+      age: _selectedAge ?? PetAge.adulto,
+      petSex: _selectedSex ?? PetSex.macho,
+      behavior: _selectedBehavior!,
+      isBeingWalked: userDataCubit.state.pets[widget.index!].isBeingWalked,
+      avatarURL: imageURL.isNotEmpty
+          ? imageURL
+          : userDataCubit.state.pets[widget.index!].avatarURL,
+      notes: _notesController.text,
+    );
+    try {
+      if (_image != null) {
+        uploadImage().then((value) => setPetAvatar(value));
+      }
+      userDataCubit.updatePet(widget.index!, pet);
+      RedisDatabase().storeUserData(
+        userDataCubit.state.copyWith(pets: [
+          ...userDataCubit.state.pets
+            ..removeAt(widget.index!)
+            ..insert(widget.index!, pet)
+        ]),
+      );
+      Get.snackbar('Actualizado', '${pet.name} actualizado',
+          icon: const Icon(Icons.check),
+          colorText: Colors.white,
+          backgroundColor: Colors.green);
+      Navigator.of(context).pop();
+    } catch (e) {
+      log('Error actualizando mascota: $e');
+      Get.snackbar('Error', 'Error actualizando mascota',
+          icon: const Icon(Icons.error),
+          colorText: Colors.white,
+          backgroundColor: Colors.red);
+    }
+  }
+
+  void _addPet(UserDataCubit userDataCubit, BuildContext context) async {
+    String imageURL = '';
+    if (_image != null) {
+      imageURL = await uploadImage();
+    }
+
+    final pet = Pet(
+      id: _newPetID,
+      name: _nameController.text,
+      breed: _breedController.text,
+      age: _selectedAge ?? PetAge.adulto,
+      petSex: _selectedSex ?? PetSex.macho,
+      behavior: _selectedBehavior!,
+      isBeingWalked: false,
+      avatarURL: imageURL,
+      notes: _notesController.text,
+    );
+    try {
+      userDataCubit.addPet(pet);
+      Get.snackbar('Añadido', '${pet.name} añadido',
+          icon: const Icon(Icons.check),
+          colorText: Colors.white,
+          backgroundColor: Colors.green);
+      Navigator.of(context).pop();
+    } catch (e) {
+      log('Error añadiendo mascota: $e');
+      Get.snackbar('Error', 'Error añadiendo mascota',
+          icon: const Icon(Icons.error),
+          colorText: Colors.white,
+          backgroundColor: Colors.red);
+    }
+  }
+
+  /// Upload image to Supabase storage
+  /// and returns the URL String of the uploaded image
   Future<String> uploadImage() async {
     final userDataCubit = context.read<UserDataCubit>();
+    final String petID = widget.type == 'edit'
+        ? userDataCubit.state.pets[widget.index!].id
+        : _newPetID;
     try {
       String imageURL = '';
-      await SupabaseDatabase.uploadAvatar(File(_image!.path),
-              '${supabase.auth.currentUser!.id}-${userDataCubit.state.pets[widget.index].id}')
+      await SupabaseDatabase.uploadAvatar(
+              File(_image!.path), '${supabase.auth.currentUser!.id}-$petID')
           .then((value) => imageURL = value);
       return imageURL;
     } catch (e) {
@@ -323,42 +399,55 @@ class _EditPetState extends State<EditPet> {
     }
   }
 
+  /// Set pet avatar URL in the user data cubit
+  ///
+  /// Uses the [avatarURL] to set the avatar URL in the user data cubit
   Future<void> setPetAvatar(String avatarURL) async {
     final userDataCubit = context.read<UserDataCubit>();
     try {
-      userDataCubit.setPetAvatar(widget.index, avatarURL);
+      userDataCubit.setPetAvatar(widget.index!, avatarURL);
     } catch (e) {
       log('Error marking pet with avatar: $e');
     }
   }
 
+  /// Delete image from Supabase storage
   Future<void> deleteImage() async {
+    if (_image != null) {
+      _image = null;
+      return;
+    }
+
     final userDataCubit = context.read<UserDataCubit>();
     try {
-      SupabaseDatabase.deleteAvatar(
-          '${supabase.auth.currentUser!.id}-${userDataCubit.state.pets[widget.index].id}');
+      await SupabaseDatabase.deleteAvatar(
+          '${supabase.auth.currentUser!.id}-${userDataCubit.state.pets[widget.index!].id}');
+      _image = null;
     } catch (e) {
       log('Error deleting avatar: $e');
     }
   }
 
+  /// Mark pet without avatar in the user data cubit
   Future<void> markPetWithoutAvatar() async {
     final userDataCubit = context.read<UserDataCubit>();
     try {
-      userDataCubit.unsetPetAvatar(widget.index);
+      userDataCubit.unsetPetAvatar(widget.index!);
     } catch (e) {
       log('Error marking pet without avatar: $e');
     }
   }
 
+  /// Process image from camera or gallery
+  /// and upload it to Supabase storage
   Future<void> processImage(String source) async {
     try {
       if (source == 'gallery') {
         await pickImageFromGallery();
-        await uploadImage().then((value) => setPetAvatar(value));
+        //await uploadImage().then((value) => setPetAvatar(value));
       } else {
         await pickImageFromCamera();
-        await uploadImage().then((value) => setPetAvatar(value));
+        //await uploadImage().then((value) => setPetAvatar(value));
       }
     } catch (e) {
       log('Error procesando imagen: $e');

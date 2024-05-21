@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/redis_database.dart';
-import 'package:pet_clean/widgets/edit_pet_widget.dart';
+import 'package:pet_clean/widgets/pet_manager_widget.dart';
 
 class ListaMascotas extends StatefulWidget {
   const ListaMascotas({super.key});
@@ -46,7 +46,7 @@ class _ListaMascotasState extends State<ListaMascotas> {
                     ),
                     title: Text(pet.name,
                         style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text('${pet.breed} - ${pet.behavior.name}',
+                    subtitle: Text('${pet.breed}',
                         style: const TextStyle(color: Colors.white)),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -56,7 +56,7 @@ class _ListaMascotasState extends State<ListaMascotas> {
                           onPressed: () {
                             Get.bottomSheet(
                               isScrollControlled: true,
-                              EditPet(
+                              PetManagerWidget(
                                 index: index,
                               ),
                             );

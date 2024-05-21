@@ -26,13 +26,88 @@ class PetDetailWidget extends StatelessWidget {
               Text(pet.name,
                   style: const TextStyle(
                       fontSize: 20, fontWeight: FontWeight.bold)),
-              Text(
-                'Raza: ${pet.breed}',
+              RichText(
+                  text: TextSpan(children: [
+                TextSpan(
+                    text: 'Raza: ',
+                    style: DefaultTextStyle.of(context)
+                        .style
+                        .copyWith(fontWeight: FontWeight.bold)),
+                TextSpan(
+                    text: pet.breed.isNotEmpty ? pet.breed : 'No definida',
+                    style: DefaultTextStyle.of(context).style),
+              ])),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Sexo: ',
+                      style: DefaultTextStyle.of(context)
+                          .style
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                      text: '${petSexValues[pet.petSex]}',
+                      style: DefaultTextStyle.of(context).style,
+                    ),
+                  ],
+                ),
               ),
-              Text('Comportamiento: ${pet.behavior.name}'),
-              Text('Edad: ${pet.age} años'),
-              Text('Sexo: ${pet.petSex.name}'),
-              if (pet.notes.isNotEmpty) Text('Notas: ${pet.notes}'),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Edad: ',
+                      style: DefaultTextStyle.of(context)
+                          .style
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                      text: '${petAgeValues[pet.age]}',
+                      style: DefaultTextStyle.of(context).style,
+                    ),
+                  ],
+                ),
+              ),
+              RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Comportamiento: ',
+                      style: DefaultTextStyle.of(context)
+                          .style
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                      text: '${petBehaviorValues[pet.behavior]}',
+                      style: DefaultTextStyle.of(context).style,
+                    ),
+                  ],
+                ),
+              ),
+              if (pet.notes.isNotEmpty) ...[
+                const SizedBox(
+                  height: 10,
+                ),
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Notas: ',
+                        style: DefaultTextStyle.of(context)
+                            .style
+                            .copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(
+                        text: pet.notes,
+                        style: DefaultTextStyle.of(context).style,
+                      ),
+                    ],
+                  ),
+                ),
+              ]
             ],
           ),
         ),

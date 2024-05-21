@@ -68,11 +68,7 @@ class FirstPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: petWalkingCount > 0
-                  ? const Padding(
-                      padding: EdgeInsets.all(15.0),
-                      child: Text('¡Vamos a pasear!',
-                          style: TextStyle(color: Colors.white)),
-                    ).animate().fade()
+                  ? null
                   : const Padding(
                       padding: EdgeInsets.all(15.0),
                       child: Text('Selecciona al menos una mascota para pasear',

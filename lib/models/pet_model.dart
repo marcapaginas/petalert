@@ -1,14 +1,36 @@
 import 'dart:convert' as convert;
 
-enum PetBehavior { bueno, neutral, malo }
+enum PetBehavior { bueno, malMachos, malHembras, malNinos, malTodos }
+
+const petBehaviorValues = {
+  PetBehavior.bueno: 'Se lleva bien con todos',
+  PetBehavior.malHembras: 'No se lleva bien con hembras',
+  PetBehavior.malMachos: 'No se lleva bien con machos',
+  PetBehavior.malNinos: 'No se lleva bien con niños',
+  PetBehavior.malTodos: 'Mejor solo',
+};
 
 enum PetSex { macho, hembra }
+
+const petSexValues = {
+  PetSex.macho: 'Macho',
+  PetSex.hembra: 'Hembra',
+};
+
+enum PetAge { cachorro, adolescente, adulto, anciano }
+
+const petAgeValues = {
+  PetAge.cachorro: 'Cachorro (0-6 meses)',
+  PetAge.adolescente: 'Adolescente (6 meses - 2 años)',
+  PetAge.adulto: 'Adulto (2-8 años)',
+  PetAge.anciano: 'Anciano (8+ años)',
+};
 
 class Pet {
   final String id;
   final String name;
   final String breed;
-  final int age;
+  final PetAge age;
   final PetSex petSex;
   final PetBehavior behavior;
   final bool isBeingWalked;
@@ -46,7 +68,7 @@ class Pet {
       id: map['id'],
       name: map['name'],
       breed: map['breed'],
-      age: map['age'],
+      age: PetAge.values[map['age']],
       petSex: PetSex.values[map['petSex']],
       behavior: PetBehavior.values[map['behavior']],
       isBeingWalked: map['isBeingWalked'] == true,
@@ -59,7 +81,7 @@ class Pet {
     String? id,
     String? name,
     String? breed,
-    int? age,
+    PetAge? age,
     PetSex? petSex,
     PetBehavior? behavior,
     bool? isBeingWalked,
@@ -88,7 +110,7 @@ class Pet {
         'id': id,
         'name': name,
         'breed': breed,
-        'age': age,
+        'age': age.index,
         'petSex': petSex.index,
         'behavior': behavior.index,
         'isBeingWalked': isBeingWalked,
@@ -101,7 +123,7 @@ class Pet {
       id: json['id'],
       name: json['name'],
       breed: json['breed'],
-      age: json['age'],
+      age: PetAge.values[json['age']],
       petSex: PetSex.values[json['petSex']],
       behavior: PetBehavior.values[json['behavior']],
       isBeingWalked: json['isBeingWalked'],
