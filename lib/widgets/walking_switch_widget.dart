@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/blocs/walking_cubit.dart';
+import 'package:pet_clean/database/redis_database.dart';
 
 class WalkingSwitch extends StatefulWidget {
   const WalkingSwitch({
@@ -21,7 +22,6 @@ class _WalkingSwitchState extends State<WalkingSwitch>
   @override
   void initState() {
     super.initState();
-
     _controller = AnimationController(vsync: this);
   }
 
@@ -46,6 +46,8 @@ class _WalkingSwitchState extends State<WalkingSwitch>
           );
         } else {
           walkingCubit.toggleWalking();
+          userDataCubit.toggleWalking();
+          RedisDatabase().storeUserData(userDataCubit.state);
         }
       },
       child: Row(
@@ -66,7 +68,7 @@ class _WalkingSwitchState extends State<WalkingSwitch>
                       'assets/perrito_marron_andando.json',
                       animate: walkingCubit.state ? true : false,
                       width: 80,
-                      height: 800,
+                      height: 80,
                       fit: BoxFit.cover,
                     ),
                   ),

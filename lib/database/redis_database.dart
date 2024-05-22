@@ -184,7 +184,7 @@ class RedisDatabase {
       ]);
 
       if (response.runtimeType == RedisError) {
-        throw Exception("Error fetching user locations: ${response.message}");
+        throw Exception("Error getting user locations: ${response.message}");
       }
 
       for (var i = 0; i < response.length; i++) {
@@ -192,7 +192,10 @@ class RedisDatabase {
         final List<dynamic> coordinates = item[1];
         final String userId = item[0];
 
-        if (userId != currentUserId) {
+        // check if user id is walking
+        final userData = await getUserData(userId);
+
+        if (userId != currentUserId && userData.isWalking) {
           result.add(UserLocationModel(
             userId: userId,
             latitude: double.parse(coordinates[1]),

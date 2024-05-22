@@ -18,14 +18,23 @@ class UserDataCubit extends Cubit<UserData> {
   void updateUserData({
     required String userId,
     required String nombre,
+    required bool isWalking,
     required bool backgroundNotify,
     required List<Pet> pets,
   }) {
     final userData = state.copyWith(
       userId: userId,
       nombre: nombre,
+      isWalking: isWalking,
       backgroundNotify: backgroundNotify,
       pets: pets,
+    );
+    emit(userData);
+  }
+
+  void toggleWalking() {
+    final userData = state.copyWith(
+      isWalking: !state.isWalking,
     );
     emit(userData);
   }

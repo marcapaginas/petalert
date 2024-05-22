@@ -18,15 +18,8 @@ class MapPage extends StatelessWidget {
               Lottie.asset('assets/siluetas_perros.json', width: 300),
               const SizedBox(height: 20),
               const Center(
-                child: Text('Debes iniciar el paseo para ver el mapa.'),
+                child: Text('Debes empezar el paseo para ver el mapa.'),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                  onPressed: () => walkingCubit.toggleWalking(),
-                  child: const Text(
-                    'Iniciar paseo',
-                    style: TextStyle(color: Colors.green),
-                  ))
             ],
           );
   }
