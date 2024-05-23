@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:get/get.dart';
 import 'package:pet_clean/blocs/alerts_cubit.dart';
 import 'package:pet_clean/blocs/map_options_cubit.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
@@ -33,6 +32,7 @@ class _HomePageState extends State<HomePage> {
   String userId = supabase.auth.currentUser!.id;
   Timer? _timerCheckOtherUsersLocation;
   StreamSubscription<Position>? _positionStreamSubscription;
+  final int _minutes = 5;
 
   int _selectedIndex = 0;
   final PageController _pageController = PageController(initialPage: 0);
@@ -107,14 +107,22 @@ class _HomePageState extends State<HomePage> {
           final userLocation = mapOptionsCubit.state.userLocation;
           final radius = mapOptionsCubit.state.metersRange;
           if (userLocation != null) {
+            // RedisDatabase()
+            //     .getUserLocationsByDistance(
+            //         userLocation.longitude, userLocation.latitude, radius)
+            //     .then((result) {
+            //   log('found ${result.length} users');
+            //   mapOptionsCubit.setOtherUsersLocations(result);
+            //   alertsCubit.setAlerts(result);
+            // });
             RedisDatabase()
-                .getUserLocationsByDistance(
-                    userLocation.longitude, userLocation.latitude, radius)
-                .then((result) {
-              log('found ${result.length} users');
-              mapOptionsCubit.setOtherUsersLocations(result);
-              alertsCubit.setAlerts(result);
-            });
+                .getActiveUserLocations(userLocation.longitude,
+                    userLocation.latitude, radius, _minutes)
+                .then((result) => {
+                      log('found ${result.length} users'),
+                      mapOptionsCubit.setOtherUsersLocations(result),
+                      alertsCubit.setAlerts(result)
+                    });
           }
         }
       });
@@ -162,7 +170,7 @@ class _HomePageState extends State<HomePage> {
         userId: userDataCubit.state.userId,
         latitude: position.latitude,
         longitude: position.longitude,
-        lastUpdate: DateTime.now()));
+        lastUpdate: DateTime.now().millisecondsSinceEpoch));
   }
 
   void _onItemTapped(int index) {

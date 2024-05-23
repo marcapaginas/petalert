@@ -7,7 +7,6 @@ import 'package:flutter_map_geojson/flutter_map_geojson.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/classes/custom_geo_json_parser.dart';
 import 'package:pet_clean/database/redis_database.dart';
-import 'package:pet_clean/models/pet_model.dart';
 import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/models/user_location_model.dart';
 import 'package:pet_clean/widgets/marker_detail_widget.dart';

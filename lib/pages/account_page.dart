@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:pet_clean/blocs/user_data_cubit.dart';
 import 'package:pet_clean/database/redis_database.dart';
 import 'package:pet_clean/database/supabase_database.dart';
 import 'package:pet_clean/models/user_data_model.dart';
 import 'package:pet_clean/widgets/lista_mascotas.dart';
+import 'package:pet_clean/widgets/pet_manager_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AccountPage extends StatefulWidget {
@@ -80,6 +82,8 @@ class _AccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userDataCubit = context.watch<UserDataCubit>();
+
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
@@ -136,7 +140,28 @@ class _AccountPageState extends State<AccountPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const ListaMascotas(),
+                userDataCubit.state.pets.isEmpty
+                    ? Expanded(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text('No tienes mascotas registradas'),
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Abre el formulario para añadir una nueva mascota
+                                  Get.bottomSheet(
+                                    isScrollControlled: true,
+                                    const PetManagerWidget(type: 'add'),
+                                  );
+                                },
+                                child: const Text('Añadir mascota'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : const ListaMascotas(),
                 const SizedBox(height: 25),
                 // ElevatedButton(
                 //   onPressed: () {

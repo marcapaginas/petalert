@@ -6,7 +6,7 @@ class UserLocationModel {
   final String userId;
   final double latitude;
   final double longitude;
-  final DateTime? lastUpdate;
+  final int? lastUpdate;
 
   UserLocationModel(
       {required this.userId,
@@ -23,7 +23,7 @@ class UserLocationModel {
     String? userId,
     double? latitude,
     double? longitude,
-    DateTime? lastUpdate,
+    int? lastUpdate,
   }) {
     return UserLocationModel(
       userId: userId ?? this.userId,

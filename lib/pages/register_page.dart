@@ -53,11 +53,13 @@ class RegisterPage extends StatelessWidget {
                   await Supabase.instance.client.auth.signUp(
                       password: passwordController.text,
                       email: emailController.text);
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('Registro completado con éxito')));
+                  ScaffoldMessenger.of(Get.context!).showSnackBar(
+                      const SnackBar(
+                          content: Text('Registro completado con éxito')));
                 } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('Error al registrar el usuario')));
+                  ScaffoldMessenger.of(Get.context!).showSnackBar(
+                      const SnackBar(
+                          content: Text('Error al registrar el usuario')));
                 }
               },
               child: const Text('Registrarse como usuario'),

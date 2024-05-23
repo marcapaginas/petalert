@@ -46,7 +46,7 @@ class _ListaMascotasState extends State<ListaMascotas> {
                     ),
                     title: Text(pet.name,
                         style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text('${pet.breed}',
+                    subtitle: Text(pet.breed,
                         style: const TextStyle(color: Colors.white)),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,

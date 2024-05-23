@@ -337,7 +337,7 @@ class _PetManagerState extends State<PetManagerWidget> {
           icon: const Icon(Icons.check),
           colorText: Colors.white,
           backgroundColor: Colors.green);
-      Navigator.of(context).pop();
+      Navigator.of(Get.context!).pop();
     } catch (e) {
       log('Error actualizando mascota: $e');
       Get.snackbar('Error', 'Error actualizando mascota',
@@ -370,7 +370,7 @@ class _PetManagerState extends State<PetManagerWidget> {
           icon: const Icon(Icons.check),
           colorText: Colors.white,
           backgroundColor: Colors.green);
-      Navigator.of(context).pop();
+      Navigator.of(Get.context!).pop();
     } catch (e) {
       log('Error añadiendo mascota: $e');
       Get.snackbar('Error', 'Error añadiendo mascota',

@@ -84,7 +84,7 @@ class RedisDatabase {
           "HSET",
           "userLocationUpdates",
           userLocation.userId,
-          userLocation.lastUpdate!.millisecondsSinceEpoch.toString(),
+          userLocation.lastUpdate,
         ]);
       }
     } catch (e) {
@@ -96,69 +96,59 @@ class RedisDatabase {
     }
   }
 
-  // get al user locations
-  Future<List<UserLocationModel>> getUserLocations() async {
-    final command = await connectAndAuth();
-    final members =
-        await command.send_object(["ZRANGE", "userLocations", "0", "-1"]);
-    final locations = <UserLocationModel>[];
-
-    for (var userId in members) {
-      final coordinates =
-          await command.send_object(["GEOPOS", "userLocations", userId]);
-      if (coordinates.isNotEmpty) {
-        locations.add(UserLocationModel(
-          userId: userId,
-          longitude: double.parse(coordinates[0][0]),
-          latitude: double.parse(coordinates[0][1]),
-        ));
-      }
-    }
-    log(locations.toString());
-
-    return locations;
-  }
-
   Future<List<UserLocationModel>> getActiveUserLocations(
       double longitude, double latitude, double radius, int minutes) async {
     final command = await connectAndAuth();
-    final fiveMinutesAgo = DateTime.now()
-        .subtract(Duration(minutes: minutes))
-        .millisecondsSinceEpoch;
-    final nearbyUserIds = await command.send_object([
+    final currentTime = DateTime.now();
+    String currentUserId = Supabase.instance.client.auth.currentUser!.id;
+
+    // Obtener usuarios cercanos junto con sus posiciones
+    final nearbyUsers = await command.send_object([
       "GEORADIUS",
       "userLocations",
       longitude.toString(),
       latitude.toString(),
       radius.toString(),
-      "m"
+      "m",
+      "WITHCOORD"
     ]);
+
+    if (nearbyUsers.isEmpty) {
+      return [];
+    }
+
+    // Obtener IDs de los usuarios cercanos
+    final nearbyUserIds = nearbyUsers.map((user) => user[0]).toList();
+
+    // Obtener los tiempos de actualización de los usuarios cercanos
     final updates = await command
         .send_object(["HMGET", "userLocationUpdates", ...nearbyUserIds]);
 
-    final activeUserIds = <String>[];
-    for (var i = 0; i < nearbyUserIds.length; i++) {
-      final userId = nearbyUserIds[i];
-      final lastUpdate = int.parse(updates[i]);
-      if (lastUpdate >= fiveMinutesAgo) {
-        activeUserIds.add(userId);
+    // Filtrar usuarios activos y crear la lista de ubicaciones
+    final activeLocations = <UserLocationModel>[];
+    for (var i = 0; i < nearbyUsers.length; i++) {
+      final List<dynamic> item = nearbyUsers[i];
+      final String userId = item[0];
+      final List<dynamic> coordinates = item[1];
+
+      final lastUpdate = int.tryParse(updates[i]) ?? 0;
+      final lastUpdateDate = DateTime.fromMillisecondsSinceEpoch(lastUpdate);
+
+      if (userId != currentUserId) {
+        int diff = currentTime.difference(lastUpdateDate).inMinutes;
+
+        // tomamos en cuenta solo las ubicaciones actualizadas en los últimos minutos
+        if (diff <= minutes) {
+          activeLocations.add(UserLocationModel(
+            userId: userId,
+            longitude: double.parse(coordinates[0]),
+            latitude: double.parse(coordinates[1]),
+          ));
+        }
       }
     }
 
-    final locations = <UserLocationModel>[];
-    for (var userId in activeUserIds) {
-      final coordinates =
-          await command.send_object(["GEOPOS", "userLocations", userId]);
-      if (coordinates.isNotEmpty) {
-        locations.add(UserLocationModel(
-          userId: userId,
-          longitude: double.parse(coordinates[0][0]),
-          latitude: double.parse(coordinates[0][1]),
-        ));
-      }
-    }
-
-    return locations;
+    return activeLocations;
   }
 
   Future<List<UserLocationModel>> getUserLocationsByDistance(
@@ -192,10 +182,7 @@ class RedisDatabase {
         final List<dynamic> coordinates = item[1];
         final String userId = item[0];
 
-        // check if user id is walking
-        final userData = await getUserData(userId);
-
-        if (userId != currentUserId && userData.isWalking) {
+        if (userId != currentUserId) {
           result.add(UserLocationModel(
             userId: userId,
             latitude: double.parse(coordinates[1]),
