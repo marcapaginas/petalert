@@ -39,6 +39,39 @@ class RedisDatabase {
     }
   }
 
+  void processHashMap(Map<String, dynamic> hashMap, List<dynamic> hmsetData) {
+    hashMap.forEach((key, value) {
+      if (value is Map<String, dynamic>) {
+        // Si el valor es un HashMap, se llama recursivamente
+        processHashMap(value, hmsetData);
+      } else {
+        // Si el valor no es un HashMap, se añade a la lista
+        hmsetData
+          ..add(key)
+          ..add(value.toString());
+      }
+    });
+  }
+
+  Future<void> setUser(UserData user) async {
+    final command = await connectAndAuth();
+
+    // Convertir el objeto de usuario a un mapa
+    Map<String, dynamic> userMap = user.toMap();
+
+    // Preparar los datos para HMSET
+    List<dynamic> hmsetData = [];
+    processHashMap(userMap, hmsetData);
+    // userMap.forEach((key, value) {
+    //   hmsetData
+    //     ..add(key)
+    //     ..add(value.toString());
+    // });
+
+    // Guardar el usuario en Redis como un hashmap
+    await command.send_object(['HMSET', 'user:${user.userId}', ...hmsetData]);
+  }
+
   Future<UserData> getUserData(String userId) async {
     UserData userData = UserData.empty;
     RedisConnection? redisConnection;
