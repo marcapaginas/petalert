@@ -99,6 +99,18 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ],
                   ),
+                  const Text(
+                    'ACCEDER',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const Text('Nos alegra verte de nuevo',
+                      style: TextStyle(
+                        color: Colors.white,
+                      )),
                   const SizedBox(height: 10),
                   TextFormField(
                     controller: _emailController,
