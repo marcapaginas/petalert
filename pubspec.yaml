@@ -16,7 +16,7 @@ dependencies:
 
   #Geolocalización
   geolocator: ^11.0.0
-  latlong: ^0.9.1
+  latlong2: ^0.9.1
 
   #Notificaciones
   awesome_notifications_core: ^0.9.3
