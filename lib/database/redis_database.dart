@@ -13,7 +13,7 @@ class RedisDatabase {
   Future<Command> connectAndAuth() async {
     Command command =
         await conn.connect(dotenv.get('REDIS_HOST_PETALERT'), 6379);
-    await command.send_object(["AUTH", 'petalert']);
+    await command.send_object(["AUTH", dotenv.get('REDIS_PASSWORD')]);
     return command;
   }
 
