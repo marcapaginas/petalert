@@ -15,6 +15,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
   bool _redirecting = false;
+  bool _obscureText = true;
   late final TextEditingController _emailController = TextEditingController();
   late final TextEditingController _passwordController =
       TextEditingController();
@@ -127,16 +128,30 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 18),
                   TextFormField(
                     controller: _passwordController,
-                    decoration: const InputDecoration(
-                        labelText: 'Password',
-                        fillColor: Colors.white,
-                        labelStyle: TextStyle(color: Colors.black38),
-                        prefixIcon: Icon(Icons.password),
-                        focusColor: Colors.green,
-                        focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.greenAccent)),
-                        filled: true),
-                    obscureText: true,
+                    obscureText: _obscureText,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      fillColor: Colors.white,
+                      labelStyle: const TextStyle(color: Colors.black38),
+                      prefixIcon: const Icon(Icons.password),
+                      focusColor: Colors.green,
+                      focusedBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.greenAccent)),
+                      filled: true,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.black38,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 18),
                   ElevatedButton(
@@ -160,7 +175,8 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: () {
                           Navigator.of(context).pushNamed('/register');
                         },
-                        child: const Text('Registrarse'),
+                        child: const Text('Registrate aquí',
+                            style: TextStyle(color: Colors.yellow)),
                       ),
                       const SizedBox(width: 10),
                       TextButton(

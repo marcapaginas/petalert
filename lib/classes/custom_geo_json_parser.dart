@@ -4,11 +4,6 @@ import 'package:pet_clean/database/supabase_database.dart';
 
 class CustomGeoJsonParser extends GeoJsonParser {
   @override
-  set setDefaultCircleMarkerColor(Color color) {
-    defaultCircleMarkerColor = color;
-  }
-
-  @override
   Widget defaultTappableMarker(Map<String, dynamic> properties,
       void Function(Map<String, dynamic>) onMarkerTap) {
     return MouseRegion(
