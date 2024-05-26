@@ -59,20 +59,15 @@ class _HomePageState extends State<HomePage> {
     final walkingCubit = context.watch<WalkingCubit>();
 
     if (walkingCubit.state) {
-      log('Walking');
       if (_positionStreamSubscription == null) {
-        log('activating position stream');
         _listenToPositionStream();
       } else {
-        log('resuming position stream');
         _positionStreamSubscription?.resume();
       }
       if (_timerCheckOtherUsersLocation == null) {
         _searchOtherUsersLocations();
       }
     } else {
-      log('Not walking');
-      log('deactivating position stream');
       _stopListeningToPositionStream();
       _stopSearchingOtherUsersLocations();
     }
@@ -107,14 +102,6 @@ class _HomePageState extends State<HomePage> {
           final userLocation = mapOptionsCubit.state.userLocation;
           final radius = mapOptionsCubit.state.metersRange;
           if (userLocation != null) {
-            // RedisDatabase()
-            //     .getUserLocationsByDistance(
-            //         userLocation.longitude, userLocation.latitude, radius)
-            //     .then((result) {
-            //   log('found ${result.length} users');
-            //   mapOptionsCubit.setOtherUsersLocations(result);
-            //   alertsCubit.setAlerts(result);
-            // });
             RedisDatabase()
                 .getActiveUserLocations(userLocation.longitude,
                     userLocation.latitude, radius, _minutes)

@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class NotificationService {
-  static Timer? _timer;
-
   //id generator
   static int _id = 0;
   static int get id => _id++;
@@ -39,22 +37,6 @@ class NotificationService {
         )
       ],
     );
-  }
-
-  static void sendPeriodicNotification() {
-    //timer to run show notification every 5 seconds
-    _timer = Timer.periodic(
-      const Duration(seconds: 5),
-      (timer) {
-        show(
-            title: 'Periodic Notification',
-            body: 'This is a periodic notification');
-      },
-    );
-  }
-
-  static void cancelPeriodicNotifications() {
-    _timer?.cancel();
   }
 
   static void show({required String title, required String body}) {
